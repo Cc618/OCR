@@ -1,14 +1,13 @@
 #include <stdio.h>
-#include "error.h"
+#include "matrix.h"
 
 int main() {
-    printf("Hello world !\n");
+    Matrix *m = matrixNew(3, 2);
 
-    ASSERT(1 == 1, "1 != 1");
-    ASSERT(2 == 1, "2 != 1");
+    matrixSet(m, 0, 1, 42.f);
+    matrixPrint(m);
 
-    if (1 == 1)
-        ERROR("OMG fatal error");
+    matrixFree(m);
 
     return 0;
 }

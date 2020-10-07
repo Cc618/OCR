@@ -11,7 +11,7 @@ typedef struct Matrix_t {
     float *data;
 } Matrix;
 
-// * Matrix *matrixNew(size_t rows, size_t cols);
+Matrix *matrixNew(size_t rows, size_t cols);
 
 // Matrix new and the memory is zeroed
 // * Matrix *matrixZero(size_t rows, size_t cols);
@@ -21,15 +21,15 @@ typedef struct Matrix_t {
 
 // * Matrix *matrixCopy(const Matrix *other);
 
-// * void matrixFree(const Matrix *m);
+void matrixFree(Matrix *m);
 
-// * void matrixPrint(const Matrix *m);
+void matrixPrint(const Matrix *m);
 
 // Safe method to get an item from a matrix
 // * float matrixGet(const Matrix *m, size_t i, size_t j);
 
 // Safely set value
-// * void matrixSet(Matrix *m, size_t i, size_t j, float val);
+void matrixSet(Matrix *m, size_t i, size_t j, float val);
 
 // Matrix product
 // * Matrix *matrixDot(const Matrix *a, const Matrix *b);
