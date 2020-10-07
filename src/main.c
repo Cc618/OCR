@@ -2,7 +2,13 @@
 #include "matrix.h"
 
 int main() {
-    Matrix *m = matrixNew(3, 2);
+    const float data[6] = {
+            1, 4,
+            2, 5,
+            3, 6,
+        };
+
+    Matrix *m = matrixCreate(3, 2, data);
 
     matrixSet(m, 0, 1, 42.f);
     matrixPrint(m);

@@ -13,6 +13,9 @@ typedef struct Matrix_t {
 
 Matrix *matrixNew(size_t rows, size_t cols);
 
+// matrixNew with an initializer
+Matrix *matrixCreate(size_t rows, size_t cols, const float *data);
+
 // Matrix new and the memory is zeroed
 // * Matrix *matrixZero(size_t rows, size_t cols);
 
