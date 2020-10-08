@@ -40,15 +40,18 @@ void matrixSet(Matrix *m, size_t i, size_t j, float val);
 // Transposed product a^T * b
 // * Matrix *matrixDotT(const Matrix *a, const Matrix *b);
 
-// Element wise operations
-// * Matrix *matrixAdd(const Matrix *a, const Matrix *b);
-// * Matrix *matrixSub(const Matrix *a, const Matrix *b);
-// * Matrix *matrixMul(const Matrix *a, const Matrix *b);
-// * Matrix *matrixDiv(const Matrix *a, const Matrix *b);
+// Inplace element wise operations
+// * void matrixAdd(Matrix *a, float b);
+// * void matrixSub(Matrix *a, float b);
+// * void matrixMul(Matrix *a, float b);
+// * void matrixDiv(Matrix *a, float b);
+// * void matrixAddMat(Matrix *a, const Matrix *b);
+// * void matrixSubMat(Matrix *a, const Matrix *b);
+// * void matrixMulMat(Matrix *a, const Matrix *b);
+// * void matrixDivMat(Matrix *a, const Matrix *b);
 
-// Map element wise function to matrix
-// * Matrix *matrixMap(const Matrix *a, float (*func)(float value));
-// * void matrixMapInplace(Matrix *a, float (*func)(float value));
+// Inplace map element wise function to matrix
+// * void matrixMap(Matrix *a, float (*func)(float value));
 
 #endif // MATRIX_H
 
