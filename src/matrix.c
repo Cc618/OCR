@@ -73,3 +73,26 @@ void matrixMap(Matrix *m, float (*func)(float value)) {
             MAT_GET(m, i, j) = func(MAT_GET(m, i, j));
 }
 
+void matrixAdd(Matrix *a, float b) {
+    for (size_t i = 0; i < a->rows; ++i)
+        for (size_t j = 0; j < a->cols; ++j)
+            MAT_GET(a, i, j) += b;
+}
+
+void matrixSub(Matrix *a, float b) {
+    for (size_t i = 0; i < a->rows; ++i)
+        for (size_t j = 0; j < a->cols; ++j)
+            MAT_GET(a, i, j) -= b;
+}
+
+void matrixMul(Matrix *a, float b) {
+    for (size_t i = 0; i < a->rows; ++i)
+        for (size_t j = 0; j < a->cols; ++j)
+            MAT_GET(a, i, j) *= b;
+}
+
+void matrixDiv(Matrix *a, float b) {
+    for (size_t i = 0; i < a->rows; ++i)
+        for (size_t j = 0; j < a->cols; ++j)
+            MAT_GET(a, i, j) /= b;
+}
