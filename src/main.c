@@ -9,9 +9,11 @@ int main() {
         };
 
     Matrix *m = matrixCreate(3, 2, data);
-    Matrix *m2 = matrixLike(m);
-
     matrixSet(m, 0, 1, 42.f);
+
+    Matrix *m2 = matrixCopy(m);
+    matrixSet(m2, 0, 1, 8.f);
+
     matrixPrint(m);
     matrixPrint(m2);
 

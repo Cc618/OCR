@@ -22,7 +22,7 @@ Matrix *matrixCreate(size_t rows, size_t cols, const float *data);
 // matrixNew(other->rows, other->cols)
 Matrix *matrixLike(const Matrix *other);
 
-// * Matrix *matrixCopy(const Matrix *other);
+Matrix *matrixCopy(const Matrix *other);
 
 void matrixFree(Matrix *m);
 

@@ -30,6 +30,14 @@ Matrix *matrixLike(const Matrix *other) {
     return matrixNew(other->rows, other->cols);
 }
 
+Matrix *matrixCopy(const Matrix *other) {
+    Matrix *m = matrixLike(other);
+
+    memcpy(m->data, other->data, sizeof(float) * m->rows * m->cols);
+
+    return m;
+}
+
 void matrixFree(Matrix *m) {
     free(m->data);
     free(m);
