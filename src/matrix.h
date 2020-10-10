@@ -41,10 +41,14 @@ void matrixSet(Matrix *m, size_t i, size_t j, float val);
 // * Matrix *matrixDotT(const Matrix *a, const Matrix *b);
 
 // Inplace element wise operations
-// * void matrixAdd(Matrix *a, float b);
-// * void matrixSub(Matrix *a, float b);
-// * void matrixMul(Matrix *a, float b);
-// * void matrixDiv(Matrix *a, float b);
+void matrixAdd(Matrix *a, float b);
+
+void matrixSub(Matrix *a, float b);
+
+void matrixMul(Matrix *a, float b);
+
+void matrixDiv(Matrix *a, float b);
+
 // * void matrixAddMat(Matrix *a, const Matrix *b);
 // * void matrixSubMat(Matrix *a, const Matrix *b);
 // * void matrixMulMat(Matrix *a, const Matrix *b);
