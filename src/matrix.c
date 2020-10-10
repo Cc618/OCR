@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 #include "matrix.h"
 #include "error.h"
 
@@ -44,13 +45,19 @@ void matrixFree(Matrix *m) {
 }
 
 void matrixPrint(const Matrix *m) {
+    printf("[ ");
+
     for (size_t i = 0; i < m->rows; ++i) {
-        printf(MAT_PRINT_FORMAT, MAT_GET(m, i, 0));
+        printf(i != 0 ? "  " MAT_PRINT_FORMAT : MAT_PRINT_FORMAT,
+                MAT_GET(m, i, 0));
+
         for (size_t j = 1; j < m->cols; ++j)
             printf(" " MAT_PRINT_FORMAT, MAT_GET(m, i, j));
 
-        putchar('\n');
+        if (i != m->rows - 1)
+            putchar('\n');
     }
+    puts(" ]");
 }
 
 void matrixSet(Matrix *m, size_t i, size_t j, float val) {
