@@ -67,3 +67,9 @@ void matrixSet(Matrix *m, size_t i, size_t j, float val) {
     MAT_GET(m, i, j) = val;
 }
 
+void matrixMap(Matrix *m, float (*func)(float value)) {
+    for (size_t i = 0; i < m->rows; ++i)
+        for (size_t j = 0; j < m->cols; ++j)
+            MAT_GET(m, i, j) = func(MAT_GET(m, i, j));
+}
+

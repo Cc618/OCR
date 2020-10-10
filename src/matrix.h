@@ -51,7 +51,7 @@ void matrixSet(Matrix *m, size_t i, size_t j, float val);
 // * void matrixDivMat(Matrix *a, const Matrix *b);
 
 // Inplace map element wise function to matrix
-// * void matrixMap(Matrix *a, float (*func)(float value));
+void matrixMap(Matrix *m, float (*func)(float value));
 
 #endif // MATRIX_H
 
