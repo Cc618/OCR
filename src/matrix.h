@@ -20,7 +20,7 @@ Matrix *matrixCreate(size_t rows, size_t cols, const float *data);
 // * Matrix *matrixZero(size_t rows, size_t cols);
 
 // matrixNew(other->rows, other->cols)
-// * Matrix *matrixLike(const Matrix *other);
+Matrix *matrixLike(const Matrix *other);
 
 // * Matrix *matrixCopy(const Matrix *other);
 

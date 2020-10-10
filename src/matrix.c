@@ -26,6 +26,10 @@ Matrix *matrixCreate(size_t rows, size_t cols, const float *data) {
     return m;
 }
 
+Matrix *matrixLike(const Matrix *other) {
+    return matrixNew(other->rows, other->cols);
+}
+
 void matrixFree(Matrix *m) {
     free(m->data);
     free(m);

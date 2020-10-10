@@ -9,10 +9,13 @@ int main() {
         };
 
     Matrix *m = matrixCreate(3, 2, data);
+    Matrix *m2 = matrixLike(m);
 
     matrixSet(m, 0, 1, 42.f);
     matrixPrint(m);
+    matrixPrint(m2);
 
+    matrixFree(m2);
     matrixFree(m);
 
     return 0;
