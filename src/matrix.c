@@ -27,6 +27,14 @@ Matrix *matrixCreate(size_t rows, size_t cols, const float *data) {
     return m;
 }
 
+Matrix *matrixZero(size_t rows, size_t cols) {
+    Matrix *m = matrixNew(rows, cols);
+
+    memset(m->data, rows * cols * sizeof(float), 0);
+
+    return m;
+}
+
 Matrix *matrixLike(const Matrix *other) {
     return matrixNew(other->rows, other->cols);
 }

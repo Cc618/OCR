@@ -14,7 +14,8 @@ int main() {
             3, 6,
         };
 
-    Matrix *m = matrixCreate(3, 2, data);
+    // Matrix *m = matrixCreate(3, 2, data);
+    Matrix *m = matrixZero(3, 2);
 
     matrixMap(m, fun);
     matrixPrint(m);
