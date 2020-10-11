@@ -3,21 +3,29 @@
 #include "matrix.h"
 
 int main() {
-    const float data[6] = {
-            1, 4,
-            2, 5,
-            3, 6,
+    const float data1[] = {
+            1, 2, 1,
+            0, 1, 0,
+            2, 3, 4,
         };
 
-    Matrix *m = matrixCreate(3, 2, data);
+    const float data2[] = {
+            2, 5,
+            6, 7,
+            1, 8,
+        };
 
-    printf("%f\n", matrixGet(m, 2, 0));
-
-    // Should throw
-    matrixGet(m, 42, 42);
+    Matrix *a = matrixCreate(3, 3, data1);
+    Matrix *b = matrixCreate(3, 2, data2);
+    Matrix *m = matrixDot(a, b);
 
     matrixPrint(m);
 
+    // Should throw
+    matrixDot(b, m);
+
+    matrixFree(a);
+    matrixFree(b);
     matrixFree(m);
 
     return 0;

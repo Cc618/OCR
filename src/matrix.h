@@ -35,7 +35,7 @@ float matrixGet(const Matrix *m, size_t i, size_t j);
 void matrixSet(Matrix *m, size_t i, size_t j, float val);
 
 // Matrix product
-// * Matrix *matrixDot(const Matrix *a, const Matrix *b);
+Matrix *matrixDot(const Matrix *a, const Matrix *b);
 
 // Transposed product a^T * b
 // * Matrix *matrixDotT(const Matrix *a, const Matrix *b);

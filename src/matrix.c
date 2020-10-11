@@ -81,6 +81,25 @@ void matrixSet(Matrix *m, size_t i, size_t j, float val) {
     MAT_GET(m, i, j) = val;
 }
 
+Matrix *matrixDot(const Matrix *a, const Matrix *b) {
+    ASSERT(a->cols == b->rows,
+            "matrixDot : Incompatible shapes between a and b");
+
+    Matrix *m = matrixNew(a->rows, b->cols);
+
+    for (size_t i = 0; i < m->rows; ++i)
+        for (size_t j = 0; j < m->cols; ++j) {
+            float sum = 0.f;
+
+            for (size_t k = 0; k < a->cols; ++k)
+                sum += MAT_GET(a, i, k) * MAT_GET(b, k, j);
+
+            MAT_GET(m, i, j) = sum;
+        }
+
+    return m;
+}
+
 void matrixAdd(Matrix *a, float b) {
     for (size_t i = 0; i < a->rows; ++i)
         for (size_t j = 0; j < a->cols; ++j)
