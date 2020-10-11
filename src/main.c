@@ -2,11 +2,6 @@
 #include <math.h>
 #include "matrix.h"
 
-// sin cannot be used since values must be casted
-static float fun(float val) {
-    return sin(val);
-}
-
 int main() {
     const float data[6] = {
             1, 4,
@@ -14,10 +9,13 @@ int main() {
             3, 6,
         };
 
-    // Matrix *m = matrixCreate(3, 2, data);
-    Matrix *m = matrixZero(3, 2);
+    Matrix *m = matrixCreate(3, 2, data);
 
-    matrixMap(m, fun);
+    printf("%f\n", matrixGet(m, 2, 0));
+
+    // Should throw
+    matrixGet(m, 42, 42);
+
     matrixPrint(m);
 
     matrixFree(m);

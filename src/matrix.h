@@ -29,7 +29,7 @@ void matrixFree(Matrix *m);
 void matrixPrint(const Matrix *m);
 
 // Safe method to get an item from a matrix
-// * float matrixGet(const Matrix *m, size_t i, size_t j);
+float matrixGet(const Matrix *m, size_t i, size_t j);
 
 // Safely set value
 void matrixSet(Matrix *m, size_t i, size_t j, float val);

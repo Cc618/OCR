@@ -68,6 +68,12 @@ void matrixPrint(const Matrix *m) {
     puts(" ]");
 }
 
+float matrixGet(const Matrix *m, size_t i, size_t j) {
+    ASSERT(i < m->rows && j < m->cols, "matrixGet : i, j outside of matrix");
+
+    return MAT_GET(m, i, j);
+}
+
 void matrixSet(Matrix *m, size_t i, size_t j, float val) {
     ASSERT(i < m->rows, "matrixSet : i out of bounds, i >= rows");
     ASSERT(j < m->cols, "matrixSet : j out of bounds, j >= cols");
