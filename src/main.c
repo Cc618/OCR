@@ -4,9 +4,9 @@
 
 int main() {
     const float data1[] = {
-            1, 2, 1,
-            0, 1, 0,
-            2, 3, 4,
+            1, 2,
+            0, 1,
+            2, 3,
         };
 
     const float data2[] = {
@@ -15,14 +15,11 @@ int main() {
             1, 8,
         };
 
-    Matrix *a = matrixCreate(3, 3, data1);
+    Matrix *a = matrixCreate(3, 2, data1);
     Matrix *b = matrixCreate(3, 2, data2);
-    Matrix *m = matrixDot(a, b);
+    Matrix *m = matrixDotT(a, b);
 
     matrixPrint(m);
-
-    // Should throw
-    matrixDot(b, m);
 
     matrixFree(a);
     matrixFree(b);

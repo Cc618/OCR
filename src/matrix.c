@@ -30,7 +30,7 @@ Matrix *matrixCreate(size_t rows, size_t cols, const float *data) {
 Matrix *matrixZero(size_t rows, size_t cols) {
     Matrix *m = matrixNew(rows, cols);
 
-    memset(m->data, rows * cols * sizeof(float), 0);
+    memset(m->data, 0, rows * cols * sizeof(float));
 
     return m;
 }
@@ -93,6 +93,25 @@ Matrix *matrixDot(const Matrix *a, const Matrix *b) {
 
             for (size_t k = 0; k < a->cols; ++k)
                 sum += MAT_GET(a, i, k) * MAT_GET(b, k, j);
+
+            MAT_GET(m, i, j) = sum;
+        }
+
+    return m;
+}
+
+Matrix *matrixDotT(const Matrix *a, const Matrix *b) {
+    ASSERT(a->rows == b->rows,
+            "matrixDot : Incompatible shapes between a and b");
+
+    Matrix *m = matrixNew(a->cols, b->cols);
+
+    for (size_t i = 0; i < m->rows; ++i)
+        for (size_t j = 0; j < m->cols; ++j) {
+            float sum = 0.f;
+
+            for (size_t k = 0; k < b->rows; ++k)
+                sum += MAT_GET(a, k, i) * MAT_GET(b, k, j);
 
             MAT_GET(m, i, j) = sum;
         }

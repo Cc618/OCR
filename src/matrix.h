@@ -38,7 +38,7 @@ void matrixSet(Matrix *m, size_t i, size_t j, float val);
 Matrix *matrixDot(const Matrix *a, const Matrix *b);
 
 // Transposed product a^T * b
-// * Matrix *matrixDotT(const Matrix *a, const Matrix *b);
+Matrix *matrixDotT(const Matrix *a, const Matrix *b);
 
 // Inplace element wise operations
 void matrixAdd(Matrix *a, float b);
