@@ -1,5 +1,5 @@
 #include "tools.h"
-
+//Print the image.
 void printImage(SDL_Renderer * ren,SDL_Surface * sur, int x, int y) //This function permits to print the image in the renderer. Only for tests.
 {
     SDL_Texture* tex = SDL_CreateTextureFromSurface(ren,sur);
@@ -10,7 +10,7 @@ void printImage(SDL_Renderer * ren,SDL_Surface * sur, int x, int y) //This funct
     SDL_RenderCopy(ren, tex, NULL, &dst);
     SDL_RenderPresent(ren);
 }
-
+//Set a pixel with the x and y and pixel is the color.
 void setPixel(SDL_Surface *sur, int x, int y, Uint32 pixel)
 {
     int nbOctetsPerPixel = sur->format->BytesPerPixel;
@@ -45,7 +45,7 @@ void setPixel(SDL_Surface *sur, int x, int y, Uint32 pixel)
             break;
     }
 }
-
+//Take the color of a pixel with the x and y.
 Uint32 getpixel(SDL_Surface *surface, int x, int y) //This function permits to have the Uint32 value of a pixel.
 {
     int bpp = surface->format->BytesPerPixel;
@@ -76,7 +76,7 @@ Uint32 getpixel(SDL_Surface *surface, int x, int y) //This function permits to h
                 return 0;
     }
 }
-
+//Test function
 void modifImage(SDL_Renderer * ren,SDL_Surface * sur)//From a basic image, tranform all dark pixels in red pixels
 {
     SDL_Color rgb;
@@ -101,7 +101,7 @@ void modifImage(SDL_Renderer * ren,SDL_Surface * sur)//From a basic image, tranf
         x++;
     }
 }
-
+//Test function
 int redToBlack(int argc, char** argv)
 {
     //Initialisation
@@ -134,4 +134,14 @@ int redToBlack(int argc, char** argv)
 	SDL_DestroyWindow(win);
 	SDL_Quit();
 	return 0;
+}
+//Take an image, size it, and put in it matrix.
+void imageToMatrix(SDL_Surface *surface) {
+    int sizeofmatrix = 32;
+    int static matrix[sizeofmatrix][sizeofmatrix];
+    for (i = 0; i < sizeofmatrix; i++)
+    {
+        for (j = 0; j < sizeofmatrix; j++)
+            matrix[i][j] = getpixel((i * surface->w) / sizeofmatrix, (j * surface->h) / sizeofmatrix);
+    } 
 }
