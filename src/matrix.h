@@ -49,10 +49,13 @@ void matrixMul(Matrix *a, float b);
 
 void matrixDiv(Matrix *a, float b);
 
-// * void matrixAddMat(Matrix *a, const Matrix *b);
-// * void matrixSubMat(Matrix *a, const Matrix *b);
-// * void matrixMulMat(Matrix *a, const Matrix *b);
-// * void matrixDivMat(Matrix *a, const Matrix *b);
+void matrixAddMat(Matrix *a, const Matrix *b);
+
+void matrixSubMat(Matrix *a, const Matrix *b);
+
+void matrixMulMat(Matrix *a, const Matrix *b);
+
+void matrixDivMat(Matrix *a, const Matrix *b);
 
 // Inplace map element wise function to matrix
 void matrixMap(Matrix *m, float (*func)(float value));

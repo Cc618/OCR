@@ -143,6 +143,70 @@ void matrixDiv(Matrix *a, float b) {
             MAT_GET(a, i, j) /= b;
 }
 
+void matrixAddMat(Matrix *a, const Matrix *b) {
+    size_t n1 = a->rows;
+    size_t p1 = a->cols;
+    size_t n2 = b->rows;
+    size_t p2 = b->cols;
+
+    ASSERT(n1 == n2 && p1 == p2,
+            "matrixAddMat : Incompatible shapes between a and b");
+    
+    for (size_t i = 0; i < n1; ++i) {
+        for (size_t j = 0; j < p1; ++j) {
+            MAT_GET(a, i, j) += MAT_GET(b, i, j);
+        }
+    }
+}
+
+void matrixSubMat(Matrix *a, const Matrix *b) {
+    size_t n1 = a->rows;
+    size_t p1 = a->cols;
+    size_t n2 = b->rows;
+    size_t p2 = b->cols;
+
+    ASSERT(n1 == n2 && p1 == p2,
+            "matrixSubMat : Incompatible shapes between a and b");
+    
+    for (size_t i = 0; i < n1; ++i) {
+        for (size_t j = 0; j < p1; ++j) {
+            MAT_GET(a, i, j) -= MAT_GET(b, i, j);
+        }
+    }
+}
+
+void matrixMulMat(Matrix *a, const Matrix *b) {
+    size_t n1 = a->rows;
+    size_t p1 = a->cols;
+    size_t n2 = b->rows;
+    size_t p2 = b->cols;
+
+    ASSERT(n1 == n2 && p1 == p2,
+            "matrixMulMat : Incompatible shapes between a and b");
+    
+    for (size_t i = 0; i < n1; ++i) {
+        for (size_t j = 0; j < p1; ++j) {
+            MAT_GET(a, i, j) *= MAT_GET(b, i, j);
+        }
+    }
+}
+
+void matrixDivMat(Matrix *a, const Matrix *b) {
+    size_t n1 = a->rows;
+    size_t p1 = a->cols;
+    size_t n2 = b->rows;
+    size_t p2 = b->cols;
+
+    ASSERT(n1 == n2 && p1 == p2,
+            "matrixDivMat : Incompatible shapes between a and b");
+    
+    for (size_t i = 0; i < n1; ++i) {
+        for (size_t j = 0; j < p1; ++j) {
+            MAT_GET(a, i, j) /= MAT_GET(b, i, j);
+        }
+    }
+}
+
 void matrixMap(Matrix *m, float (*func)(float value)) {
     for (size_t i = 0; i < m->rows; ++i)
         for (size_t j = 0; j < m->cols; ++j)

@@ -21,6 +21,15 @@ int main() {
 
     matrixPrint(m);
 
+    matrixAddMat(a, b);
+    matrixPrint(a);
+    matrixSubMat(a, b);
+    matrixPrint(a);
+    matrixMulMat(a, b);
+    matrixPrint(a);
+    matrixDivMat(a, b);
+    matrixPrint(a);
+
     matrixFree(a);
     matrixFree(b);
     matrixFree(m);
