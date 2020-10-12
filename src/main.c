@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include "error.h"
+#include "tools.h"
 
-int main() {
+int main(int argc, char** argv) {
     printf("Hello world !\n");
 
     ASSERT(1 == 1, "1 != 1");

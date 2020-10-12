@@ -1,5 +1,4 @@
-#include <SDL2/SDL.h>
-#include<stdio.h>
+#include "tools.h"
 
 void printImage(SDL_Renderer * ren,SDL_Surface * sur, int x, int y) //This function permits to print the image in the renderer. Only for tests.
 {
@@ -16,8 +15,8 @@ void setPixel(SDL_Surface *sur, int x, int y, Uint32 pixel)
 {
     int nbOctetsPerPixel = sur->format->BytesPerPixel;
     //p is the address of the pixel we want to modify
-    Uint8 *p = (Uint8 *)sur->pixels + y * surface->pitch + x * nbOctetsPerPixel;
-    switch(nbOctetsParPixel)
+    Uint8 *p = (Uint8 *)sur->pixels + y * sur->pitch + x * nbOctetsPerPixel;
+    switch(nbOctetsPerPixel)
     {
         case 1:
             *p = pixel;
@@ -103,8 +102,7 @@ void modifImage(SDL_Renderer * ren,SDL_Surface * sur)//From a basic image, tranf
     }
 }
 
-
-int main(int argc, char** argv)
+int redToBlack(int argc, char** argv)
 {
     //Initialisation
 	SDL_Window *win = 0;

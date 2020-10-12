@@ -9,8 +9,12 @@ DEP = $(OBJ:.o=.d)
 CC = gcc
 CPPFLAGS = -MMD
 CFLAGS = -Wall -Wextra -std=c99
-LDLIBS = -lm
+LDLIBS = -lm -lSDL2
 LDFLAGS =
+if eq (($WINDOWS),1)
+CFLAGS += -Ilib/include
+LDFLAGS += -Llib/lib
+endif
 
 all: dirs $(BIN)
 
