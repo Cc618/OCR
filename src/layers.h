@@ -6,15 +6,25 @@
 #include "matrix.h"
 
 typedef struct Layer_t {
-    // Forward propagation
-    Matrix *(*forward)(const Matrix *x);
+    Matrix *(*forward)(Layer_t *l, const Matrix *x);
 
-    // Backward propagation, accumulate gradients
-    // - grad : dLoss / dOutput
-    Matrix *(*backward)(const Matrix *grad);
+    Matrix *(*backward)(Layer_t *l, const Matrix *grad);
 
     // TODO : update(optimizer)
+
+    // Frees only data, l is freed in layerFree
+    void (*free)(Layer_t *l);
 } Layer;
+
+// Forward propagation
+Matrix *layerForward(Layer *l, const Matrix *x);
+
+// Backward propagation, accumulate gradients
+// - grad : dLoss / dOutput
+// Must free allocated data in forward
+Matrix *layerBackward(Layer *l, const Matrix *grad);
+
+void layerFree(Layer *l);
 
 #endif // LAYERS_H
 
