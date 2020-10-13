@@ -1,38 +1,26 @@
 #include <stdio.h>
 #include <math.h>
 #include "matrix.h"
+#include "layers.h"
 
 int main() {
-    const float data1[] = {
-            1, 2,
+    const float xData[] = {
             0, 1,
-            2, 3,
         };
+    Matrix *x = matrixCreate(2, 1, xData);
 
-    const float data2[] = {
-            2, 5,
-            6, 7,
-            1, 8,
-        };
+    Layer *fc = denseNew(2, 4);
 
-    Matrix *a = matrixCreate(3, 2, data1);
-    Matrix *b = matrixCreate(3, 2, data2);
-    Matrix *m = matrixDotT(a, b);
+    Matrix *y = layerForward(fc, x);
+    // TODO : forwardFree when propagation
 
-    matrixPrint(m);
+    matrixPrint(x);
+    puts("> Result :");
+    matrixPrint(y);
 
-    matrixAddMat(a, b);
-    matrixPrint(a);
-    matrixSubMat(a, b);
-    matrixPrint(a);
-    matrixMulMat(a, b);
-    matrixPrint(a);
-    matrixDivMat(a, b);
-    matrixPrint(a);
-
-    matrixFree(a);
-    matrixFree(b);
-    matrixFree(m);
+    matrixFree(y);
+    layerFree(fc);
+    matrixFree(x);
 
     return 0;
 }
