@@ -10,8 +10,14 @@ Matrix *layerBackward(Layer *l, const Matrix *grad) {
     return l->backward(l, grad);
 }
 
+void layerForwardFree(Layer *l) {
+    if (l->forwardFree)
+        l->forwardFree(l);
+}
+
 void layerFree(Layer *l) {
-    l->free(l);
+    if (l->free)
+        l->free(l);
 
     free(l);
 }
@@ -33,6 +39,10 @@ static Matrix *denseBackward(Dense *l, const Matrix *grad) {
     return matrixDotT(l->weight, grad);
 }
 
+static void denseForwardFree(Dense *l) {
+    // TODO
+}
+
 void denseFree(Dense *l) {
     matrixFree(l->weight);
     matrixFree(l->gradWeight);
@@ -45,6 +55,7 @@ Layer *denseNew(size_t in, size_t out) {
 
     l->forward = (Matrix *(*)(Layer *l, const Matrix*)) denseForward;
     l->backward = (Matrix *(*)(Layer *l, const Matrix*)) denseBackward;
+    l->forwardFree = (void (*)(Layer *l)) denseForwardFree;
     l->free = (void (*)(Layer *l)) denseFree;
 
     // TODO : Initialisation for weight

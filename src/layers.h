@@ -8,10 +8,12 @@
 typedef struct Layer_t Layer;
 struct Layer_t {
     // TODO : update(optimizer)
-    // - free : Frees only data, l is freed in layerFree
+    // - forwardFree : Can be NULL
+    // - free : Frees only data, l is freed in layerFree, can be NULL
 #define LAYER_ATTRIBUTES \
     Matrix *(*forward)(Layer *l, const Matrix *x); \
     Matrix *(*backward)(Layer *l, const Matrix *grad); \
+    void (*forwardFree)(Layer *l); \
     void (*free)(Layer *l);
 
     // Declare attributes (always at the top)
@@ -39,6 +41,9 @@ Matrix *layerForward(Layer *l, const Matrix *x);
 // - grad : dLoss / dOutput
 // Must free allocated data in forward
 Matrix *layerBackward(Layer *l, const Matrix *grad);
+
+// Frees data allocated with layerForward
+void layerForwardFree(Layer *l);
 
 void layerFree(Layer *l);
 
