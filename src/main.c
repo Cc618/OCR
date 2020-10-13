@@ -2,23 +2,36 @@
 #include <math.h>
 #include "matrix.h"
 
-// sin cannot be used since values must be casted
-static float fun(float val) {
-    return sin(val);
-}
-
 int main() {
-    const float data[6] = {
-            1, 4,
-            2, 5,
-            3, 6,
+    const float data1[] = {
+            1, 2,
+            0, 1,
+            2, 3,
         };
 
-    Matrix *m = matrixCreate(3, 2, data);
+    const float data2[] = {
+            2, 5,
+            6, 7,
+            1, 8,
+        };
 
-    matrixMap(m, fun);
+    Matrix *a = matrixCreate(3, 2, data1);
+    Matrix *b = matrixCreate(3, 2, data2);
+    Matrix *m = matrixDotT(a, b);
+
     matrixPrint(m);
 
+    matrixAddMat(a, b);
+    matrixPrint(a);
+    matrixSubMat(a, b);
+    matrixPrint(a);
+    matrixMulMat(a, b);
+    matrixPrint(a);
+    matrixDivMat(a, b);
+    matrixPrint(a);
+
+    matrixFree(a);
+    matrixFree(b);
     matrixFree(m);
 
     return 0;
