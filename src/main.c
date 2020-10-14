@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <math.h>
 #include "matrix.h"
+#include "error.h"
+#include "tools.h"
 
-int main() {
+int main(int argc, char** argv) {
+    // Matrix transposed dot product test
     const float data1[] = {
             1, 2,
             0, 1,
