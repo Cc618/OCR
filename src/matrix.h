@@ -40,6 +40,10 @@ Matrix *matrixDot(const Matrix *a, const Matrix *b);
 // Transposed product a^T * b
 Matrix *matrixDotT(const Matrix *a, const Matrix *b);
 
+// Outer vector product
+// y = a * b^T
+Matrix *matrixOuter(const Matrix *a, const Matrix *b);
+
 // Inplace element wise operations
 void matrixAdd(Matrix *a, float b);
 

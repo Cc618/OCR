@@ -119,6 +119,21 @@ Matrix *matrixDotT(const Matrix *a, const Matrix *b) {
     return m;
 }
 
+Matrix *matrixOuter(const Matrix *a, const Matrix *b) {
+    ASSERT(a->cols == 1 && b->cols == 1,
+            "matrixOuter : Not a vector as input");
+
+    Matrix *m = matrixNew(a->rows, b->rows);
+
+    for (size_t i = 0; i < a->rows; ++i)
+        for (size_t j = 0; j < b->rows; ++j)
+            // a and b are 1 dimensional so we can access items
+            // within data directly
+            MAT_GET(m, i, j) = a->data[i] * b->data[j];
+
+    return m;
+}
+
 void matrixAdd(Matrix *a, float b) {
     for (size_t i = 0; i < a->rows; ++i)
         for (size_t j = 0; j < a->cols; ++j)
