@@ -1,4 +1,7 @@
+#include <stdio.h>
 #include "tools.h"
+#include "matrix.h"
+
 //Print the image.
 void printImage(SDL_Renderer * ren,SDL_Surface * sur, int x, int y) //This function permits to print the image in the renderer. Only for tests.
 {
@@ -136,13 +139,30 @@ int redToBlack(int argc, char** argv)
 	SDL_Quit();
 	return 0;
 }*/
-//Take an image, size it, and put in it matrix.
-/*void imageToMatrix(SDL_Surface *surface) {
-    int sizeofmatrix = 32;
-    int static matrix[sizeofmatrix][sizeofmatrix];
-    for (i = 0; i < sizeofmatrix; i++)
+
+//Take an image, size it, and put in it matrix. *surface the image, raws and cols the height and weight of the new matrix.
+//Needs to change the function because getpixel returns Uint32 and Matrix takes float;
+/*Matrix imageToMatrix(SDL_Surface *surface, int rows, int cols) {
+    Matrix *matrix = matrixNew(rows, cols);
+    for (i = 0; i < rows; i++)
     {
-        for (j = 0; j < sizeofmatrix; j++)
-            matrix[i][j] = getpixel(*surface, (i * surface->w) / sizeofmatrix, (j * surface->h) / sizeofmatrix);
-    } 
+        for (j = 0; j < cols; j++)
+		matrixSet(*matrix, i, j, getpixel(*surface, (i * surface->w) / raws, (j * surface->h) / cols));
+    }
+    return *matrix;
 }*/
+
+//Transforms a matrix into a binary matrix(changes directly the matrix).
+void matrixToBinary(Matrix *matrix) {
+	int rows = matrix->rows;
+	int cols = matrix->cols;
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			float value = matrixGet(matrix, i, j);
+			if (value > 0.5)
+				matrixSet(matrix, i, j, 1);
+			else
+				matrixSet(matrix, i, j, 0);
+		}
+	}
+}
