@@ -76,6 +76,7 @@ Uint32 getpixel(SDL_Surface *surface, int x, int y) //This function permits to h
                 return 0;
     }
 }
+/*
 //Test function
 void modifImage(SDL_Renderer * ren,SDL_Surface * sur)//From a basic image, tranform all dark pixels in red pixels
 {
@@ -134,14 +135,14 @@ int redToBlack(int argc, char** argv)
 	SDL_DestroyWindow(win);
 	SDL_Quit();
 	return 0;
-}
+}*/
 //Take an image, size it, and put in it matrix.
-void imageToMatrix(SDL_Surface *surface) {
+/*void imageToMatrix(SDL_Surface *surface) {
     int sizeofmatrix = 32;
     int static matrix[sizeofmatrix][sizeofmatrix];
     for (i = 0; i < sizeofmatrix; i++)
     {
         for (j = 0; j < sizeofmatrix; j++)
-            matrix[i][j] = getpixel((i * surface->w) / sizeofmatrix, (j * surface->h) / sizeofmatrix);
+            matrix[i][j] = getpixel(*surface, (i * surface->w) / sizeofmatrix, (j * surface->h) / sizeofmatrix);
     } 
-}
+}*/
