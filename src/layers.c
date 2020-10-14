@@ -2,17 +2,12 @@
 #include "error.h"
 
 // --- Layer ---
-Matrix *layerForward(Layer *l, const Matrix *x) {
-    return l->forward(l, x);
+Matrix *layerForward(Layer *l, const Matrix *x, bool training) {
+    return l->forward(l, x, training);
 }
 
 Matrix *layerBackward(Layer *l, const Matrix *grad) {
     return l->backward(l, grad);
-}
-
-void layerForwardFree(Layer *l) {
-    if (l->forwardFree)
-        l->forwardFree(l);
 }
 
 void layerFree(Layer *l) {
@@ -23,10 +18,13 @@ void layerFree(Layer *l) {
 }
 
 // --- Dense ---
-static Matrix *denseForward(Dense *l, const Matrix *x) {
-    // TODO
+static Matrix *denseForward(Dense *l, const Matrix *x, bool training) {
     ASSERT(x->rows == l->weight->cols && x->cols == 1,
             "denseForward : Invalid x shape");
+
+    // Update training context
+    if (training)
+        l->x = matrixCopy(x);
 
     Matrix *y = matrixDot(l->weight, x);
     matrixAddMat(y, l->bias);
@@ -35,12 +33,21 @@ static Matrix *denseForward(Dense *l, const Matrix *x) {
 }
 
 static Matrix *denseBackward(Dense *l, const Matrix *grad) {
-    // TODO
-    return matrixDotT(l->weight, grad);
-}
+    // dL / dW = (dL/dY) . x^T
+    Matrix *gradWeight = matrixOuter(grad, l->x);
+    // TODO : Multiply by 1/batch_size ? -> or in optimizer.update
+    matrixAddMat(l->gradWeight, gradWeight);
 
-static void denseForwardFree(Dense *l) {
-    // TODO
+    // dL / dB = (dL/dY)
+    matrixAddMat(l->gradBias, grad);
+
+    matrixFree(gradWeight);
+
+    // Free training context
+    matrixFree(l->x);
+    l->x = NULL;
+
+    return matrixDotT(l->weight, grad);
 }
 
 void denseFree(Dense *l) {
@@ -53,9 +60,8 @@ void denseFree(Dense *l) {
 Layer *denseNew(size_t in, size_t out) {
     Dense *l = malloc(sizeof(Dense));
 
-    l->forward = (Matrix *(*)(Layer *l, const Matrix*)) denseForward;
+    l->forward = (Matrix *(*)(Layer *l, const Matrix*, bool)) denseForward;
     l->backward = (Matrix *(*)(Layer *l, const Matrix*)) denseBackward;
-    l->forwardFree = (void (*)(Layer *l)) denseForwardFree;
     l->free = (void (*)(Layer *l)) denseFree;
 
     // TODO : Initialisation for weight

@@ -3,17 +3,16 @@
 
 // Contains neural net's layers
 
+#include <stdbool.h>
 #include "matrix.h"
 
 typedef struct Layer_t Layer;
 struct Layer_t {
     // TODO : update(optimizer)
-    // - forwardFree : Can be NULL
     // - free : Frees only data, l is freed in layerFree, can be NULL
 #define LAYER_ATTRIBUTES \
-    Matrix *(*forward)(Layer *l, const Matrix *x); \
+    Matrix *(*forward)(Layer *l, const Matrix *x, bool training); \
     Matrix *(*backward)(Layer *l, const Matrix *grad); \
-    void (*forwardFree)(Layer *l); \
     void (*free)(Layer *l);
 
     // Declare attributes (always at the top)
@@ -32,18 +31,20 @@ typedef struct Dense {
     Matrix *bias;
     Matrix *gradWeight;
     Matrix *gradBias;
+
+    // Copy of x in forward
+    Matrix *x;
 } Dense;
 
 // Forward propagation
-Matrix *layerForward(Layer *l, const Matrix *x);
+// - training : If true, allocates data for the backward pass
+Matrix *layerForward(Layer *l, const Matrix *x, bool training);
 
 // Backward propagation, accumulate gradients
 // - grad : dLoss / dOutput
+// - Returns dLoss / dInput
 // Must free allocated data in forward
 Matrix *layerBackward(Layer *l, const Matrix *grad);
-
-// Frees data allocated with layerForward
-void layerForwardFree(Layer *l);
 
 void layerFree(Layer *l);
 
