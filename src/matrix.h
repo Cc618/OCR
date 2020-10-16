@@ -3,6 +3,9 @@
 
 #include <stdlib.h>
 
+// Unsafe get
+#define MAT_GET(m, i, j) (m->data[i * m->cols + j])
+
 typedef struct Matrix_t {
     // Height, width
     size_t rows, cols;

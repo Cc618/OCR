@@ -4,9 +4,6 @@
 #include "matrix.h"
 #include "error.h"
 
-// Unsafe get
-#define MAT_GET(m, i, j) (m->data[i * m->cols + j])
-
 #define MAT_PRINT_FORMAT "%5.2f"
 
 static float sigmoid(float x) {
