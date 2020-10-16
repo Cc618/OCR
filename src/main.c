@@ -13,7 +13,8 @@ int main(int __attribute__((unused)) argc, char __attribute__((unused)) **argv) 
 
     // Feed forward
     Matrix *y = layerForward(fc, x, true);
-    matrixSigmoid(y);
+    matrixAdd(y, 1);
+    matrixSigmoidPrime(y);
 
     // Back propagate
     // y isn't the grad but has the same shape

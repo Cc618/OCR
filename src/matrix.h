@@ -67,5 +67,8 @@ void matrixMap(Matrix *m, float (*func)(float value));
 // The sigmoid function
 void matrixSigmoid(Matrix *m);
 
+// First derivative of the sigmoid
+void matrixSigmoidPrime(Matrix *m);
+
 #endif // MATRIX_H
 

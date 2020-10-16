@@ -13,6 +13,14 @@ static float sigmoid(float x) {
     return 1.f / (1.f + exp(-x));
 }
 
+static float sigmoidPrime(float x) {
+    float expMinusX = exp(-x);
+    float div = 1 + expMinusX;
+    div *= div;
+
+    return expMinusX / div;
+}
+
 Matrix *matrixNew(size_t rows, size_t cols) {
     Matrix *mat = malloc(sizeof(Matrix));
 
@@ -234,5 +242,9 @@ void matrixMap(Matrix *m, float (*func)(float value)) {
 
 void matrixSigmoid(Matrix *m) {
     matrixMap(m, sigmoid);
+}
+
+void matrixSigmoidPrime(Matrix *m) {
+    matrixMap(m, sigmoidPrime);
 }
 
