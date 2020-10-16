@@ -21,7 +21,7 @@ struct Layer_t {
 
 // A fully connected layer
 // Y = WX + B
-typedef struct Dense {
+typedef struct Dense_t {
     // Inherit from Layer
     LAYER_ATTRIBUTES;
 
@@ -35,6 +35,20 @@ typedef struct Dense {
     // Copy of x in forward
     Matrix *x;
 } Dense;
+
+// Function mapped to the input
+typedef struct Activation_t {
+    // Inherit from Layer
+    LAYER_ATTRIBUTES;
+
+    // y = activation(x)
+    void (*activation)(Matrix *x);
+    // dLoss / dX = dLoss / dY * dY / dX
+    void (*prime)(Matrix *x);
+
+    // Copy of x in forward
+    Matrix *x;
+} Activation;
 
 // Forward propagation
 // - training : If true, allocates data for the backward pass
@@ -52,5 +66,7 @@ void layerFree(Layer *l);
 // - out : Output features
 Layer *denseNew(size_t in, size_t out);
 
-#endif // LAYERS_H
+// Sigmoid activation layer
+Layer *sigmoidNew();
 
+#endif // LAYERS_H
