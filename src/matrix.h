@@ -64,5 +64,8 @@ void matrixDivMat(Matrix *a, const Matrix *b);
 // Inplace map element wise function to matrix
 void matrixMap(Matrix *m, float (*func)(float value));
 
+// The sigmoid function
+void matrixSigmoid(Matrix *m);
+
 #endif // MATRIX_H
 

@@ -9,6 +9,10 @@
 
 #define MAT_PRINT_FORMAT "%5.2f"
 
+static float sigmoid(float x) {
+    return 1.f / (1.f + exp(-x));
+}
+
 Matrix *matrixNew(size_t rows, size_t cols) {
     Matrix *mat = malloc(sizeof(Matrix));
 
@@ -166,7 +170,7 @@ void matrixAddMat(Matrix *a, const Matrix *b) {
 
     ASSERT(n1 == n2 && p1 == p2,
             "matrixAddMat : Incompatible shapes between a and b");
-    
+
     for (size_t i = 0; i < n1; ++i) {
         for (size_t j = 0; j < p1; ++j) {
             MAT_GET(a, i, j) += MAT_GET(b, i, j);
@@ -182,7 +186,7 @@ void matrixSubMat(Matrix *a, const Matrix *b) {
 
     ASSERT(n1 == n2 && p1 == p2,
             "matrixSubMat : Incompatible shapes between a and b");
-    
+
     for (size_t i = 0; i < n1; ++i) {
         for (size_t j = 0; j < p1; ++j) {
             MAT_GET(a, i, j) -= MAT_GET(b, i, j);
@@ -198,7 +202,7 @@ void matrixMulMat(Matrix *a, const Matrix *b) {
 
     ASSERT(n1 == n2 && p1 == p2,
             "matrixMulMat : Incompatible shapes between a and b");
-    
+
     for (size_t i = 0; i < n1; ++i) {
         for (size_t j = 0; j < p1; ++j) {
             MAT_GET(a, i, j) *= MAT_GET(b, i, j);
@@ -214,7 +218,7 @@ void matrixDivMat(Matrix *a, const Matrix *b) {
 
     ASSERT(n1 == n2 && p1 == p2,
             "matrixDivMat : Incompatible shapes between a and b");
-    
+
     for (size_t i = 0; i < n1; ++i) {
         for (size_t j = 0; j < p1; ++j) {
             MAT_GET(a, i, j) /= MAT_GET(b, i, j);
@@ -227,3 +231,8 @@ void matrixMap(Matrix *m, float (*func)(float value)) {
         for (size_t j = 0; j < m->cols; ++j)
             MAT_GET(m, i, j) = func(MAT_GET(m, i, j));
 }
+
+void matrixSigmoid(Matrix *m) {
+    matrixMap(m, sigmoid);
+}
+
