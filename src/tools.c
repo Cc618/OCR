@@ -79,9 +79,8 @@ Uint32 getpixel(SDL_Surface *surface, int x, int y) //This function permits to h
                 return 0;
     }
 }
-/*
-//Test function
-void modifImage(SDL_Renderer * ren,SDL_Surface * sur)//From a basic image, tranform all dark pixels in red pixels
+
+void modifImage(SDL_Renderer * ren,SDL_Surface * sur)//From a basic image, transform all pixels in black pixels or black pixels depending on the pixel's luminosity.
 {
     SDL_Color rgb;
     SDL_PixelFormat * format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
@@ -89,6 +88,7 @@ void modifImage(SDL_Renderer * ren,SDL_Surface * sur)//From a basic image, tranf
     Uint32* pixels = (Uint32*)sur->pixels;
     int x = 0;
     int y = 0;
+    int c = 0;
     while (x<sur->w)
     {
         y=0;
@@ -96,17 +96,22 @@ void modifImage(SDL_Renderer * ren,SDL_Surface * sur)//From a basic image, tranf
         {
             SDL_GetRGB(getpixel(sur, x, y), sur->format, &rgb.r, &rgb.g, &rgb.b);
             //printf("(%d %d %d %d)\n",rgb.r, rgb.g, rgb.b, rgb.a);
+            //Calcul de la luminosité du pixel, avec comme seuil 119.
+            c = (int)(0.299*rgb.r+0.587*rgb.g+0.114*rgb.b);
+            c = (c>119)*255;
             if (rgb.r==0 && rgb.g == 0 && rgb.b == 0)
             {
-                setPixel(sur,x,y,SDL_MapRGBA(sur->format, 255, 0, 0, 255));
+                setPixel(sur,x,y,SDL_MapRGBA(sur->format, c, c, c, 255));
             }
             y++;
         }
         x++;
     }
 }
+
+/*
 //Test function
-int redToBlack(int argc, char** argv)
+int main(int argc, char** argv)
 {
     //Initialisation
 	SDL_Window *win = 0;
@@ -138,7 +143,7 @@ int redToBlack(int argc, char** argv)
 	SDL_DestroyWindow(win);
 	SDL_Quit();
 	return 0;
-}*/
+}
 
 //Take an image, size it, and put in it matrix. *surface the image, raws and cols the height and weight of the new matrix.
 //Needs to change the function because getpixel returns Uint32 and Matrix takes float;
