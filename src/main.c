@@ -5,8 +5,7 @@
 #include "layers.h"
 #include "initializer.h"
 
-int main(
-        int __attribute__((unused)) argc,
+int main(int __attribute__((unused)) argc,
         char __attribute__((unused)) **argv) {
     // Dataset
 
@@ -61,25 +60,25 @@ int main(
     matrixPrint(b);
     matrixPrint(c);
 
-    // Display 5000 values created with randomFloatNorm() to verify normal distribution
-    float list[5000];
-    for (int i=0; i<5000; i++) {
-        list[i] = randFloatNorm();
-    }
-    for (float k= -3; k < 3; k+=0.1) {
-        int count = 0;
-        for (int j = 0; j < 5000; j++) {
-            float current = list[j];
-            if (k < current && current < k+0.1) {
-                count += 1;
-            }
-        }
-        for (int l = 0; l < count; l++) {
-            printf("=");
-        }
-        printf("\n");
-    }
-    
+    // // Display 5000 values created with randomFloatNorm() to verify normal distribution
+    // float list[5000];
+    // for (int i=0; i<5000; i++) {
+    //     list[i] = randFloatNorm();
+    // }
+    // for (float k= -3; k < 3; k+=0.1) {
+    //     int count = 0;
+    //     for (int j = 0; j < 5000; j++) {
+    //         float current = list[j];
+    //         if (k < current && current < k+0.1) {
+    //             count += 1;
+    //         }
+    //     }
+    //     for (int l = 0; l < count; l++) {
+    //         printf("=");
+    //     }
+    //     printf("\n");
+    // }
+
     // Free test matrices
     matrixFree(a);
     matrixFree(b);

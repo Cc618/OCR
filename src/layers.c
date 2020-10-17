@@ -1,5 +1,6 @@
 #include "layers.h"
 #include "error.h"
+#include "initializer.h"
 
 // --- Layer ---
 Matrix *layerForward(Layer *l, const Matrix *x, bool training) {
@@ -66,8 +67,8 @@ Layer *denseNew(size_t in, size_t out) {
     l->free = (void (*)(Layer *l))denseFree;
 
     // Init weights and gradients
-    // TODO : Initialisation for weight
-    l->weight = matrixZero(out, in);
+    // TODO : Xavier initialisation for weight
+    l->weight = randNormal(out, in);
     l->gradWeight = matrixZero(out, in);
     l->bias = matrixZero(out, 1);
     l->gradBias = matrixZero(out, 1);
