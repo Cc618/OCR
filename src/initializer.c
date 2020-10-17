@@ -10,7 +10,8 @@ float randFloatUnif(float min, float max) {
 }
 
 float randFloatNorm() {
-    // Method described by Abramowitz and Stegun to generate random numbers with a gaussian distribution
+    // Method described by Abramowitz and Stegun to generate random numbers
+    // with a gaussian distribution
 
 	static float U, V;
 	static int phase = 0;
