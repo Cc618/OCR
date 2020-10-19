@@ -5,13 +5,17 @@
 #include "layers.h"
 #include "losses.h"
 #include "initializer.h"
+#include "optimizer.h"
 
 int main(int __attribute__((unused)) argc,
         char __attribute__((unused)) **argv) {
-    // Dataset
-
     srand(time(NULL));
 
+    // Hyper parameters
+    float learningRate = 1e-2;
+    unsigned int batchSize = 4;
+
+    // Dataset
     const float xData[] = {
             0, 1,
         };
@@ -25,6 +29,7 @@ int main(int __attribute__((unused)) argc,
     Layer *fc = denseNew(2, 1);
     Layer *activation = sigmoidNew();
     LossFunction criterion = mseLoss;
+    Optimizer *opti = sgdNew(learningRate, batchSize);
 
     // Feed forward
     Matrix *y1 = layerForward(fc, x, true);
@@ -38,12 +43,18 @@ int main(int __attribute__((unused)) argc,
     Matrix *dLossDY2 = layerBackward(activation, dLoss);
     Matrix *dLossDY1 = layerBackward(fc, dLossDY2);
 
+    // Optimize (each batch)
+    layerUpdate(fc, opti);
+    layerUpdate(activation, opti);
+
     // Display result
     matrixPrint(x);
     puts("> Result :");
     matrixPrint(y2);
     puts("> Last gradient :");
     matrixPrint(dLossDY1);
+    puts("> Updated gradient (should be 0) :");
+    matrixPrint(((Dense*)fc)->gradWeight);
 
     // Free (each epoch)
     lossFree(error);
@@ -58,6 +69,7 @@ int main(int __attribute__((unused)) argc,
 
     // Free network
     layerFree(activation);
+    optimizerFree(opti);
 
     // // Create test matrices
     // Matrix *a = randNormal(2, 3);
@@ -88,11 +100,11 @@ int main(int __attribute__((unused)) argc,
     //     printf("\n");
     // }
 
-    // Free test matrices
-    matrixFree(a);
-    matrixFree(b);
-    matrixFree(c);
-    layerFree(fc);
+    // // Free test matrices
+    // matrixFree(a);
+    // matrixFree(b);
+    // matrixFree(c);
+    // layerFree(fc);
 
     return 0;
 }

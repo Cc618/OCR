@@ -11,6 +11,11 @@ Matrix *layerBackward(Layer *l, const Matrix *grad) {
     return l->backward(l, grad);
 }
 
+void layerUpdate(Layer *l, Optimizer *o) {
+    if (l->update != NULL)
+        l->update(l, o);
+}
+
 void layerFree(Layer *l) {
     if (l->free)
         l->free(l);
@@ -51,6 +56,11 @@ static Matrix *denseBackward(Dense *l, const Matrix *grad) {
     return matrixDotT(l->weight, grad);
 }
 
+static void denseUpdate(Dense *l, Optimizer *o) {
+    optimizerUpdate(o, l->weight, l->gradWeight);
+    optimizerUpdate(o, l->bias, l->gradBias);
+}
+
 void denseFree(Dense *l) {
     matrixFree(l->weight);
     matrixFree(l->gradWeight);
@@ -64,6 +74,7 @@ Layer *denseNew(size_t in, size_t out) {
     // Override virtual functions
     l->forward = (Matrix *(*)(Layer *l, const Matrix*, bool))denseForward;
     l->backward = (Matrix *(*)(Layer *l, const Matrix*))denseBackward;
+    l->update = (void (*)(Layer *l, Optimizer *o))denseUpdate;
     l->free = (void (*)(Layer *l))denseFree;
 
     // Init weights and gradients
@@ -118,6 +129,7 @@ static Layer *activationNew(
     // Override virtual functions
     l->forward = (Matrix *(*)(Layer *l, const Matrix*, bool))activationForward;
     l->backward = (Matrix *(*)(Layer *l, const Matrix*))activationBackward;
+    l->update = NULL;
     l->free = NULL;
 
     // Init training context
