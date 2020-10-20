@@ -80,7 +80,8 @@ Uint32 getpixel(SDL_Surface *surface, int x, int y) //This function permits to h
     }
 }
 
-void modifImage(SDL_Renderer * ren,SDL_Surface * sur)//From a basic image, transform all pixels in black pixels or black pixels depending on the pixel's luminosity.
+//From a basic image, transform all pixels in black pixels or black pixels depending on the pixel's luminosity.
+void modifImage(SDL_Renderer * ren,SDL_Surface * sur)
 {
     SDL_Color rgb;
     SDL_PixelFormat * format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
@@ -96,7 +97,7 @@ void modifImage(SDL_Renderer * ren,SDL_Surface * sur)//From a basic image, trans
         {
             SDL_GetRGB(getpixel(sur, x, y), sur->format, &rgb.r, &rgb.g, &rgb.b);
             //printf("(%d %d %d %d)\n",rgb.r, rgb.g, rgb.b, rgb.a);
-            //Calcul de la luminosité du pixel, avec comme seuil 119.
+            //Calcul de la luminositï¿½ du pixel, avec comme seuil 119.
             c = (int)(0.299*rgb.r+0.587*rgb.g+0.114*rgb.b);
             c = (c>119)*255;
             if (rgb.r==0 && rgb.g == 0 && rgb.b == 0)
@@ -155,6 +156,40 @@ int main(int argc, char** argv)
 		matrixSet(*matrix, i, j, getpixel(*surface, (i * surface->w) / raws, (j * surface->h) / cols));
     }
     return *matrix;
+}*/
+
+//Returns an array of lines with the length of this array.
+/*int getLines(Matrix *matrix) {
+    int cols = matrix->cols;
+    int rows = matrix->rows;
+    int result [malloc(sizeof(int))];
+    int length = 0;
+    for (int i = 0; i < cols; i++) {
+        float dark_dot = matrixGet(matrix, i, j)
+        if (value == cols) {
+            int j = 0;
+            while (matrixGet(matrix, i, j) != 1 && j < rows) {
+                j += 1;
+            if (j == raws)
+                result[length] = i;
+                realloc(result, sizeof(int));
+                length++;
+            }
+        }
+    }
+    return (result, length);
+}
+
+//Draws the lines with an array that comes from getLines.
+void drawLines(Matrix *matrix, int arraylines, int length) {
+    int cols = matrix->cols;
+    for (size_t i = 0; i < length; i++)
+    {
+        for (size_t j = 0; j < cols; j++)
+        {
+            matrixSet(matrix, arraylines[i], j, 0);
+        } 
+    }
 }*/
 
 //Transforms a matrix into a binary matrix(changes directly the matrix).
