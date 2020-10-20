@@ -41,7 +41,6 @@ static Matrix *denseForward(Dense *l, const Matrix *x, bool training) {
 static Matrix *denseBackward(Dense *l, const Matrix *grad) {
     // dL / dW = (dL/dY) . x^T
     Matrix *gradWeight = matrixOuter(grad, l->x);
-    // TODO : Multiply by 1/batch_size ? -> or in optimizer.update
     matrixAddMat(l->gradWeight, gradWeight);
 
     // dL / dB = (dL/dY)
