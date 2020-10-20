@@ -12,7 +12,7 @@ int main(int __attribute__((unused)) argc,
     srand(time(NULL));
 
     // Hyper parameters
-    float learningRate = 1e-2;
+    float learningRate = 5e-2;
     unsigned int batchSize = 4;
 
     // Dataset
@@ -31,43 +31,49 @@ int main(int __attribute__((unused)) argc,
     LossFunction criterion = mseLoss;
     Optimizer *opti = sgdNew(learningRate, batchSize);
 
-    // Feed forward
-    Matrix *y1 = layerForward(fc, x, true);
-    Matrix *y2 = layerForward(activation, y1, true);
+    static const unsigned long long epochs = 100ull;
 
-    Loss *error = criterion(y2, y);
-    printf("Loss : %g\n", error->loss);
+    for (unsigned long long e = 1; e <= epochs; ++e) {
+        // Feed forward
+        Matrix *y1 = layerForward(fc, x, true);
+        Matrix *y2 = layerForward(activation, y1, true);
 
-    // Back propagate
-    Matrix *dLoss = error->grad;
-    Matrix *dLossDY2 = layerBackward(activation, dLoss);
-    Matrix *dLossDY1 = layerBackward(fc, dLossDY2);
+        Loss *error = criterion(y2, y);
 
-    // Optimize (each batch)
-    layerUpdate(fc, opti);
-    layerUpdate(activation, opti);
+        // Back propagate
+        Matrix *dLoss = error->grad;
+        Matrix *dLossDY2 = layerBackward(activation, dLoss);
+        Matrix *dLossDY1 = layerBackward(fc, dLossDY2);
 
-    // Display result
-    matrixPrint(x);
-    puts("> Result :");
-    matrixPrint(y2);
-    puts("> Last gradient :");
-    matrixPrint(dLossDY1);
-    puts("> Updated gradient (should be 0) :");
-    matrixPrint(((Dense*)fc)->gradWeight);
+        // Optimize (each batch)
+        layerUpdate(fc, opti);
+        layerUpdate(activation, opti);
 
-    // Free (each epoch)
-    lossFree(error);
-    matrixFree(dLossDY1);
-    matrixFree(dLossDY2);
-    matrixFree(y2);
-    matrixFree(y1);
+        // Display result
+        // matrixPrint(x);
+        printf("Epoch %3llu", e);
+        printf(", Loss : %.3e", error->loss);
+        printf(", Prediction : ");
+        matrixPrint(y2);
+        // puts("> Last gradient :");
+        // matrixPrint(dLossDY1);
+        // puts("> Updated gradient (should be 0) :");
+        // matrixPrint(((Dense*)fc)->gradWeight);
+
+        // Free (each epoch)
+        lossFree(error);
+        matrixFree(dLossDY1);
+        matrixFree(dLossDY2);
+        matrixFree(y2);
+        matrixFree(y1);
+    }
 
     // Free (each phase)
     matrixFree(y);
     matrixFree(x);
 
     // Free network
+    layerFree(fc);
     layerFree(activation);
     optimizerFree(opti);
 
