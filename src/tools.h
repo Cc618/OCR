@@ -2,6 +2,7 @@
 #define TOOLS_H
 #include <SDL2/SDL.h>
 #include <stdio.h>
+#include "matrix.h"
 
 typedef struct {
     int* array;
@@ -12,13 +13,13 @@ typedef struct {
 void printImage(SDL_Renderer * ren,SDL_Surface * sur, int x, int y);
 
 //Modify the pixel (x,y) in the surface sur with the given color (pixel value)
-void setPixel(SDL_Surface* sur, int x, int y, Uint32 pixel);
+void setpixel(SDL_Surface* sur, int x, int y, Uint32 pixel);
 
 //Returns the Uint32 value of the pixel (x,y) in the surface sur.
-Uint32 getPixel(SDL_Surface* sur, int x, int y);
+Uint32 getpixel(SDL_Surface* sur, int x, int y);
 
 //From a basic image, transform all pixels in black pixels or black pixels depending on the pixel's luminosity.
-void modifImage(SDL_Renderer * ren,SDL_Surface * sur);
+void modifImage(SDL_Surface *sur);
 
 //Greyscale the image.
 void imageToGrey(SDL_Surface *surface);
@@ -34,5 +35,5 @@ dyn_arr getLines(Matrix *matrix);
 void drawLines(Matrix *matrix, dyn_arr arraylines);
 
 //Transforms a matrix into a binary matrix(changes directly the matrix).
-void matrixToBinary(Matrix *matrix)
+void matrixToBinary(Matrix *matrix);
 #endif
