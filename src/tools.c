@@ -1,9 +1,8 @@
 #include <stdio.h>
-#include "tools.h"
 #include "matrix.h"
 
-//Print the image.
-void printImage(SDL_Renderer * ren,SDL_Surface * sur, int x, int y) //This function permits to print the image in the renderer. Only for tests.
+//This function permits to print the image in the renderer. Only for tests.
+void printImage(SDL_Renderer * ren,SDL_Surface * sur, int x, int y) 
 {
     SDL_Texture* tex = SDL_CreateTextureFromSurface(ren,sur);
     SDL_Rect dst;
@@ -13,6 +12,7 @@ void printImage(SDL_Renderer * ren,SDL_Surface * sur, int x, int y) //This funct
     SDL_RenderCopy(ren, tex, NULL, &dst);
     SDL_RenderPresent(ren);
 }
+
 //Set a pixel with the x and y and pixel is the color.
 void setPixel(SDL_Surface *sur, int x, int y, Uint32 pixel)
 {
@@ -48,6 +48,7 @@ void setPixel(SDL_Surface *sur, int x, int y, Uint32 pixel)
             break;
     }
 }
+
 //Take the color of a pixel with the x and y.
 Uint32 getpixel(SDL_Surface *surface, int x, int y) //This function permits to have the Uint32 value of a pixel.
 {
@@ -96,14 +97,11 @@ void modifImage(SDL_Renderer * ren,SDL_Surface * sur)
         while(y<sur->h)
         {
             SDL_GetRGB(getpixel(sur, x, y), sur->format, &rgb.r, &rgb.g, &rgb.b);
-            //printf("(%d %d %d %d)\n",rgb.r, rgb.g, rgb.b, rgb.a);
-            //Calcul de la luminosit� du pixel, avec comme seuil 119.
+            //Calcul de la luminosite du pixel, avec comme seuil 119.
             c = (int)(0.299*rgb.r+0.587*rgb.g+0.114*rgb.b);
             c = (c>119)*255;
             if (rgb.r==0 && rgb.g == 0 && rgb.b == 0)
-            {
-                setPixel(sur,x,y,SDL_MapRGBA(sur->format, c, c, c, 255));
-            }
+                setPixel(sur,x,y,SDL_MapRGBA(sur->format, c, c, c, 255));f
             y++;
         }
         x++;
@@ -144,53 +142,92 @@ int main(int argc, char** argv)
 	SDL_DestroyWindow(win);
 	SDL_Quit();
 	return 0;
+} */
+
+//Greyscale the image.
+void imageToGrey(SDL_Surface *surface) {
+    int width = surface->w;
+    int height = surface->h;
+    for (int i = 0; i < width; i++)
+    {
+        for (int j = 0; j < height; j++)
+        {
+            Uint32 pixel = get_pixel(surface, i, j);
+            Uint8 r, g, b;
+            SDL_GetRGB(pixel, surface->format, &r, &g, &b);
+            Uint8 average = 0.3 * r + 0.59 * g + 0.11 * b;
+            r = g = b = average;
+            pixel = SDL_MapRGB(surface->format, average, average, average);
+            put_pixel(image_surface, x , y, pixel); 
+        }
+    }
 }
 
-//Take an image, size it, and put in it matrix. *surface the image, raws and cols the height and weight of the new matrix.
-//Needs to change the function because getpixel returns Uint32 and Matrix takes float;
-/*Matrix imageToMatrix(SDL_Surface *surface, int rows, int cols) {
+//Take an grey only image, size it, and put in it matrix. *surface the image, 
+//rows and cols the height and weight of the new matrix.
+Matrix greyToMatrix(SDL_Surface *surface, int rows, int cols) {
     Matrix *matrix = matrixNew(rows, cols);
+    int width = surface->w;
+    int height = surface->h;
     for (i = 0; i < rows; i++)
     {
-        for (j = 0; j < cols; j++)
-		matrixSet(*matrix, i, j, getpixel(*surface, (i * surface->w) / raws, (j * surface->h) / cols));
+        for (j = 0; j < cols; j++) {
+            //Only the r channel, because r == g == b
+            Uint8 r;
+            //Resize
+            Uint32 pixel = getpixel(*surface, (i * width) / rows, (j * height) / cols);
+            SDL_GetRGB(pixel, surface->format, &r, &r, &r;
+            matrixSet(matrix, i, j, r);
+        }
     }
     return *matrix;
-}*/
+}
 
 //Returns an array of lines with the length of this array.
-/*int getLines(Matrix *matrix) {
+dyn_arr getLines(Matrix *matrix) {
     int cols = matrix->cols;
     int rows = matrix->rows;
-    int result [malloc(sizeof(int))];
-    int length = 0;
+    dyn_arr array_lines;
+    array_lines.array = malloc(sizeof(int) * 32);
+    array_lines.length = 0;
+    int accu = 0;
+    int true_length = 32;
+    //Travels the matrix vertically, looking for a black pixel.
     for (int i = 0; i < cols; i++) {
-        float dark_dot = matrixGet(matrix, i, j)
-        if (value == cols) {
+        float pixel_color = matrixGet(matrix, i, j)
+        //If it has been found.
+        if (pixel_color == 1) {
             int j = 0;
+            //We look if there is no other black pixels on this line
             while (matrixGet(matrix, i, j) != 1 && j < rows) {
-                j += 1;
-            if (j == raws)
-                result[length] = i;
-                realloc(result, sizeof(int));
-                length++;
+                j++;
+            //If it was a line
+            if (j == rows)
+                array_lines.length++;
+                if (true_length <= accu)
+                {
+                    realloc(array_lines.array, sizeof(int) * 10);
+                    true_length += 10;
+                }
+                array_lines.array[accu] = i;
             }
         }
     }
-    return (result, length);
+    return array_lines;
 }
 
 //Draws the lines with an array that comes from getLines.
-void drawLines(Matrix *matrix, int arraylines, int length) {
+void drawLines(Matrix *matrix, dyn_arr arraylines) {
     int cols = matrix->cols;
-    for (size_t i = 0; i < length; i++)
+    for (size_t i = 0; i < arraylines.length; i++)
     {
         for (size_t j = 0; j < cols; j++)
         {
-            matrixSet(matrix, arraylines[i], j, 0);
+            matrixSet(matrix, arraylines.array[i], j, 0);
         } 
     }
-}*/
+    free(arraylines.array)
+}
 
 //Transforms a matrix into a binary matrix(changes directly the matrix).
 void matrixToBinary(Matrix *matrix) {
@@ -206,3 +243,8 @@ void matrixToBinary(Matrix *matrix) {
 		}
 	}
 }
+
+//Apply a convolution matrix on a another matrix
+/*void convolution(Matrix *matrix, Matrix *convolution_matrix) {
+
+}*/
