@@ -60,7 +60,7 @@ static void denseUpdate(Dense *l, Optimizer *o) {
     optimizerUpdate(o, l->bias, l->gradBias);
 }
 
-void denseFree(Dense *l) {
+static void denseFree(Dense *l) {
     matrixFree(l->weight);
     matrixFree(l->gradWeight);
     matrixFree(l->bias);
