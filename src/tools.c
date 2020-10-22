@@ -134,7 +134,7 @@ void imageToGrey(SDL_Surface *surface) {
 
 //Take an grey only image, size it, and put in it matrix. *surface the image, 
 //rows and cols the height and weight of the new matrix.
-Matrix greyToMatrix(SDL_Surface *surface, int rows, int cols) {
+Matrix *greyToMatrix(SDL_Surface *surface, int rows, int cols) {
     Matrix *matrix = matrixNew(rows, cols);
     int width = surface->w;
     int height = surface->h;
@@ -149,7 +149,21 @@ Matrix greyToMatrix(SDL_Surface *surface, int rows, int cols) {
             matrixSet(matrix, i, j, r);
         }
     }
-    return *matrix;
+    return matrix;
+}
+
+//Transforms a surface based on a matrix, the matrix and the surface need to have the same size.
+void matrixToGrey(SDL_Surface *surface, Matrix *matrix) {
+	int width = surface->w;
+	int height = surface->h;
+	for (int i = 0; i < width; i++) {
+		for (int j = 0; j < height; j++) {
+			float matrixValue = matrixGet(matrix, i, j);
+			Uint8 average = 255 * matrixValue;
+			Uint32 pixel = SDL_MapRGB(surface->format, average, average, average);
+			setpixel(surface, i, j, pixel);
+		}
+	}
 }
 
 //Returns an array of lines with the length of this array.
@@ -166,19 +180,22 @@ dyn_arr getLines(Matrix *matrix) {
         float pixel_color = matrixGet(matrix, i, cols / 2);
         //If it has been found.
         if (pixel_color == 1) {
-            int j = 0;
+            int j = cols / 2 + 1;
             //We look if there is no other black pixels on this line
-            while (matrixGet(matrix, i, j) != 1 && j < rows)
+            while (j < rows && matrixGet(matrix, i, j) != 1) {
                 j++;
+	    }
             //If it was a line
             if (j == rows) {
                 array_lines.length++;
+		//Reallocate some memory for the array
                 if (true_length <= accu)
                 {
                     array_lines.array = realloc(array_lines.array, sizeof(int) * 10);
                     true_length += 10;
                 }
                 array_lines.array[accu] = i;
+		accu++;
             }
         }
     }
@@ -192,7 +209,7 @@ void drawLines(Matrix *matrix, dyn_arr arraylines) {
     {
         for (int j = 0; j < cols; j++)
         {
-            matrixSet(matrix, arraylines.array[i], j, 0);
+            matrixSet(matrix, arraylines.array[i], j, 1);
         } 
     }
     free(arraylines.array);

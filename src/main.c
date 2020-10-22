@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include "tools.h"
+#include "matrix.h"
+
 int main()
 {
     //Initialisation
@@ -12,13 +14,16 @@ int main()
 		return -1;
 	}
 	//Image Loading	
-	SDL_Surface *sur = SDL_LoadBMP("image.bmp");
+	SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
 	if (!sur)
 	{
 		fprintf(stderr,"Ne trouve pas l'image\n");
 		return -1;	
 	}
-
+	imageToGrey(sur);
+	//Matrix *matrix = greyToMatrix(sur, 200, 200);
+	//matrixPrint(matrix);
+	//matrixFree(matrix);
 	SDL_CreateWindowAndRenderer(1400, 1000,0,&win,&ren);
 	if (!win || !ren)
 	{

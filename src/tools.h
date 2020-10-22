@@ -26,7 +26,10 @@ void imageToGrey(SDL_Surface *surface);
 
 //Take an grey only image, size it, and put in it matrix. *surface the image, 
 //rows and cols the height and weight of the new matrix.
-Matrix greyToMatrix(SDL_Surface *surface, int rows, int cols);
+Matrix *greyToMatrix(SDL_Surface *surface, int rows, int cols);
+
+//Transforms a surface based on a matrix, the matrix and the surface need to have the same size.
+void matrixToGrey(SDL_Surface *surface, Matrix *matrix);
 
 //Returns an array of lines with the length of this array.
 dyn_arr getLines(Matrix *matrix);
