@@ -4,13 +4,15 @@
 #include <SDL2/SDL.h>
 
 //This function permits to print the image in the renderer. Only for tests.
-void printImage(SDL_Renderer * ren,SDL_Surface * sur, int x, int y) 
+void printImage(SDL_Renderer *ren,SDL_Surface *sur, int x, int y) 
 {
-    SDL_Texture* tex = SDL_CreateTextureFromSurface(ren,sur);
+    SDL_Texture *tex = SDL_CreateTextureFromSurface(ren,sur);
     SDL_Rect dst;
     SDL_QueryTexture(tex,NULL,NULL,&dst.w,&dst.h);
     dst.x = x;
     dst.y = y;
+    dst.w = 1400;
+    dst.h = 1000;
     SDL_RenderCopy(ren, tex, NULL, &dst);
     SDL_RenderPresent(ren);
 }
@@ -110,42 +112,6 @@ void modifImage(SDL_Surface *sur)
         x++;
     }
 }
-
-/*
-//Test function
-int main(int argc, char** argv)
-{
-    //Initialisation
-	SDL_Window *win = 0;
-	SDL_Renderer *ren = 0;
-	if (SDL_Init(SDL_INIT_EVERYTHING)<0)
-	{
-		fprintf(stderr,"Erreur initialisation\n");
-		return -1;
-	}
-	SDL_CreateWindowAndRenderer(500,500,0,&win,&ren);
-	if (!win || !ren)
-	{
-		fprintf(stderr,"Erreur a la creation des fenetres\n");
-		SDL_Quit();
-		return -1;
-	}
-	SDL_SetRenderDrawColor(ren,0,0,0,255);
-	SDL_RenderClear(ren);
-	//Image Loading
-	SDL_Surface * sur = SDL_LoadBMP("image2.bmp");
-	printImage(ren,sur,0,0);
-	//modifImage is only a test which permits to see if the conversion of pixels with a certain color in another color works.
-	modifImage(ren,sur);
-	printImage(ren,sur,100,0);
-	SDL_RenderPresent(ren);
-	SDL_Delay(4000);
-	//Closure
-	SDL_DestroyRenderer(ren);
-	SDL_DestroyWindow(win);
-	SDL_Quit();
-	return 0;
-} */
 
 //Greyscale the image.
 void imageToGrey(SDL_Surface *surface) {
