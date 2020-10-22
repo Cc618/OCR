@@ -16,7 +16,7 @@ void netMain() {
     // Hyper parameters
     static const float learningRate = 1e-2;
     static const unsigned int batchSize = 4;
-    static const size_t epochs = 1500;
+    static const size_t epochs = 2000;
     static const size_t dispFreq = 100;
 
     // Dataset
@@ -44,7 +44,6 @@ void netMain() {
     Layer *fc1 = denseNew(2, 4);
     Layer *activation1 = sigmoidNew();
     Layer *fc2 = denseNew(4, 1);
-    // TODO Layer *activation2 = sigmoidNew();
     LossFunction criterion = mseLoss;
     Optimizer *opti = sgdNew(learningRate, batchSize);
 
