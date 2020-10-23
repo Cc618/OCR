@@ -6,7 +6,7 @@
 int main()
 {
     //Initialisation
-	SDL_Window *win = 0;
+	/*SDL_Window *win = 0;
 	SDL_Renderer *ren = 0;
 	if (SDL_Init(SDL_INIT_EVERYTHING)<0)
 	{
@@ -21,8 +21,8 @@ int main()
 		return -1;	
 	}
 	imageToGrey(sur);
-	//Matrix *matrix = greyToMatrix(sur, 200, 200);
-	//matrixPrint(matrix);
+	//Matrix *matrix = greyToMatrix(sur, sur->w, sur->h);
+	//matrixToGrey(sur, matrix);
 	//matrixFree(matrix);
 	SDL_CreateWindowAndRenderer(1400, 1000,0,&win,&ren);
 	if (!win || !ren)
@@ -39,6 +39,14 @@ int main()
 	//Closure
 	SDL_DestroyRenderer(ren);
 	SDL_DestroyWindow(win);
-	SDL_Quit();
+	SDL_Quit();*/
+	Matrix *matrix = matrixZero(8, 8);
+	matrixSet(matrix, 4, 4, 1);
+	matrixSet(matrix, 5, 3, 1);
+	matrixPrint(matrix);
+	dyn_arr dar = getLines(matrix);
+	drawLines(matrix, dar);
+	printf("\n");
+	matrixPrint(matrix);
 	return 0;
 }

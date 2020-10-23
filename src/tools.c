@@ -135,7 +135,7 @@ void imageToGrey(SDL_Surface *surface) {
 //Take an grey only image, size it, and put in it matrix. *surface the image, 
 //rows and cols the height and weight of the new matrix.
 Matrix *greyToMatrix(SDL_Surface *surface, int rows, int cols) {
-    Matrix *matrix = matrixNew(rows, cols);
+    Matrix *matrix = matrixZero(rows, cols);
     int width = surface->w;
     int height = surface->h;
     for (int i = 0; i < rows; i++)
@@ -165,41 +165,52 @@ void matrixToGrey(SDL_Surface *surface, Matrix *matrix) {
 		}
 	}
 }
-
-//Returns an array of lines with the length of this array.
 dyn_arr getLines(Matrix *matrix) {
-    int cols = matrix->cols;
-    int rows = matrix->rows;
-    dyn_arr array_lines;
-    array_lines.array = malloc(sizeof(int) * 32);
-    array_lines.length = 0;
-    int accu = 0;
-    int true_length = 32;
-    //Travels the matrix vertically, looking for a black pixel.
-    for (int i = 0; i < cols; i++) {
-        float pixel_color = matrixGet(matrix, i, cols / 2);
-        //If it has been found.
-        if (pixel_color == 1) {
-            int j = cols / 2 + 1;
-            //We look if there is no other black pixels on this line
-            while (j < rows && matrixGet(matrix, i, j) != 1) {
-                j++;
-	    }
-            //If it was a line
-            if (j == rows) {
-                array_lines.length++;
-		//Reallocate some memory for the array
-                if (true_length <= accu)
-                {
-                    array_lines.array = realloc(array_lines.array, sizeof(int) * 10);
-                    true_length += 10;
-                }
-                array_lines.array[accu] = i;
-		accu++;
-            }
-        }
-    }
-    return array_lines;
+	int cols = matrix->cols;
+    	int rows = matrix->rows;
+	int accu = 0;
+	int true_length = 32;
+   	dyn_arr array_lines;
+    	array_lines.array = malloc(sizeof(int) * 32);
+    	array_lines.length = 0;
+	for (int i = 0; i < rows; i++) {
+		int is_empty = 0;
+		int j = 0;
+		while (is_empty == 0 && j < cols) {
+			float pixel_color = matrixGet(matrix, i, j);
+			if (pixel_color != 0)
+				is_empty = -1;
+			j++;
+		}
+		if (is_empty == -1) {
+			array_lines.array[accu] = i;
+			array_lines.length++;
+			accu++;
+			if (accu >= true_length) {
+				array_lines.array = realloc(array_lines.array, sizeof(int) * 10);
+                  		true_length += 10;
+			}
+		}
+	}
+	dyn_arr array_lines2;
+    	array_lines2.array = malloc(sizeof(int) * array_lines.length);
+	array_lines2.length = 0;
+	accu = 1;
+	array_lines2.array[0] = array_lines.array[0] - 1;
+	for (int j = 1; j < array_lines.length - 1; j++) {
+		if (array_lines.array[j - 1] != array_lines.array[j] - 1) {
+			array_lines2.array[accu] = array_lines.array[j] - 1;
+			accu++;
+		}
+	}
+	array_lines2.length = accu;
+	if (array_lines.length > 1) {
+		array_lines2.array[accu] = array_lines.array[array_lines.length - 1] + 1;
+		array_lines2.length++;
+	}
+	free(array_lines.array);
+	return array_lines2;
+
 }
 
 //Draws the lines with an array that comes from getLines.
