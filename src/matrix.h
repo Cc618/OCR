@@ -3,6 +3,9 @@
 
 #include <stdlib.h>
 
+// Unsafe get
+#define MAT_GET(m, i, j) (m->data[i * m->cols + j])
+
 typedef struct Matrix_t {
     // Height, width
     size_t rows, cols;
@@ -40,6 +43,10 @@ Matrix *matrixDot(const Matrix *a, const Matrix *b);
 // Transposed product a^T * b
 Matrix *matrixDotT(const Matrix *a, const Matrix *b);
 
+// Outer vector product
+// y = a * b^T
+Matrix *matrixOuter(const Matrix *a, const Matrix *b);
+
 // Inplace element wise operations
 void matrixAdd(Matrix *a, float b);
 
@@ -59,6 +66,12 @@ void matrixDivMat(Matrix *a, const Matrix *b);
 
 // Inplace map element wise function to matrix
 void matrixMap(Matrix *m, float (*func)(float value));
+
+// The sigmoid function
+void matrixSigmoid(Matrix *m);
+
+// First derivative of the sigmoid
+void matrixSigmoidPrime(Matrix *m);
 
 #endif // MATRIX_H
 
