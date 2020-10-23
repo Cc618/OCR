@@ -10,21 +10,15 @@ float randFloatUnif(float min, float max) {
 }
 
 float randFloatNorm() {
-    // Method described by Abramowitz and Stegun to generate random numbers
+    // Using Box-Muller transform to generate random numbers
     // with a gaussian distribution
 
     static float U, V;
-    static int phase = 0;
     float Z;
 
-    if(phase == 0) {
-        U = (rand() + 1.) / (RAND_MAX + 2.);
-        V = rand() / (RAND_MAX + 1.);
-        Z = sqrt(-2 * log(U)) * sin(2 * PI * V);
-    } else
-        Z = sqrt(-2 * log(U)) * cos(2 * PI * V);
-
-    phase = 1 - phase;
+    U = (rand() + 1.) / (RAND_MAX + 2.);
+    V = rand() / (RAND_MAX + 1.);
+    Z = sqrt(-2 * log(U)) * cos(2 * PI * V);
 
     return Z;
 }
