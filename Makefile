@@ -2,15 +2,21 @@ DIR_BIN = bin
 DIR_OBJ = obj
 DIR_SRC = src
 BIN = $(DIR_BIN)/ocr
-SRC = $(wildcard $(DIR_SRC)/*.c) 
+SRC = $(wildcard $(DIR_SRC)/*.c)
 OBJ = $(subst $(DIR_SRC),$(DIR_OBJ), $(SRC:.c=.o))
-DEP = $(OBJ:.o=.d) 
+DEP = $(OBJ:.o=.d)
 
 CC = gcc
 CPPFLAGS = -MMD
 CFLAGS = -Wall -Wextra -std=c99
-LDLIBS = -lm
+LDLIBS = -lm -lSDL2
 LDFLAGS =
+
+# Windows specific flags
+ifeq ($(OS), Windows_NT)
+	CFLAGS += -Ilib/include
+	LDFLAGS += -Llib/lib
+endif
 
 all: dirs $(BIN)
 
@@ -35,4 +41,3 @@ dirs:
 	mkdir -p $(DIR_BIN) $(DIR_OBJ)
 
 -include $(DEP)
-

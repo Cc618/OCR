@@ -1,1 +1,8 @@
 # OCR
+
+tools.c :
+setPixel(SDL_Surface sur, int x, int y, Uint32 pixel) : modify the pixel (x,y) in the surface sur with the given color (pixel value)
+
+getPixel(SDL_Surface sur, int x, int y) : returns the Uint32 value of the pixel (x,y) in the surface sur.
+
+printImage(SDL_Renderer ren, SDL_Surface sur) : print the actual surface on the renderer.
