@@ -1,15 +1,15 @@
 //m contient les données (pixels noir, pixels blancs)
-void analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,int** result)
+int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,int** result)
 {
     //Premier parcours : on change les valeurs 1 en fonction de la valeur du caractère. On crée une première version de values et de coord, les variables n et m indiquant le nombre de valeurs utilisées et le nombre de caractères détectés, ainsi que ram qui rassemble les données de coord et values immédiatement modifiables.
     int x = 0;
     int y = haut;
     int n = 0;
     int m = 0;
-    int** ram = malloc(sizeof(int)*(bas-haut)*2+2);
+    int** ram = malloc(sizeof(int*)*((bas-haut)*2+2));
     while (x<(bas-haut)*2+2);
     {
-        ram[x]=ram;
+        ram[x]=NULL;
         //Les pointeurs de ram sont tous sur ram : on sait ainsi que ram n'a pas de données particulières.
         //Les premiers pointeurs sont ceux de values, les suivants sont coord, et les deux derniers pointent sur les structures dynamiques de coord et values, qui seront stockées dans l'étape 2 sous la forme d'un tableau, avec les valeurs coord et values comme adresse.
         x++;
@@ -38,23 +38,27 @@ void analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,i
             //Le pixel prend alors la valeur du caractère auquel il se connecte.
             //S'il n'y a pas d'autres pixels, alors il se forme une nouvelle valeur.
             //Si le pixel est connecté à deux valeurs différentes, celles-ci sont connectées (dans values).
-            if (mat[x,y])
+            if (matrixGet(mat,x,y))
             {
-                int neighbours[4] = [0,0,0,0];
+                int neighbours[4];
+                neighbours[0]=0;
+                neighbours[1]=0;
+                neighbours[2]=0;
+                neighbours[3]=0;
                 if (x>gauche)
                 {
-                    neighbours[2]=mat[x-1,y];
+                    neighbours[2]=matrixGet(mat,x-1,y);
                     if (y<bas)
                     {
-                        neighbours[3]=mat[x-1,y+1];
+                        neighbours[3]=matrixGet(mat,x-1,y+1);
                     }
                 }
                 if (y>haut)
                 {
-                    neighbours[0]=mat[x,y-1];
+                    neighbours[0]=matrixGet(mat,x,y-1);
                     if (x>gauche)
                     {
-                        neighbours[1]=mat[x-1,y-1];
+                        neighbours[1]=matrixGet(mat,x-1,y-1);
                     }
                 }
                 //Comparaison des pixels voisins. Z est un compteur, value est la valeur que prendra le pixel
@@ -92,8 +96,8 @@ void analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,i
                                     //Si elles ne sont pas dans les fusions, alors soit elles ont été liées avant la boucle actuelle, soit elles ne sont pas liées.
                                     //Dans ce cas, si l'on trouve value et neighbours[z] dans la ram, elles ne sont pas liées.
                                     //Et si l'on ne trouve que l'un des deux facteurs, elles sont liées.
-                                    int a1=ram[(bas-haut)*2];
-                                    int a2=ram[(bas-haut)*2];
+                                    int* a1=ram[(bas-haut)*2];
+                                    int* a2=ram[(bas-haut)*2];
                                     w=0;
                                     while (w<bas-haut)
                                     {
@@ -130,7 +134,7 @@ void analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,i
                     value = n;
                     newvalue = 1;
                 }
-                mat[x,y]=value;
+                matrixSet(mat,x,y,value);
                 //Et derniere etape : indiquer que cette valeur se trouve dans la colonne.
                 z=(bas-haut)*2;
                 while (column[z]!=value && column[z]!=0)
@@ -140,11 +144,16 @@ void analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,i
                 //En n'oubliant pas de modifier les coordonnées.
                 if (newvalue)
                 {
-                    int newcoord[6]=[value,x,y,1,1,0];
+                    int** newcoord = malloc(sizeof(int*)*6);
+                    newcoord[0]=value;
+                    newcoord[1]=x;
+                    newcoord[2]=y;
+                    newcoord[3]=1;
+                    newcoord[4]=1;
                     newcoord[5]=&newcoord;
                     column[z+1]=&newcoord;
                     int adress = 0;
-                    while (ram[(bas-haut)+adress]!=&ram)
+                    while (ram[(bas-haut)+adress]!=NULL)
                     {
                         adress++;
                     }
@@ -213,7 +222,7 @@ void analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,i
                     else
                     {
                         //Dans l'autre cas, on prend la valeur présente dans ram. S'il y a fusion, il y a forcément une valeur dans ram.
-                        int newfusion[3];
+                        int** newfusion = malloc(sizeof(int*)*3);
                         if (w1==-1)
                         {
                             int v = w2;
@@ -321,6 +330,7 @@ void analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,i
             coord1[4*(adress[0]-1)+y]=adress[1+y];
             y++;
         }
+        free(adress);
         adress=adress[5];
         x++;
     }
@@ -376,6 +386,7 @@ void analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,i
         }
         //Et enfin, on met la valeur dans values, et on passe à la valeur suivante.
         values1[x]=adress[0];
+        free(adress);
         adress = adress[1];
     }
     //Maintenant, la matrice a terminé d'être analysée, on a toutes les données utiles.
@@ -393,6 +404,9 @@ void analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,i
         }
         x++;
     }
+    free(ram);
+    free(coord1);
+    free(values1);
     //On place ainsi result1 dans le pointeur result, et on retourne le nombre de mot m (qui est donc la longueur de result1).
     result[0]=result1;
     return m;
@@ -403,3 +417,6 @@ void analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,i
 //-> La localisation de chaque caractère : pour un caractère n (n<m), le caractère est formé de tous les pixels de valeur
 //     result[0][5*n] dans le rectangle délimité par : x=result[0][5*n+1],y=result[0][5*n+2],w=result[0][5*n+3],h=result[0][5*n+4].
 //A partir de là, envoyer les matrices au réseau ne devrait pas être trop compliqué...
+
+
+//ATTENTION !!! Il ne faut pas oublier de free result[0] une fois que le programme est terminé !
