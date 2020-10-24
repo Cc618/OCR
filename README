@@ -1,8 +1,17 @@
-# OCR
+# OCR by Iron Minds
+Currently shows the image processing and a neural network learning the XOR function.
 
-tools.c :
-setPixel(SDL_Surface sur, int x, int y, Uint32 pixel) : modify the pixel (x,y) in the surface sur with the given color (pixel value)
+## Usage
+### Build
+Run make to compile this project to bin/ocr.
+Furthermore, there are clean and run rules to remove temporary files and run the program without any argument.
 
-getPixel(SDL_Surface sur, int x, int y) : returns the Uint32 value of the pixel (x,y) in the surface sur.
+### Run
+For the moment, only demos are available for the image segmentation and the neural network parts :
 
-printImage(SDL_Renderer ren, SDL_Surface sur) : print the actual surface on the renderer.
+```sh
+# Image part
+bin/ocr img
+# Network part
+bin/ocr net
+```
