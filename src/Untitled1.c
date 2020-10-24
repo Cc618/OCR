@@ -214,7 +214,7 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                         int** end = ram[w1];
                         while (end[1]!=NULL)
                         {
-                            end=end[1];
+                            *end=end[1];
                         }
                         end[1]=&ram[w2];
                         ram[w2]=NULL;
@@ -235,10 +235,10 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                         newfusion[0]=other;
                         newfusion[1]=&newfusion;
                         newfusion[2]=&newfusion;
-                        int* end = ram[w1];
+                        int** end = ram[w1];
                         while (end[1]!=&end)
                         {
-                            end=end[1];
+                            *end=end[1];
                         }
                         end[1]=&newfusion;
                     }
