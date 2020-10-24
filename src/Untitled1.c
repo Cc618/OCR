@@ -145,7 +145,7 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                 if (newvalue)
                 {
                     int** newcoord = malloc(sizeof(int*)*6);
-                    newcoord[0]=value;
+                    newcoord[0]=(int*)value;
                     newcoord[1]=x;
                     newcoord[2]=y;
                     newcoord[3]=1;
@@ -211,13 +211,13 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                     {
                         //value et other sont dans ram. On prend alors other et on la place tout au bout de la liste des fusions de value.
                         //la place qu'occupait other dans ram devient un pointeur sur la ram.
-                        int* end = ram[w1];
-                        while (end[1]!=&end)
+                        int** end = ram[w1];
+                        while (end[1]!=NULL)
                         {
                             end=end[1];
                         }
                         end[1]=&ram[w2];
-                        ram[w2]=&ram;
+                        ram[w2]=NULL;
                     }
                     else
                     {
@@ -375,9 +375,9 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                 int y1 = othercoord[1];
                 while (y1<othercoord[1]+othercoord[3])
                 {
-                    if (mat[x1,y1]==fusion[0])
+                    if (matriceGet(mat,x1,y1)==fusion[0])
                     {
-                        mat[x1,y1]=adress[0];
+                        matriceSet(mat,x1,y1,adress[0]);
                     }
                     y1++;
                 }
