@@ -24,13 +24,13 @@ res - Folder for the ressources of the project. For now it's the reference image
 
 src - Folder for the source of the project. It contains our code :
   main.c = The all target, the program.
-  
+
   matrix.c = Contains the matrix functions.
   matrix.h = Header for the matrix.c with explanations of the functions.
-  
+
   tools.c = Contains all the tools for image manipulations.
   tools.h = Header for the tools.c with explanations of the functions.
-  
+
   initializer.c = Contains ths functions for initializing matrices.
   initializer.h = Header for the initializer.c.
 
