@@ -55,6 +55,6 @@ void drawLines(Matrix *matrix, dyn_arr arraylines);
 //Transforms a matrix into a binary matrix(changes directly the matrix).
 void matrixToBinary(Matrix *matrix);
 
-//m contient les données (pixels noir, pixels blancs)
-int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,int** result);
+//Separates all symbols in a line.
+int analysis(Matrix* mat, int top, int down, int left,int right,int** result);
 #endif

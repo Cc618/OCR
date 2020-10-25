@@ -79,7 +79,7 @@ void setpixel(SDL_Surface *sur, int x, int y, Uint32 pixel)
 }
 
 //Take the color of a pixel with the x and y.
-Uint32 getpixel(SDL_Surface *surface, int x, int y) //This function permits to have the Uint32 value of a pixel.
+Uint32 getpixel(SDL_Surface *surface, int x, int y)
 {
     int bpp = surface->format->BytesPerPixel;
     //Here p is the address to the pixel we want to retrieve
@@ -111,7 +111,8 @@ Uint32 getpixel(SDL_Surface *surface, int x, int y) //This function permits to h
     }
 }
 
-//From a basic image, transform all pixels in black pixels or black pixels depending on the pixel's luminosity.
+//From a basic image, transform all pixels in white pixels or black pixels
+//depending on the pixel's luminosity.
 void modifImage(SDL_Surface *sur)
 {
     SDL_Color rgb;
@@ -126,7 +127,7 @@ void modifImage(SDL_Surface *sur)
         y=0;
         while(y<sur->h)
         {
-            SDL_GetRGB(getpixel(sur, x, y), sur->format, &rgb.r, &rgb.g, &rgb.b);
+            SDL_GetRGB(getpixel(sur, x,y), sur->format, &rgb.r, &rgb.g, &rgb.b);
             //Calcul de la luminosite du pixel, avec comme seuil 119.
             c = (int)(0.299*rgb.r+0.587*rgb.g+0.114*rgb.b);
             c = (c>119)*255;
@@ -177,7 +178,8 @@ Matrix *greyToMatrix(SDL_Surface *surface) {
     return matrix;
 }
 
-//Transforms a surface based on a matrix, the matrix and the surface need to have the same size.
+//Transforms a surface based on a matrix, the matrix and the surface
+//need to have the same size.
 void matrixToGrey(SDL_Surface *surface, Matrix *matrix) {
 	int width = surface->w;
 	int height = surface->h;
@@ -185,7 +187,7 @@ void matrixToGrey(SDL_Surface *surface, Matrix *matrix) {
 		for (int i = 0; i < height; i++) {
 			float matrixValue = matrixGet(matrix, i, j);
 			Uint8 average = matrixValue * 255.0f;
-			Uint32 pixel = SDL_MapRGB(surface->format, average, average, average);
+			Uint32 pixel = SDL_MapRGB(surface->format,average,average, average);
 			setpixel(surface, j, i, pixel);
 		}
 	}
@@ -261,70 +263,70 @@ void matrixToBinary(Matrix *matrix) {
 	}
 }
 
-//m contient les données (pixels noir, pixels blancs)
-int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,int** result)
+int analysis(Matrix* mat, int top, int down, int left,int right,int** result)
 {
-    //Premier parcours : on change les valeurs 1 en fonction de la valeur du caractère. On crée une première version de values et de coord, les variables n et m indiquant le nombre de valeurs utilisées et le nombre de caractères détectés, ainsi que ram qui rassemble les données de coord et values immédiatement modifiables.
+    //First step : we browse the matrix in order to associate each pixel
+    //with a value which shows to which sign the pixel owns.
+    //During this step, we count the number of value used, the number of
+    //symbols detected, the values which owns to a same symbol and the
+    //localisation of each value.
     int x = 0;
-    int y = haut;
+    int y = top;
     int n = 0;
     int m = 0;
-    ValueList** ramValue = malloc(sizeof(ValueList*)*(bas-haut+1));
-    CoordList** ramCoord = malloc(sizeof(CoordList*)*(bas-haut+1));
-    while (x<(bas-haut)+1)
+    int h = down-top;
+    ValueList** ramValue = malloc(sizeof(ValueList*)*(h+1));
+    CoordList** ramCoord = malloc(sizeof(CoordList*)*(h+1));
+    while (x<(h)+1)
     {
         ramValue[x]=NULL;
         ramCoord[x]=NULL;
-        //Les pointeurs de ram sont tous sur ram : on sait ainsi que ram n'a pas de données particulières.
-        //Les premiers pointeurs sont ceux de values, les suivants sont coord, et les deux derniers pointent sur les structures dynamiques de coord et values, qui seront stockées dans l'étape 2 sous la forme d'un tableau, avec les valeurs coord et values comme adresse.
         x++;
     }
-    x=gauche;
-    int* column = malloc(sizeof(int)*(bas-haut)*3);
-    //Début du premier parcours : on va de haut en bas, de gauche jusqu'à droite. Cela devrait à priori réduire le temps de calcul de la seconde étape... Mais l'inverse fonctionne également.
-    while (x<=droite)
+    x=left;
+    int* column = malloc(sizeof(int)*(h)*3);
+    while (x<=right)
     {
-        y=haut;
-        //On crée un tableau fusions, qui va récapituler les valeurs fusionnées et les valeurs présentes dans la colonne. fusionscount est un marqueur.
-        int fusionscount = (bas-haut)*2;
-        while (fusionscount < (bas-haut)*3)
+        y=top;
+        //fusion will memorize all fusions in the current column.
+        int fusionscount = (h)*2;
+        while (fusionscount < (h)*3)
         {
             column[fusionscount*2]=0;
             fusionscount++;
         }
         fusionscount=0;
-        while (y<=bas)
+        while (y<=down)
         {
 
-            //Pour chaque pixel, s'il a comme valeur 1 (pixel noir), on regarde les quatre posés à gauche et juste en haut.
-            //Si l'un de ces pixels a une valeur différente de 0, les deux pixels sont connectés.
-            //Le pixel prend alors la valeur du caractère auquel il se connecte.
-            //S'il n'y a pas d'autres pixels, alors il se forme une nouvelle valeur.
-            //Si le pixel est connecté à deux valeurs différentes, celles-ci sont connectées (dans values).
-            if (matrixGet(mat,y,x))
+            //For each pixel, we look the others pixel at its left and
+            //over him. Then we can determine the value of the pixel.
+            //If there are multiple values a pixel can have, it means that
+            //these values have to be merged.
+            if (!matrixGet(mat,y,x))
             {
                 int neighbours[4];
                 neighbours[0]=0;
                 neighbours[1]=0;
                 neighbours[2]=0;
                 neighbours[3]=0;
-                if (x>gauche)
+                if (x>left)
                 {
-                    neighbours[2]=matrixGet(mat,y,x-1);
-                    if (y<bas)
+                    neighbours[2]=(int)matrixGet(mat,y,x-1)*100000;
+                    if (y<down)
                     {
-                        neighbours[3]=matrixGet(mat,y+1,x-1);
+                        neighbours[3]=(int)matrixGet(mat,y+1,x-1)*100000;
                     }
                 }
-                if (y>haut)
+                if (y>top)
                 {
-                    neighbours[0]=matrixGet(mat,y-1,x);
-                    if (x>gauche)
+                    neighbours[0]=(int)matrixGet(mat,y-1,x)*100000;
+                    if (x>left)
                     {
-                        neighbours[1]=matrixGet(mat,y-1,x-1);
+                        neighbours[1]=(int)matrixGet(mat,y-1,x-1)*100000;
                     }
                 }
-                //Comparaison des pixels voisins. Z est un compteur, value est la valeur que prendra le pixel
+                //Here is the determination of the value.
                 int z = 1;
                 int value = neighbours[0];
                 while (z<4)
@@ -339,30 +341,40 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                         {
                             if (value!=neighbours[z])
                             {
-                                //On cherche les emplacements des values dans fusion, pour savoir si elles sont déjà liées.
+                                //We search if both merges values are in
+                                //the column. If it is the case, it means
+                                //that they have already been saved.
                                 int w = 0;
                                 char found = 0;
-                                while (w<(haut-bas) && !found)
+                                while (w<h && !found)
                                 {
-                                    if (column[w*2]==value || column[w*2+1]==value)
+                                    if(column[w*2]==value||column[w*2+1]==value)
                                     {
-                                        if (column[w*2]==neighbours[z] || column[w*2+1]==neighbours[z])
+                                        if (column[w*2]==neighbours[z])
                                         {
                                             found=1;
                                             w-=1;
+                                        }
+                                        else
+                                        {
+                                            if(column[w*2+1]==neighbours[z])
+                                            {
+                                                found=1;
+                                                w-=1;
+                                            }
                                         }
                                     }
                                     w+=1;
                                 }
                                 if (!found)
                                 {
-                                    //Si elles ne sont pas dans les fusions, alors soit elles ont été liées avant la boucle actuelle, soit elles ne sont pas liées.
-                                    //Dans ce cas, si l'on trouve value et neighbours[z] dans la ram, elles ne sont pas liées.
-                                    //Et si l'on ne trouve que l'un des deux facteurs, elles sont liées.
-                                    ValueList* a1=ramValue[bas-haut];
-                                    ValueList* a2=ramValue[bas-haut];
+                                    //Else, we search for these values in the
+                                    //ramValues. If there is only one value,
+                                    //they have already been merge.
+                                    ValueList* a1=ramValue[h];
+                                    ValueList* a2=ramValue[h];
                                     w=0;
-                                    while (w<bas-haut)
+                                    while (w<h)
                                     {
                                         if (ramValue[w]->value==value)
                                         {
@@ -374,9 +386,10 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                                         }
                                         w++;
                                     }
-                                    if (a1!=ramValue[bas-haut] && a2!=ramValue[bas-haut])
+                                    if (a1!=ramValue[h] && a2!=ramValue[h])
                                     {
-                                        //Il ne reste plus qu'à fusionner les deux valeurs.
+                                        //What remains to do is only to
+                                        //say that they will be merged.
                                         column[fusionscount*2]=value;
                                         column[fusionscount*2+1]=neighbours[z];
                                         fusionscount++;
@@ -387,8 +400,8 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                     }
                     z++;
                 }
-                //On a ainsi la valeur du pixel, plus qu'à l'assigner.
-                //Si elle est nulle, il faut créer une nouvelle valeur. Il suffit d'augmenter m et n pour cela.
+                //If the value found is null, it means that we are on a pixel
+                //of a potential new symbol.
                 char newvalue = 0;
                 if (!value)
                 {
@@ -397,14 +410,14 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                     value = n;
                     newvalue = 1;
                 }
-                matrixSet(mat,y,x,value);
-                //Et derniere etape : indiquer que cette valeur se trouve dans la colonne.
-                z=(bas-haut)*2;
+                matrixSet(mat,y,x,value*0.00001);
+                //And last step : write in the column that the value is inside.
+                z=(h)*2;
                 while (column[z]!=value && column[z]!=0)
                 {
                     z++;
                 }
-                //En n'oubliant pas de modifier les coordonnées.
+                //Don't forget to update ramCoord.
                 if (newvalue)
                 {
                     CoordList* newcoord = newCoordList();
@@ -431,32 +444,28 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                     if (column[z]==0)
                     {
                         ramCoord[adress]->coord[2]=x;
-                        //On augmente la largeur de la valeur, car elle n'était jusque là pas présente dans la colonne.
+                        //The value width.
                     }
                     if (ramCoord[adress]->coord[3]<y)
                     {
                         ramCoord[adress]->coord[3]=y;
-                        //On augmente la hauteur de la valeur, car l'ordonnée actuelle est plus basse que celle déjà enregistrée.
+                        //The value max height.
                     }
                     if (ramCoord[adress]->coord[1]>y)
                     {
                         ramCoord[adress]->coord[1]=y;
-                        //On baisse la hauteur de la valeur, car l'ordonnée actuelle est plus haute que celle déjà enregistrée.
+                        //The value min height.
                     }
                 }
                 column[z]=value;
             }
             y++;
         }
-        //La colonne est finie. Maintenant, il faut modifier la ram avec les fusions effectuées et les valeurs créées.
-        //Premièrement, les fusions.
-        //Notez que si cela semble complexe, il y aura assez peu de fusions au final...
+        //Column is finished ! Now we have to update ramValue with earned datas.
         int z =0;
-        while (z<(bas-haut))
+        while (z<(h))
         {
-            //Les fusions.
-            //A chaque fusion, on prend la valeur de ram et on la place après la valeur de fusion, et on remplace tout dans le tableau column.
-            //En gros, on fait un chainage de liste dynamique.
+            //Here is the merging...
             if (column[z*2])
             {
                 int value = column[z*2];
@@ -464,7 +473,7 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                 int w1 = -1;
                 int w2 = -1;
                 int w = 0;
-                while (w<bas-haut)
+                while (w<h)
                 {
                     if (ramValue[w]!=NULL)
                     {
@@ -483,8 +492,6 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                 {
                     if (w1 != -1 && w2 != -1)
                     {
-                        //value et other sont dans ram. On prend alors other et on la place tout au bout de la liste des fusions de value.
-                        //la place qu'occupait other dans ram devient un pointeur sur la ram.
                         ValueList* adress = ramValue[w1];
                         while (adress->fusion!=NULL)
                         {
@@ -495,7 +502,6 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                     }
                     else
                     {
-                        //Dans l'autre cas, on prend la valeur présente dans ram. S'il y a fusion, il y a forcément une valeur dans ram.
                         ValueList* newList = newValueList();
                         if (w1==-1)
                         {
@@ -515,10 +521,11 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                         adress->fusion = newList;
                     }
                     m--;
-                    //On a un caractère potentiel en moins.
-                    //Et dernière étape : il faut remplacer toutes les valeurs other de column par la valeur value.
+                    //After the merging has been done, we decrement m because
+                    //there is a potential symbol in less.
+                    //Now, we replace all other values in the column.
                     int v = 0;
-                    while(v<(bas-haut)*2)
+                    while(v<(h)*2)
                     {
                         if (column[v]==other)
                         {
@@ -531,71 +538,69 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
             z++;
 
         }
-        //Maintenant, on retire les valeurs de la ram qui ne sont pas apparues dans la colonne.
-        //Les valeurs ayant été fusionnées ne sont pour rappel plus dans la colonne.
+        //Now, all values in the ramValue which have not been used in the
+        //column have to be removed at the end of the ram, until the end of
+        //the matrix browsing.
         z=0;
-        while (z<(bas-haut))
+        while (z<(h))
         {
             if (ramValue[z]!=NULL)
             {
                 char found = 0;
                 int value = ramValue[z]->value;
                 int w = 0;
-                while (w<(bas-haut) && !found)
+                while (w<(h) && !found)
                 {
-                    if (column[w+(bas-haut)*2]==value)
+                    if (column[w+(h)*2]==value)
                     {
                         found = 1;
                     }
                 }
-                if (!found)
+                if (!found||x==right)
                 {
-                    //On place la valeur et toutes celles fusionnées dans la liste dynamique values.
-                    ramValue[z]->next=ramValue[(bas-haut)];
-                    ramValue[bas-haut]=ramValue[z];
+                    ramValue[z]->next=ramValue[(h)];
+                    ramValue[h]=ramValue[z];
                     ramValue[z]=NULL;
                 }
             }
             z++;
         }
-        //La même, mais cette fois avec les Coordonnées.
+        //The same, but with ramCoord.
         z=0;
-        while (z<bas-haut)
+        while (z<h)
         {
             if (ramCoord[z]!=NULL)
             {
                 char found = 0;
                 int value = ramCoord[z]->value;
                 int w = 0;
-                while (w<(bas-haut) && !found)
+                while (w<(h) && !found)
                 {
-                    if (column[w+(bas-haut)*2]==value)
+                    if (column[w+(h)*2]==value)
                     {
                         found = 1;
                     }
                 }
-                if (!found)
+                if (!found||x==right)
                 {
-                    //On place la valeur et ses coordonnées dans la liste dynamique coord.
-                    ramCoord[z]->next=ramCoord[bas-haut];
-                    ramCoord[bas-haut]=ramCoord[z];
+                    ramCoord[z]->next=ramCoord[h];
+                    ramCoord[h]=ramCoord[z];
                     ramCoord[z]=NULL;
                 }
             }
             z++;
         }
-        //Et on peut enfin changer de colonne.
+        //Et we can change of columns.
         x++;
     }
     free(column);
-    //Fin de l'étape 1 !
-    //Maintenant qu'on a tout parcouru, on dispose du nombre d'éléments n et du nombre de caractères m.
-    //Il ne nous reste donc plus qu'à compléter les dernières bribes de fusion, et à tout ranger dans un tableau.
-    //On crée déjà les tableaux.
+    //End of the first step !
+    //We have now all the values we need, as n and m.
+    //So we'll put datas in arrays.
     int* coord1 = malloc(sizeof(int)*4*n);
     int * values1 = malloc(sizeof(int)*2*m);
-    //Commencons par remplir coord1. Ce tableau renferme toutes les coordonnées des valeurs utilisées.
-    CoordList* adress = ramCoord[bas-haut];
+    //Let's start by filling coord.
+    CoordList* adress = ramCoord[h];
     x = 0;
     while (x<n)
     {
@@ -610,12 +615,13 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
         adress=next;
         x++;
     }
-    //Ensuite, on passe à values1. Pour cela, on va remplir tout en modifiant coord1 et les pixels à fusionner.
+    //Then, values. By doing this, we will also complete the merges in the
+    //matrix.
     x=0;
-    ValueList* otherList = ramValue[(bas-haut)];
+    ValueList* otherList = ramValue[h];
     while (x<m)
     {
-        //On prend l'ensemble de valeurs actuel, et pour chaque valeur liée, on va combiner les coordonnées...
+        //Firstly, we have to update global coordonates.
         ValueList* fusion = otherList;
         int * valuecoord = coord1+4*(fusion->value-1);
         while (fusion->fusion!=NULL)
@@ -626,45 +632,45 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
             int* othercoord=coord1+4*(fusion->value-1);
             if (othercoord[0]<valuecoord[0])
             {
-                //Comparaison de x...
+                //xmin...
                 valuecoord[0]=othercoord[0];
             }
             if (othercoord[1]<valuecoord[1])
             {
-                //Comparaison de y...
+                //ymin...
                 valuecoord[1]=othercoord[1];
             }
             if (othercoord[2]>valuecoord[2])
             {
-                //Comparaison de xmax...
+                //xmax...
                 valuecoord[2]=othercoord[2];
             }
             if (othercoord[3]>valuecoord[3])
             {
-                //Comparaison de ymax...
+                //ymax...
                 valuecoord[3]=othercoord[3];
             }
-            //Et on remplace tous les pixels dans l'intervalle ayant la valeur à fusionner.
+            //Here is the end of the merging.
             int x1 = othercoord[0];
             while (x1<=othercoord[2])
             {
                 int y1 = othercoord[1];
                 while (y1<=othercoord[3])
                 {
-                    if (matrixGet(mat,y1,x1)==fusion->value)
+                    if (matrixGet(mat,y1,x1)==fusion->value*0.00001)
                     {
-                        matrixSet(mat,y1,x1,otherList->value);
+                        matrixSet(mat,y1,x1,otherList->value*0.00001);
                     }
                     y1++;
                 }
                 x1++;
             }
         }
-        //Et enfin, on met la valeur dans values, et on passe à la valeur suivante.
         values1[x]=otherList->value;
     }
-    //Maintenant, la matrice a terminé d'être analysée, on a toutes les données utiles.
-    //La dernière opération consiste à former result, avec uniquement les données utiles. Allons-y.
+    //Now, all datas are ready !
+    //The last thing to do is to put all these datas in only one array, without
+    //unuseful datas, for exemple coordonates of merged values.
     int * result1 = malloc(sizeof(int)*5*m);
     x=0;
     while (x<m)
@@ -682,16 +688,8 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
     free(ramCoord);
     free(coord1);
     free(values1);
-    //On place ainsi result1 dans le pointeur result, et on retourne le nombre de mot m (qui est donc la longueur de result1).
+    //The array is put in the result, and we return m, which permits to know
+    //the length of result.
     result[0]=result1;
     return m;
 }
-
-//Avec cette fonction, en entrant la matrice et les coordonnées d'une ligne, on peut obtenir :
-//-> Le nombre de caractères dans cette ligne (valeur retournée)
-//-> La localisation de chaque caractère : pour un caractère n (n<m), le caractère est formé de tous les pixels de valeur
-//     result[0][5*n] dans le rectangle délimité par : x=result[0][5*n+1],y=result[0][5*n+2],w=result[0][5*n+3],h=result[0][5*n+4].
-//A partir de là, envoyer les matrices au réseau ne devrait pas être trop compliqué...
-
-
-//ATTENTION !!! Il ne faut pas oublier de free result[0] une fois que le programme est terminé !
