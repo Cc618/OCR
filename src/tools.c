@@ -5,7 +5,7 @@
 
 CoordList newCoordList()
 {
-    CoordList newList = malloc(sizeof(CoordList));
+    CoordList* newList = malloc(sizeof(CoordList*));
     int newcoord[4];
     int x=4;
     while (x)
@@ -13,18 +13,18 @@ CoordList newCoordList()
         x--;
         newcoord[x]=0;
     }
-    newList.coord = newcoord;
-    newList.next=NULL;
-    newList.value=0;
+    newList->coord = newcoord;
+    newList->next=NULL;
+    newList->value=0;
     return newList;
 }
 
 ValueList newValueList()
 {
-    ValueList newList = malloc(sizeof(ValueList));
-    newList.next=NULL;
-    newList.fusion=NULL;
-    newList.value=0;
+    ValueList* newList = malloc(sizeof(ValueList*));
+    newList->next=NULL;
+    newList->fusion=NULL;
+    newList->value=0;
     return newList;
 }
 
@@ -407,19 +407,19 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                 //En n'oubliant pas de modifier les coordonnées.
                 if (newvalue)
                 {
-                    CoordList newcoord = newCoordList();
-                    newcoord.coord[0]=x;
-                    newcoord.coord[1]=y;
-                    newcoord.coord[2]=x;
-                    newcoord.coord[3]=y;
-                    newcoord.next=NULL;
-                    newcoord.value=value;
+                    CoordList* newcoord = newCoordList();
+                    newcoord->coord[0]=x;
+                    newcoord->coord[1]=y;
+                    newcoord->coord[2]=x;
+                    newcoord->coord[3]=y;
+                    newcoord->next=NULL;
+                    newcoord->value=value;
                     int adress = 0;
                     while (ramCoord[adress]!=NULL)
                     {
                         adress++;
                     }
-                    ramCoord[adress]=&newcoord;
+                    ramCoord[adress]=newcoord;
                 }
                 else
                 {
@@ -496,7 +496,7 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                     else
                     {
                         //Dans l'autre cas, on prend la valeur présente dans ram. S'il y a fusion, il y a forcément une valeur dans ram.
-                        ValueList newList = newValueList();
+                        ValueList* newList = newValueList();
                         if (w1==-1)
                         {
                             int v = w2;
@@ -506,13 +506,13 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                             value = other;
                             other = v;
                         }
-                        newList.value=other;
+                        newList->value=other;
                         ValueList* adress = ramValue[w1];
                         while (adress->fusion!=NULL)
                         {
                             adress=adress->fusion;
                         }
-                        adress->fusion = &newList;
+                        adress->fusion = newList;
                     }
                     m--;
                     //On a un caractère potentiel en moins.
