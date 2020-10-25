@@ -15,3 +15,24 @@ bin/ocr img
 # Network part
 bin/ocr net
 ```
+Structure :
+README - What you're currently reading
+
+AUTHORS - Who we are
+
+res - Folder for the ressources of the project. For now it's the reference images.
+
+src - Folder for the source of the project. It contains our code :
+  main.c = The all target, the program.
+  
+  matrix.c = Contains the matrix functions.
+  matrix.h = Header for the matrix.c with explanations with explanations of the functions.
+  
+  tools.c = Contains all the tools for image manipulations.
+  tools.h = Header for the tools.c with explanations of the functions.
+
+bin - Folder that contains the executable file (can be removed by using the make clean command).
+
+obj - Folder that contains the obj. files (can be removed by using the make clean command).
+Makefile - File for GNU Make. Simply use the command make to compile the code.
+
