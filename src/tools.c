@@ -3,7 +3,7 @@
 #include "tools.h"
 #include <SDL2/SDL.h>
 
-*CoordList newCoordList()
+CoordList* newCoordList()
 {
     CoordList* newList = malloc(sizeof(CoordList*));
     int newcoord[4];
@@ -19,7 +19,7 @@
     return newList;
 }
 
-*ValueList newValueList()
+ValueList* newValueList()
 {
     ValueList* newList = malloc(sizeof(ValueList*));
     newList->next=NULL;
