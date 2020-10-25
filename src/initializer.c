@@ -6,6 +6,9 @@
 #define PI 3.141592654
 
 float randFloatUnif(float min, float max) {
+    // Using builtin rand() function to generate random numbers
+    // with a uniform distribution
+
     return (((float)rand()) / ((float)RAND_MAX)) * (max-min) + min;
 }
 
@@ -24,6 +27,9 @@ float randFloatNorm() {
 }
 
 Matrix *randUniform(size_t rows, size_t cols, float min, float max) {
+    // Initializes a (rows * cols) matrix with uniformly-distributed
+    // random numbers
+
     Matrix *m = matrixNew(rows, cols);
 
     for (size_t i = 0; i < rows; ++i) {
@@ -36,6 +42,9 @@ Matrix *randUniform(size_t rows, size_t cols, float min, float max) {
 }
 
 Matrix *randNormal(size_t rows, size_t cols) {
+    // Initializes a (rows * cols) matrix with normally-distributed
+    // random numbers
+    
     Matrix *m = matrixNew(rows, cols);
 
     for (size_t i = 0; i < rows; ++i) {
