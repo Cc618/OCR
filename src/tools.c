@@ -3,6 +3,31 @@
 #include "tools.h"
 #include <SDL2/SDL.h>
 
+CoordList newCoordList()
+{
+    CoordList newList = malloc(sizeof(CoordList*));
+    int newcoord[4];
+    int x=4;
+    while (x)
+    {
+        x--;
+        newcoord[x]=0;
+    }
+    newList.coord = newcoord;
+    newList.next=NULL;
+    newList.value=0;
+    return newList;
+}
+
+ValueList newValueList()
+{
+    ValueList newList = malloc(sizeof(ValueList*));
+    newList.next=NULL;
+    newList.fusion=NULL;
+    newList.value=0;
+    return newList;
+}
+
 //This function permits to print the image in the renderer. Only for tests.
 void printImage(SDL_Renderer *ren,SDL_Surface *sur, int x, int y)
 {
@@ -127,12 +152,12 @@ void imageToGrey(SDL_Surface *surface) {
             Uint8 average = 0.3 * r + 0.59 * g + 0.11 * b;
             r = g = b = average;
             pixel = SDL_MapRGB(surface->format, average, average, average);
-            setpixel(surface, i , j, pixel); 
+            setpixel(surface, i , j, pixel);
         }
     }
 }
 
-//Take an grey only image, size it, and put in it matrix. *surface the image, 
+//Take an grey only image, size it, and put in it matrix. *surface the image,
 //rows and cols the height and weight of the new matrix.
 Matrix *greyToMatrix(SDL_Surface *surface) {
     int width = surface->w;
@@ -166,7 +191,7 @@ void matrixToGrey(SDL_Surface *surface, Matrix *matrix) {
 	}
 }
 
-//Put the lines into a 
+//Put the lines into a
 dyn_arr getLines(Matrix *matrix) {
 	int cols = matrix->cols;
     	int rows = matrix->rows;
@@ -214,9 +239,9 @@ void drawLines(Matrix *matrix, dyn_arr arraylines) {
     for (int i = 0; i < arraylines.length; i++)
     {
         for (int j = 0; j < cols; j++)
-        { 
+        {
             matrixSet(matrix, arraylines.array[i], j, 0);
-        } 
+        }
     }
     free(arraylines.array);
 }
@@ -244,9 +269,9 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
     int y = haut;
     int n = 0;
     int m = 0;
-    ValueList* ramValue = malloc(sizeof(ValueList*)*(bas-haut+1));
-    CoordList* ramCoord = malloc(sizeof(CoordList*)*(bas-haut+1));
-    while (x<(bas-haut)+1);
+    ValueList** ramValue = malloc(sizeof(ValueList*)*(bas-haut+1));
+    CoordList** ramCoord = malloc(sizeof(CoordList*)*(bas-haut+1));
+    while (x<(bas-haut)+1)
     {
         ramValue[x]=NULL;
         ramCoord[x]=NULL;
@@ -383,18 +408,18 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                 if (newvalue)
                 {
                     CoordList newcoord = newCoordList();
-                    newcoord->coord[0]=x;
-                    newcoord->coord[1]=y;
-                    newcoord->coord[2]=x;
-                    newcoord->coord[3]=y;
-                    newcoord->next=NULL;
-                    newcoord->value=value;
+                    newcoord.coord[0]=x;
+                    newcoord.coord[1]=y;
+                    newcoord.coord[2]=x;
+                    newcoord.coord[3]=y;
+                    newcoord.next=NULL;
+                    newcoord.value=value;
                     int adress = 0;
                     while (ramCoord[adress]!=NULL)
                     {
                         adress++;
                     }
-                    ramCoord[adress]=newcoord;
+                    ramCoord[adress]=*newcoord;
                 }
                 else
                 {
@@ -405,17 +430,17 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                     }
                     if (column[z]==0)
                     {
-                        newcoord->coord[2]=x;
+                        ramCoord[adress]->coord[2]=x;
                         //On augmente la largeur de la valeur, car elle n'était jusque là pas présente dans la colonne.
                     }
-                    if (newcoord->coord[3]<y)
+                    if (ramCoord[adress]->coord[3]<y)
                     {
-                        newcoord->coord[3]=y;
+                        ramCoord[adress]->coord[3]=y;
                         //On augmente la hauteur de la valeur, car l'ordonnée actuelle est plus basse que celle déjà enregistrée.
                     }
-                    if (newcoord->coord[1]>y)
+                    if (ramCoord[adress]->coord[1]>y)
                     {
-                        newcoord->coord[1]=y;
+                        ramCoord[adress]->coord[1]=y;
                         //On baisse la hauteur de la valeur, car l'ordonnée actuelle est plus haute que celle déjà enregistrée.
                     }
                 }
@@ -460,13 +485,13 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                     {
                         //value et other sont dans ram. On prend alors other et on la place tout au bout de la liste des fusions de value.
                         //la place qu'occupait other dans ram devient un pointeur sur la ram.
-                        ValueList adress = ram[w1];
+                        ValueList* adress = ramValue[w1];
                         while (adress->fusion!=NULL)
                         {
                             adress=adress->fusion;
                         }
-                        adress->fusion=ramCoord[w2];
-                        ramCoord[w2]=NULL;
+                        adress->fusion=ramValue[w2];
+                        ramValue[w2]=NULL;
                     }
                     else
                     {
@@ -481,13 +506,13 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                             value = other;
                             other = v;
                         }
-                        newList->value=other;
-                        ValueList adress = ramValue[w1];
+                        newList.value=other;
+                        ValueList* adress = ramValue[w1];
                         while (adress->fusion!=NULL)
                         {
                             adress=adress->fusion;
                         }
-                        adress->fusion = newList;
+                        adress->fusion = *newList;
                     }
                     m--;
                     //On a un caractère potentiel en moins.
@@ -570,11 +595,11 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
     int* coord1 = malloc(sizeof(int)*4*n);
     int * values1 = malloc(sizeof(int)*2*m);
     //Commencons par remplir coord1. Ce tableau renferme toutes les coordonnées des valeurs utilisées.
-    CoordList adress = ramCoord[bas-haut];
-    int x = 0;
+    CoordList* adress = ramCoord[bas-haut];
+    x = 0;
     while (x<n)
     {
-        CoordList next = adress->next;
+        CoordList* next = adress->next;
         int y = 0;
         while (y<4)
         {
@@ -587,15 +612,15 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
     }
     //Ensuite, on passe à values1. Pour cela, on va remplir tout en modifiant coord1 et les pixels à fusionner.
     x=0;
-    ValueList otherList = ramValue[(bas-haut)];
+    ValueList* otherList = ramValue[(bas-haut)];
     while (x<m)
     {
         //On prend l'ensemble de valeurs actuel, et pour chaque valeur liée, on va combiner les coordonnées...
-        ValueList fusion = otherList;
+        ValueList* fusion = otherList;
         int * valuecoord = coord1+4*(fusion->value-1);
         while (fusion->fusion!=NULL)
         {
-            ValueList next = fusion->fusion;
+            ValueList* next = fusion->fusion;
             free(fusion);
             fusion = next;
             int* othercoord=coord1+4*(fusion->value-1);
