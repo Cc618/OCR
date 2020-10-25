@@ -459,6 +459,10 @@ int analysis(Matrix* mat, int top, int down, int left,int right,int** result)
                 }
                 column[z]=value;
             }
+            else
+            {
+                matrixSet(mat,y,x,0);
+            }
             y++;
         }
         //Column is finished ! Now we have to update ramValue with earned datas.
@@ -555,6 +559,7 @@ int analysis(Matrix* mat, int top, int down, int left,int right,int** result)
                     {
                         found = 1;
                     }
+                    w++;
                 }
                 if (!found||x==right)
                 {
@@ -580,6 +585,7 @@ int analysis(Matrix* mat, int top, int down, int left,int right,int** result)
                     {
                         found = 1;
                     }
+                    w++;
                 }
                 if (!found||x==right)
                 {
