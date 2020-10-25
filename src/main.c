@@ -157,7 +157,8 @@ void netMain() {
     // Show results
     for (size_t i = 0; i < batchSize; ++i) {
         printf("x = %.2f %.2f\n", xs[i]->data[0], xs[i]->data[1]);
-        printf("y = %.2f (should be %.2f)\n\n", display[i]->data[0], ys[i]->data[0]);
+        printf("y = %.2f (should be %.2f)\n\n",
+                display[i]->data[0], ys[i]->data[0]);
     }
 
     // Free batch (each phase)

@@ -125,7 +125,8 @@ void modifImage(SDL_Surface *sur)
         y=0;
         while(y<sur->h)
         {
-            SDL_GetRGB(getpixel(sur, x,y), sur->format, &rgb.r, &rgb.g, &rgb.b);
+            SDL_GetRGB(getpixel(sur, x,y),
+                    sur->format, &rgb.r, &rgb.g, &rgb.b);
             //Calcul de la luminosite du pixel, avec comme seuil 119.
             c = (int)(0.299*rgb.r+0.587*rgb.g+0.114*rgb.b);
             c = (c>119)*255;
@@ -398,7 +399,8 @@ int analysis(Matrix* mat, int top, int down, int left,int right,int** result)
                                 char found = 0;
                                 while (w<h && !found)
                                 {
-                                    if(column[w*2]==value||column[w*2+1]==value)
+                                    if(column[w*2]==value||
+                                            column[w*2+1]==value)
                                     {
                                         if (column[w*2]==neighbours[z])
                                         {
@@ -515,7 +517,8 @@ int analysis(Matrix* mat, int top, int down, int left,int right,int** result)
             }
             y++;
         }
-        //Column is finished ! Now we have to update ramValue with earned datas.
+        //Column is finished !
+        //Now we have to update ramValue with earned datas.
         int z =0;
         while (z<(h))
         {

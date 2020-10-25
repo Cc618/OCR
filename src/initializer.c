@@ -44,7 +44,6 @@ Matrix *randUniform(size_t rows, size_t cols, float min, float max) {
 Matrix *randNormal(size_t rows, size_t cols) {
     // Initializes a (rows * cols) matrix with normally-distributed
     // random numbers
-    
     Matrix *m = matrixNew(rows, cols);
 
     for (size_t i = 0; i < rows; ++i) {
