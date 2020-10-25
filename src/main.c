@@ -46,7 +46,7 @@ int main()
 	SDL_RenderClear(ren);
 	printImage(ren,sur,0,0);
 	SDL_RenderPresent(ren);
-	SDL_Delay(5000);
+	SDL_Delay(120000);
 	//Closure
 	SDL_DestroyRenderer(ren);
 	SDL_DestroyWindow(win);
