@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
-#include "tools.c"
-#include "matrix.c"
+#include "tools.h"
+#include "matrix.h"
 
 int main()
 {
@@ -15,7 +15,7 @@ int main()
 		return -1;
 	}
 	//Image Loading
-	SDL_Surface *sur = SDL_LoadBMP("image.bmp");
+	SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
 	if (!sur)
 	{
 		fprintf(stderr,"Ne trouve pas l'image\n");
@@ -26,12 +26,12 @@ int main()
 	matrixToGrey(sur, matrix);
 	dyn_arr dar = getLines(matrix);
 	dyn_arr dar2 = getCaracters(matrix,0,dar.array[0]);
-    drawCaracters(matrix,dar2,0,dar.array[0]);
+    	drawCaracters(matrix,dar2,0,dar.array[0]);
 	for (int i = 1; i+1 < dar.length; i+=2)
-    {
-        dyn_arr dar2 = getCaracters(matrix,dar.array[i],dar.array[i+1]);
-        drawCaracters(matrix,dar2,dar.array[i],dar.array[i+1]);
-    }
+    	{
+        	dyn_arr dar2 = getCaracters(matrix,dar.array[i],dar.array[i+1]);
+        	drawCaracters(matrix,dar2,dar.array[i],dar.array[i+1]);
+    	}
 	drawLines(matrix, dar);
 	matrixToGrey(sur, matrix);
 	matrixFree(matrix);
