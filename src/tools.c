@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include "matrix.h"
 #include "tools.h"
-#include <SDL2/SDL.h>
-
+/*
 CoordList* newCoordList()
 {
     CoordList* newList = malloc(sizeof(CoordList*));
@@ -26,7 +25,7 @@ ValueList* newValueList()
     newList->fusion=NULL;
     newList->value=0;
     return newList;
-}
+}*/
 
 //This function permits to print the image in the renderer. Only for tests.
 void printImage(SDL_Renderer *ren,SDL_Surface *sur, int x, int y)
@@ -36,8 +35,8 @@ void printImage(SDL_Renderer *ren,SDL_Surface *sur, int x, int y)
     SDL_QueryTexture(tex,NULL,NULL,&dst.w,&dst.h);
     dst.x = x;
     dst.y = y;
-    dst.w = 1400;
-    dst.h = 1000;
+    dst.w = 1000;
+    dst.h = 800;
     SDL_RenderCopy(ren, tex, NULL, &dst);
     SDL_RenderPresent(ren);
 }
@@ -199,7 +198,7 @@ dyn_arr getLines(Matrix *matrix) {
     	int rows = matrix->rows;
 	int accu = 0;
    	dyn_arr array_lines;
-    	array_lines.array = malloc(sizeof(int) * 2000);
+    	array_lines.array = (int*) malloc(sizeof(int) * 2000);
     	array_lines.length = 0;
 	for (int i = 0; i < rows; i++) {
 		int is_empty = 0;
@@ -217,7 +216,7 @@ dyn_arr getLines(Matrix *matrix) {
 		}
 	}
 	dyn_arr array_lines2;
-    	array_lines2.array = malloc(sizeof(int) * 500);
+    	array_lines2.array = (int*) malloc(sizeof(int) * 500);
 	array_lines2.length = 0;
 	accu = 0;
 	//We add a number if two pixels are far from one another.
@@ -248,6 +247,58 @@ void drawLines(Matrix *matrix, dyn_arr arraylines) {
     free(arraylines.array);
 }
 
+dyn_arr getCaracters(Matrix *matrix,int top, int down) {
+	int cols = matrix->cols;
+	int accu = 0;
+   	dyn_arr array_lines;
+    	array_lines.array = (int*) malloc(sizeof(int) * 2000);
+    	array_lines.length = 0;
+	for (int j = 0; j < cols; j++) {
+		int is_empty = 0;
+		int i = top;
+		while (is_empty == 0 && i < down) {
+            //printf("i j %d %d\n",i,j);
+			float pixel_color = matrixGet(matrix, i, j);
+			if (pixel_color != 1)
+				is_empty = -1;
+			i++;
+		}
+		if (is_empty == -1) {
+			array_lines.array[accu] = j;
+			array_lines.length++;
+			accu++;
+		}
+	}
+	dyn_arr array_lines2;
+    	array_lines2.array = (int*)malloc(sizeof(int) * 500);
+	array_lines2.length = 0;
+	accu = 0;
+	//We add a number if two pixels are far from one another.
+	for (int j = 1; j < array_lines.length - 1; j++) {
+		if (array_lines.array[j - 1] != array_lines.array[j] - 1) {
+			array_lines2.array[accu] = array_lines.array[j - 1] + 1;
+			accu++;
+			array_lines2.array[accu] = array_lines.array[j] - 1;
+			accu++;
+		}
+	}
+	array_lines2.length = accu;
+	free(array_lines.array);
+	return array_lines2;
+}
+
+void drawCaracters(Matrix *matrix, dyn_arr arraylines,int top, int down)
+{
+    for (int j = 0; j < arraylines.length; j++)
+    {
+        for (int i = top; i <down; i++)
+        {
+            matrixSet(matrix, i,arraylines.array[j], 0);
+        }
+    }
+    free(arraylines.array);
+}
+
 //Transforms a matrix into a binary matrix(changes directly the matrix).
 void matrixToBinary(Matrix *matrix) {
 	int rows = matrix->rows;
@@ -262,7 +313,7 @@ void matrixToBinary(Matrix *matrix) {
 		}
 	}
 }
-
+/*
 int analysis(Matrix* mat, int top, int down, int left,int right,int** result)
 {
     //First step : we browse the matrix in order to associate each pixel
@@ -699,3 +750,4 @@ int analysis(Matrix* mat, int top, int down, int left,int right,int** result)
     result[0]=result1;
     return m;
 }
+*/

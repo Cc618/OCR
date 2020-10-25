@@ -52,6 +52,10 @@ dyn_arr getLines(Matrix *matrix);
 //Draws the lines with an array that comes from getLines.
 void drawLines(Matrix *matrix, dyn_arr arraylines);
 
+dyn_arr getCaracters(Matrix *matrix,int top, int down);
+
+void drawCaracters(Matrix *matrix, dyn_arr arraylines,int top, int down);
+
 //Transforms a matrix into a binary matrix(changes directly the matrix).
 void matrixToBinary(Matrix *matrix);
 
