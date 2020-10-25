@@ -1,13 +1,16 @@
 # OCR by Iron Minds
-Currently shows the image processing and a neural network learning the XOR function.
+Currently shows the image processing and a neural network learning the XOR
+function.
 
 ## Usage
 ### Build
 Run make to compile this project to bin/ocr.
-Furthermore, there are clean and run rules to remove temporary files and run the program without any argument.
+Furthermore, there are clean and run rules to remove temporary files and run
+the program without any argument.
 
 ### Run
-For the moment, only demos are available for the image segmentation and the neural network parts :
+For the moment, only demos are available for the image segmentation and the
+neural network parts :
 
 ```sh
 # Image part
@@ -15,14 +18,15 @@ bin/ocr img
 # Network part
 bin/ocr net
 ```
-Structure :
-README - What you're currently reading
+## Structure
++ README - What you're currently reading.
 
-AUTHORS - Who we are
++ AUTHORS - Who we are.
 
-res - Folder for the ressources of the project. For now it's the reference images.
++ res - Folder for the ressources of the project. For now it's the reference
+        images.
 
-src - Folder for the source of the project. It contains our code :
++ src - Folder for the source of the project. It contains our code :
   main.c = The all target, the program.
 
   matrix.c = Contains the matrix functions.
@@ -31,11 +35,21 @@ src - Folder for the source of the project. It contains our code :
   tools.c = Contains all the tools for image manipulations.
   tools.h = Header for the tools.c with explanations of the functions.
 
-  initializer.c = Contains ths functions for initializing matrices.
+  initializer.c = Contains the functions for initializing matrices.
   initializer.h = Header for the initializer.c.
 
-bin - Folder that contains the executable file (can be removed by using the make clean command).
+  layers.h/.c = Neural network layers.
 
-obj - Folder that contains the obj. files (can be removed by using the make clean command).
-Makefile - File for GNU Make. Simply use the command make to compile the code.
+  losses.h/.c = Loss functions (layers) for the neural net.
 
+  optimizer.h/.c = Neural network optimizer
+    (updates weights of the network).
+
++ bin - Folder that contains the executable file (can be removed by using the
+        make clean command).
+
++ obj - Folder that contains the obj. files (can be removed by using the make
+        clean command).
+
++ Makefile - File for GNU Make.
+        Simply use the command make to compile the code.
