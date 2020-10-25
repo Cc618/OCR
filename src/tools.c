@@ -5,7 +5,7 @@
 
 CoordList newCoordList()
 {
-    CoordList newList = malloc(sizeof(CoordList*));
+    CoordList newList = malloc(sizeof(CoordList));
     int newcoord[4];
     int x=4;
     while (x)
@@ -21,7 +21,7 @@ CoordList newCoordList()
 
 ValueList newValueList()
 {
-    ValueList newList = malloc(sizeof(ValueList*));
+    ValueList newList = malloc(sizeof(ValueList));
     newList.next=NULL;
     newList.fusion=NULL;
     newList.value=0;
@@ -419,11 +419,11 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                     {
                         adress++;
                     }
-                    ramCoord[adress]=*newcoord;
+                    ramCoord[adress]=&newcoord;
                 }
                 else
                 {
-                    int* adress = 0;
+                    int adress = 0;
                     while (ramCoord[adress]->value!=value)
                     {
                         adress++;
@@ -512,7 +512,7 @@ int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,in
                         {
                             adress=adress->fusion;
                         }
-                        adress->fusion = *newList;
+                        adress->fusion = &newList;
                     }
                     m--;
                     //On a un caractère potentiel en moins.
