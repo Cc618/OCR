@@ -3,21 +3,6 @@
 #include "tools.h"
 #include <SDL2/SDL.h>
 
-typedef struct CoordList CoordList;
-typedef struct ValueList ValueList;
-struct CoordList
-{
-    int value;
-    int* coord;
-    CoordList next;
-};
-struct ValueList
-{
-    int value;
-    ValueList fusion;
-    ValueList next;
-};
-
 CoordList newCoordList()
 {
     CoordList newList = malloc(sizeof(CoordList*));
@@ -167,26 +152,26 @@ void imageToGrey(SDL_Surface *surface) {
             Uint8 average = 0.3 * r + 0.59 * g + 0.11 * b;
             r = g = b = average;
             pixel = SDL_MapRGB(surface->format, average, average, average);
-            setpixel(surface, i , j, pixel);
+            setpixel(surface, i , j, pixel); 
         }
     }
 }
 
-//Take an grey only image, size it, and put in it matrix. *surface the image,
+//Take an grey only image, size it, and put in it matrix. *surface the image, 
 //rows and cols the height and weight of the new matrix.
-Matrix *greyToMatrix(SDL_Surface *surface, int rows, int cols) {
-    Matrix *matrix = matrixZero(rows, cols);
+Matrix *greyToMatrix(SDL_Surface *surface) {
     int width = surface->w;
     int height = surface->h;
-    for (int i = 0; i < rows; i++)
+    Matrix *matrix = matrixZero(height, width);
+    for (int i = 0; i < height; i++)
     {
-        for (int j = 0; j < cols; j++) {
+        for (int j = 0; j < width; j++) {
             //Only the r channel, because r == g == b
             Uint8 r;
             //Resize
-            Uint32 pixel = getpixel(surface, (i * width) / rows, (j * height) / cols);
+            Uint32 pixel = getpixel(surface, j, i);
             SDL_GetRGB(pixel, surface->format, &r, &r, &r);
-            matrixSet(matrix, i, j, r);
+            matrixSet(matrix, i, j, r / 255.0f);
         }
     }
     return matrix;
@@ -196,29 +181,30 @@ Matrix *greyToMatrix(SDL_Surface *surface, int rows, int cols) {
 void matrixToGrey(SDL_Surface *surface, Matrix *matrix) {
 	int width = surface->w;
 	int height = surface->h;
-	for (int i = 0; i < width; i++) {
-		for (int j = 0; j < height; j++) {
+	for (int j = 0; j < width; j++) {
+		for (int i = 0; i < height; i++) {
 			float matrixValue = matrixGet(matrix, i, j);
-			Uint8 average = 255 * matrixValue;
+			Uint8 average = matrixValue * 255.0f;
 			Uint32 pixel = SDL_MapRGB(surface->format, average, average, average);
-			setpixel(surface, i, j, pixel);
+			setpixel(surface, j, i, pixel);
 		}
 	}
 }
+
+//Put the lines into a 
 dyn_arr getLines(Matrix *matrix) {
 	int cols = matrix->cols;
     	int rows = matrix->rows;
 	int accu = 0;
-	int true_length = 32;
    	dyn_arr array_lines;
-    	array_lines.array = malloc(sizeof(int) * 32);
+    	array_lines.array = malloc(sizeof(int) * 2000);
     	array_lines.length = 0;
 	for (int i = 0; i < rows; i++) {
 		int is_empty = 0;
 		int j = 0;
 		while (is_empty == 0 && j < cols) {
 			float pixel_color = matrixGet(matrix, i, j);
-			if (pixel_color != 0)
+			if (pixel_color != 1)
 				is_empty = -1;
 			j++;
 		}
@@ -226,28 +212,22 @@ dyn_arr getLines(Matrix *matrix) {
 			array_lines.array[accu] = i;
 			array_lines.length++;
 			accu++;
-			if (accu >= true_length) {
-				array_lines.array = realloc(array_lines.array, sizeof(int) * 10);
-                  		true_length += 10;
-			}
 		}
 	}
 	dyn_arr array_lines2;
-    	array_lines2.array = malloc(sizeof(int) * array_lines.length);
+    	array_lines2.array = malloc(sizeof(int) * 500);
 	array_lines2.length = 0;
-	accu = 1;
-	array_lines2.array[0] = array_lines.array[0] - 1;
+	accu = 0;
+	//We add a number if two pixels are far from one another.
 	for (int j = 1; j < array_lines.length - 1; j++) {
 		if (array_lines.array[j - 1] != array_lines.array[j] - 1) {
+			array_lines2.array[accu] = array_lines.array[j - 1] + 1;
+			accu++;
 			array_lines2.array[accu] = array_lines.array[j] - 1;
 			accu++;
 		}
 	}
 	array_lines2.length = accu;
-	if (array_lines.length > 1) {
-		array_lines2.array[accu] = array_lines.array[array_lines.length - 1] + 1;
-		array_lines2.length++;
-	}
 	free(array_lines.array);
 	return array_lines2;
 
@@ -259,9 +239,9 @@ void drawLines(Matrix *matrix, dyn_arr arraylines) {
     for (int i = 0; i < arraylines.length; i++)
     {
         for (int j = 0; j < cols; j++)
-        {
-            matrixSet(matrix, arraylines.array[i], j, 1);
-        }
+        { 
+            matrixSet(matrix, arraylines.array[i], j, 0);
+        } 
     }
     free(arraylines.array);
 }

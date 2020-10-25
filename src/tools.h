@@ -9,6 +9,21 @@ typedef struct {
     int length;
 } dyn_arr;
 
+typedef struct CoordList CoordList;
+typedef struct ValueList ValueList;
+struct CoordList
+{
+    int value;
+    int* coord;
+    CoordList next;
+};
+struct ValueList
+{
+    int value;
+    ValueList fusion;
+    ValueList next;
+};
+
 //Print the actual surface on the renderer.
 void printImage(SDL_Renderer * ren,SDL_Surface * sur, int x, int y);
 
@@ -39,4 +54,7 @@ void drawLines(Matrix *matrix, dyn_arr arraylines);
 
 //Transforms a matrix into a binary matrix(changes directly the matrix).
 void matrixToBinary(Matrix *matrix);
+
+//m contient les données (pixels noir, pixels blancs)
+int analyseCharacters(Matrix * mat, int haut, int bas, int gauche, int droite,int** result);
 #endif
