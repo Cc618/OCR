@@ -3,31 +3,6 @@
 #include "tools.h"
 #include <SDL2/SDL.h>
 
-CoordList newCoordList()
-{
-    CoordList newList = malloc(sizeof(CoordList*));
-    int newcoord[4];
-    int x=4;
-    while (x)
-    {
-        x--;
-        newcoord[x]=0;
-    }
-    newList->coord = newcoord;
-    newList->next=NULL;
-    newList->value=0;
-    return newList;
-}
-
-ValueList newValueList()
-{
-    ValueList* newList = malloc(sizeof(ValueList*));
-    newList->next=NULL;
-    newList->fusion=NULL;
-    newList->value=0;
-    return newList;
-}
-
 //This function permits to print the image in the renderer. Only for tests.
 void printImage(SDL_Renderer *ren,SDL_Surface *sur, int x, int y)
 {

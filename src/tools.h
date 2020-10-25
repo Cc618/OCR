@@ -15,13 +15,13 @@ struct CoordList
 {
     int value;
     int* coord;
-    CoordList next;
+    CoordList* next;
 };
 struct ValueList
 {
     int value;
-    ValueList fusion;
-    ValueList next;
+    ValueList* fusion;
+    ValueList* next;
 };
 
 //Print the actual surface on the renderer.
@@ -41,7 +41,7 @@ void imageToGrey(SDL_Surface *surface);
 
 //Take an grey only image, size it, and put in it matrix. *surface the image, 
 //rows and cols the height and weight of the new matrix.
-Matrix *greyToMatrix(SDL_Surface *surface, int rows, int cols);
+Matrix *greyToMatrix(SDL_Surface *surface);
 
 //Transforms a surface based on a matrix, the matrix and the surface need to have the same size.
 void matrixToGrey(SDL_Surface *surface, Matrix *matrix);
