@@ -5,12 +5,12 @@ from glob import glob
 from pdf2image import convert_from_path
 
 # Whole section height
-height = 72
+height = 73
 width = 24
 # Gap before
-dy = 12
+dy = 6
 # Height of the char
-img_height = 48
+img_height = 42
 
 with open('content.txt') as f:
     content = f.read().rstrip()
@@ -24,7 +24,6 @@ for impath in impaths:
     maxy = pages[0].height
     # Chars per page
     nchars = (maxy - dy) // height
-    # print('#chars =', nchars, '2nd page first char =', content[nchars])
 
     for i in range(len(content)):
         # Get page and index of the char
@@ -38,6 +37,3 @@ for impath in impaths:
 
         # Save char
         char.save(f'dataset_png/{content[i]}_{name}.png')
-
-    # for i, img in enumerate(pages):
-    #     img.save(f'dataset_png/{i}_{name}.png')

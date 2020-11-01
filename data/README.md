@@ -1,6 +1,7 @@
 # Dataset part
 Gathers all scripts to generate the dataset.
-Run generate.sh from this directory to generate the dataset (not the python file).
+Run generate.sh from this directory to generate the dataset
+(not the python file).
 
 ## Tweaks
 Here are some files to tweak :
