@@ -5,6 +5,7 @@
 #include <dirent.h>
 #include <linux/limits.h>
 #include "error.h"
+#include "tools.h"
 
 Dataset *datasetNew(const char *dirPath) {
     // Contains an image and a link to all previous images
@@ -87,4 +88,20 @@ void datasetFree(Dataset *d) {
     free(d->images);
     free(d->labels);
     free(d);
+}
+
+void imagePrint(const Matrix *img) {
+    for (size_t i = 0; i < img->cols; ++i)
+        putchar('-');
+    putchar('\n');
+
+    for (size_t i = 0; i < img->rows; ++i) {
+        for (size_t j = 0; j < img->cols; ++j)
+            putchar(matrixGet(img, i, j) > .5f ? ' ' : '.');
+        putchar('\n');
+    }
+
+    for (size_t i = 0; i < img->cols; ++i)
+        putchar('-');
+    putchar('\n');
 }

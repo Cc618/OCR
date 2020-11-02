@@ -213,6 +213,9 @@ int dataMain() {
         printf(" %c", dataset->labels[i]);
     puts("");
 
+    puts("First image :");
+    imagePrint(dataset->images[0]);
+
     datasetFree(dataset);
 
     SDL_Quit();

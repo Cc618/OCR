@@ -179,11 +179,12 @@ Matrix *greyToMatrix(SDL_Surface *surface) {
 
 Matrix *loadImage(const char *path) {
     SDL_Surface *sur = SDL_LoadBMP(path);
-    if (!sur)
-    {
+
+    if (!sur) {
         fprintf(stderr,"loadImage : Invalid bmp file %s", path);
         return NULL;
     }
+
     imageToGrey(sur);
     Matrix *matrix = greyToMatrix(sur);
 

@@ -20,4 +20,7 @@ Dataset *datasetNew(const char *dirPath);
 
 void datasetFree(Dataset *d);
 
+// Show an image in ascii art
+void imagePrint(const Matrix *img);
+
 #endif // DATA_H
