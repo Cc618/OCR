@@ -1,4 +1,4 @@
-# Convert all pdfs to pngs
+# Convert all pdfs to bmps
 
 import os
 from glob import glob
@@ -18,7 +18,7 @@ with open('content.txt') as f:
 impaths = glob('dataset_pdf/*')
 for impath in impaths:
     name = os.path.splitext(os.path.basename(impath))[0]
-    print('Converting to png', name)
+    print('Converting to bmp', name)
 
     pages = convert_from_path(impath)
     maxy = pages[0].height
@@ -36,4 +36,4 @@ for impath in impaths:
         char = char.resize((32, 32))
 
         # Save char
-        char.save(f'dataset_png/{content[i]}_{name}.png')
+        char.save(f'dataset_bmp/{content[i]}_{name}.bmp')

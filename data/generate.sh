@@ -2,8 +2,8 @@
 
 # Run this script from this directory
 
-rm -rf dataset_tex dataset_pdf dataset_png
-mkdir -p dataset_tex dataset_pdf dataset_png
+rm -rf dataset_tex dataset_pdf dataset_bmp
+mkdir -p dataset_tex dataset_pdf dataset_bmp
 
 # Generate tex files
 python3 generate.py
@@ -18,10 +18,10 @@ do
 done
 cd ..
 
-# Convert lastly to png
-python3 to_png.py
+# Convert lastly to bmp
+python3 to_bmp.py
 
 # Remove tmp files
-# rm -rf dataset_{tex,pdf}
+rm -rf dataset_{tex,pdf}
 
 echo Done
