@@ -23,7 +23,7 @@ for impath in impaths:
     pages = convert_from_path(impath)
     maxy = pages[0].height
     # Chars per page
-    nchars = (maxy - dy) // height
+    nchars = (maxy - dy) // height + 1
 
     for i in range(len(content)):
         # Get page and index of the char
