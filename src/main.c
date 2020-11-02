@@ -12,6 +12,7 @@
 #include "losses.h"
 #include "initializer.h"
 #include "optimizer.h"
+#include "data.h"
 
 int imgMain() {
     //Initialisation
@@ -183,26 +184,38 @@ int dataMain() {
         return -1;
     }
 
-    // Load a bmp image
-    Matrix *img = loadImage("data/dataset_bmp/A_Roboto.bmp");
-    printf("Loaded a %zux%zu image\n", img->cols, img->rows);
+    // // Load & print a bmp image //
+    // Matrix *img = loadImage("data/dataset_bmp/A_Roboto.bmp");
+    // printf("Loaded a %zux%zu image\n", img->cols, img->rows);
 
-    // Pretty print the image
-    for (size_t i = 0; i < img->cols; ++i)
-        putchar('-');
-    putchar('\n');
+    // // Pretty print the image
+    // for (size_t i = 0; i < img->cols; ++i)
+    //     putchar('-');
+    // putchar('\n');
 
-    for (size_t i = 0; i < img->rows; ++i) {
-        for (size_t j = 0; j < img->cols; ++j)
-            putchar(matrixGet(img, i, j) > .5f ? ' ' : '.');
-        putchar('\n');
-    }
+    // for (size_t i = 0; i < img->rows; ++i) {
+    //     for (size_t j = 0; j < img->cols; ++j)
+    //         putchar(matrixGet(img, i, j) > .5f ? ' ' : '.');
+    //     putchar('\n');
+    // }
 
-    for (size_t i = 0; i < img->cols; ++i)
-        putchar('-');
-    putchar('\n');
+    // for (size_t i = 0; i < img->cols; ++i)
+    //     putchar('-');
+    // putchar('\n');
 
-    matrixFree(img);
+    // matrixFree(img);
+
+    // Load & show images of a dataset //
+    Dataset *dataset = datasetNew("data/dataset_bmp");
+
+    printf("Labels of the dataset :");
+    for (size_t i = 0; i < dataset->count; ++i)
+        printf(" %c", dataset->labels[i]);
+    puts("");
+
+    datasetFree(dataset);
+
+    SDL_Quit();
 
     return 0;
 }

@@ -182,7 +182,7 @@ Matrix *loadImage(const char *path) {
     if (!sur)
     {
         fprintf(stderr,"loadImage : Invalid bmp file %s", path);
-        return -1;
+        return NULL;
     }
     imageToGrey(sur);
     Matrix *matrix = greyToMatrix(sur);

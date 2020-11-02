@@ -1,3 +1,4 @@
+DEBUG = 1
 DIR_BIN = bin
 DIR_OBJ = obj
 DIR_SRC = src
@@ -6,11 +7,20 @@ SRC = $(wildcard $(DIR_SRC)/*.c)
 OBJ = $(subst $(DIR_SRC),$(DIR_OBJ), $(SRC:.c=.o))
 DEP = $(OBJ:.o=.d)
 
+ifeq ($(DEBUG),1)
+	# TODO
+	# SANITIZE = -fsanitize=address
+endif
+
 CC = gcc
 CPPFLAGS = -MMD
-CFLAGS = -Wall -Wextra -std=c99
+CFLAGS = -Wall -Wextra -std=c99 $(SANITIZE)
 LDLIBS = -lm -lSDL2
-LDFLAGS =
+LDFLAGS = $(SANITIZE)
+
+ifeq ($(DEBUG),1)
+	CFLAGS += -g
+endif
 
 # Windows specific flags
 ifeq ($(OS), Windows_NT)
