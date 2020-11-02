@@ -177,6 +177,21 @@ Matrix *greyToMatrix(SDL_Surface *surface) {
     return matrix;
 }
 
+Matrix *loadImage(const char *path) {
+    SDL_Surface *sur = SDL_LoadBMP(path);
+    if (!sur)
+    {
+        fprintf(stderr,"loadImage : Invalid bmp file %s", path);
+        return -1;
+    }
+    imageToGrey(sur);
+    Matrix *matrix = greyToMatrix(sur);
+
+    SDL_FreeSurface(sur);
+
+    return matrix;
+}
+
 //Transforms a surface based on a matrix, the matrix and the surface
 //need to have the same size.
 void matrixToGrey(SDL_Surface *surface, Matrix *matrix) {

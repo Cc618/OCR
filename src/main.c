@@ -175,6 +175,38 @@ void netMain() {
     optimizerFree(opti);
 }
 
+int dataMain() {
+    // Init sdl
+    if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
+    {
+        fprintf(stderr,"Can't initialize SDL\n");
+        return -1;
+    }
+
+    // Load a bmp image
+    Matrix *img = loadImage("data/dataset_bmp/A_Roboto.bmp");
+    printf("Loaded a %zux%zu image\n", img->cols, img->rows);
+
+    // Pretty print the image
+    for (size_t i = 0; i < img->cols; ++i)
+        putchar('-');
+    putchar('\n');
+
+    for (size_t i = 0; i < img->rows; ++i) {
+        for (size_t j = 0; j < img->cols; ++j)
+            putchar(matrixGet(img, i, j) > .5f ? ' ' : '.');
+        putchar('\n');
+    }
+
+    for (size_t i = 0; i < img->cols; ++i)
+        putchar('-');
+    putchar('\n');
+
+    matrixFree(img);
+
+    return 0;
+}
+
 int main(int argc,
         char **argv) {
     // Initialization
@@ -183,6 +215,8 @@ int main(int argc,
     int err = 0;
     if (argc != 2)
         err = 1;
+    else if (strcmp(argv[1], "data") == 0)
+        return dataMain();
     else if (strcmp(argv[1], "img") == 0)
         return imgMain();
     else if (strcmp(argv[1], "net") == 0)

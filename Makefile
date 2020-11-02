@@ -33,7 +33,7 @@ $(DIR_OBJ)/%.o: $(DIR_SRC)/%.c
 
 .PHONY: clean
 clean:
-	rm -rf $(DIR_BIN) $(DIR_OBJ) data/dataset_{tex,pdf,png}
+	rm -rf $(DIR_BIN) $(DIR_OBJ) data/dataset_{tex,pdf,bmp}
 
 # Make temporary directories
 .PHONY: dirs

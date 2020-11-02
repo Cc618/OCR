@@ -43,6 +43,10 @@ void imageToGrey(SDL_Surface *surface);
 //rows and cols the height and weight of the new matrix.
 Matrix *greyToMatrix(SDL_Surface *surface);
 
+// Loads a bmp image in a matrix (grey shades)
+// SDL must be loaded
+Matrix *loadImage(const char *path);
+
 //Transforms a surface based on a matrix, the matrix and the surface need to have the same size.
 void matrixToGrey(SDL_Surface *surface, Matrix *matrix);
 
