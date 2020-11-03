@@ -13,6 +13,7 @@
 #include "initializer.h"
 #include "optimizer.h"
 #include "data.h"
+#include "network.h"
 
 int imgMain() {
     //Initialisation
@@ -91,89 +92,111 @@ void netMain() {
         ys[i] = matrixCreate(1, 1, &yData[i]);
     }
 
-    // Network
-    Layer *fc1 = denseNew(2, 4);
-    Layer *activation1 = sigmoidNew();
-    Layer *fc2 = denseNew(4, 1);
-    LossFunction criterion = mseLoss;
-    Optimizer *opti = sgdNew(learningRate, batchSize);
+    Layer *layers[] = {
+            denseNew(2, 4),
+            sigmoidNew(),
+            denseNew(4, 1)
+        };
 
-    // Just to display it at the end
-    Matrix *display[batchSize];
+    Network *net = networkNew(3, layers);
 
-    for (size_t e = 1; e <= epochs; ++e) {
-        float avgLoss = 0;
 
-        // For each batch
-        for (size_t batch = 0; batch < batchSize; ++batch) {
-            Matrix *x = xs[batch];
-            Matrix *y = ys[batch];
+    // Net predict (eval)
+    Matrix *x = xs[0];
+    printf("Predicting value for matrix : ");
+    matrixPrint(x);
 
-            // Feed forward
-            Matrix *y1 = layerForward(fc1, x, true);
-            Matrix *y2 = layerForward(activation1, y1, true);
-            Matrix *y3 = layerForward(fc2, y2, true);
+    Matrix *y = networkPredict(net, x);
+    printf("Output : ");
+    matrixPrint(y);
 
-            // Save to display
-            if (e == epochs)
-                display[batch] = matrixCopy(y3);
+    matrixFree(y);
 
-            Loss *error = criterion(y3, y);
+    networkFree(net);
 
-            // Back propagate
-            Matrix *dLoss = error->grad;
-            Matrix *dLossDY3 = layerBackward(fc2, dLoss);
-            Matrix *dLossDY2 = layerBackward(activation1, dLossDY3);
-            Matrix *dLossDY1 = layerBackward(fc1, dLossDY2);
+    // // Network
+    // Layer *fc1 = denseNew(2, 4);
+    // Layer *activation1 = sigmoidNew();
+    // Layer *fc2 = denseNew(4, 1);
+    // LossFunction criterion = mseLoss;
+    // Optimizer *opti = sgdNew(learningRate, batchSize);
 
-            avgLoss += error->loss;
+    // // Just to display it at the end
+    // Matrix *display[batchSize];
 
-            // Free (each epoch)
-            lossFree(error);
-            matrixFree(dLossDY1);
-            matrixFree(dLossDY2);
-            matrixFree(dLossDY3);
-            matrixFree(y3);
-            matrixFree(y2);
-            matrixFree(y1);
-        }
+    // for (size_t e = 1; e <= epochs; ++e) {
+    //     float avgLoss = 0;
 
-        avgLoss /= batchSize;
+    //     // For each batch
+    //     for (size_t batch = 0; batch < batchSize; ++batch) {
+    //         Matrix *x = xs[batch];
+    //         Matrix *y = ys[batch];
 
-        // Display result
-        if (e % dispFreq == 0) {
-            // matrixPrint(x);
-            printf("Epoch %4lu", e);
-            printf(", Loss : %.1e\n", avgLoss);
-            // printf(", Prediction : ");
-            // matrixPrint(y3);
-        }
+    //         // Feed forward
+    //         Matrix *y1 = layerForward(fc1, x, true);
+    //         Matrix *y2 = layerForward(activation1, y1, true);
+    //         Matrix *y3 = layerForward(fc2, y2, true);
 
-        // Optimize (each batch)
-        layerUpdate(fc2, opti);
-        layerUpdate(activation1, opti);
-        layerUpdate(fc1, opti);
-    }
+    //         // Save to display
+    //         if (e == epochs)
+    //             display[batch] = matrixCopy(y3);
 
-    // Show results
-    for (size_t i = 0; i < batchSize; ++i) {
-        printf("x = %.2f %.2f\n", xs[i]->data[0], xs[i]->data[1]);
-        printf("y = %.2f (should be %.2f)\n\n",
-                display[i]->data[0], ys[i]->data[0]);
-    }
+    //         Loss *error = criterion(y3, y);
 
-    // Free batch (each phase)
-    for (size_t i = 0; i < batchSize; ++i) {
-        matrixFree(display[i]);
-        matrixFree(xs[i]);
-        matrixFree(ys[i]);
-    }
+    //         // Back propagate
+    //         Matrix *dLoss = error->grad;
+    //         Matrix *dLossDY3 = layerBackward(fc2, dLoss);
+    //         Matrix *dLossDY2 = layerBackward(activation1, dLossDY3);
+    //         Matrix *dLossDY1 = layerBackward(fc1, dLossDY2);
 
-    // Free network
-    layerFree(fc1);
-    layerFree(fc2);
-    layerFree(activation1);
-    optimizerFree(opti);
+    //         avgLoss += error->loss;
+
+    //         // Free (each epoch)
+    //         lossFree(error);
+    //         matrixFree(dLossDY1);
+    //         matrixFree(dLossDY2);
+    //         matrixFree(dLossDY3);
+    //         matrixFree(y3);
+    //         matrixFree(y2);
+    //         matrixFree(y1);
+    //     }
+
+    //     avgLoss /= batchSize;
+
+    //     // Display result
+    //     if (e % dispFreq == 0) {
+    //         // matrixPrint(x);
+    //         printf("Epoch %4lu", e);
+    //         printf(", Loss : %.1e\n", avgLoss);
+    //         // printf(", Prediction : ");
+    //         // matrixPrint(y3);
+    //     }
+
+    //     // Optimize (each batch)
+    //     layerUpdate(fc2, opti);
+    //     layerUpdate(activation1, opti);
+    //     layerUpdate(fc1, opti);
+    // }
+
+    // // Show results
+    // for (size_t i = 0; i < batchSize; ++i) {
+    //     printf("x = %.2f %.2f\n", xs[i]->data[0], xs[i]->data[1]);
+    //     printf("y = %.2f (should be %.2f)\n\n",
+    //             display[i]->data[0], ys[i]->data[0]);
+    // }
+
+    // // Free batch (each phase)
+    // for (size_t i = 0; i < batchSize; ++i) {
+    //     matrixFree(display[i]);
+    //     matrixFree(xs[i]);
+    //     matrixFree(ys[i]);
+    // }
+
+    // // Free network
+    // layerFree(fc1);
+    // layerFree(fc2);
+    // layerFree(activation1);
+    // optimizerFree(opti);
 }
 
 int dataMain() {
