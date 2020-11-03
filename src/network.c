@@ -1,12 +1,16 @@
 #include "network.h"
 #include <string.h>
 
-Network *networkNew(size_t nLayers, Layer *const *layers) {
+Network *networkNew(size_t nLayers, Layer *const *layers,
+        Optimizer *opti, LossFunction criterion) {
     Network *net = malloc(sizeof(Network));
 
     net->nLayers = nLayers;
     net->layers = malloc(nLayers * sizeof(Layer*));
     memcpy(net->layers, layers, nLayers * sizeof(Layer*));
+
+    net->opti = opti;
+    net->criterion = criterion;
 
     return net;
 }
@@ -30,5 +34,9 @@ void networkFree(Network *net) {
         layerFree(net->layers[i]);
 
     free(net->layers);
+
+    if (net->opti)
+        free(net->opti);
+
     free(net);
 }

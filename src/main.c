@@ -92,22 +92,25 @@ void netMain() {
         ys[i] = matrixCreate(1, 1, &yData[i]);
     }
 
+    // Build network
     Layer *layers[] = {
             denseNew(2, 4),
             sigmoidNew(),
             denseNew(4, 1)
         };
+    LossFunction criterion = mseLoss;
+    Optimizer *opti = sgdNew(learningRate, batchSize);
 
-    Network *net = networkNew(3, layers);
+    Network *net = networkNew(3, layers, opti, criterion);
 
 
     // Net predict (eval)
     Matrix *x = xs[0];
-    printf("Predicting value for matrix : ");
+    printf("Predicting value for matrix :\n");
     matrixPrint(x);
 
     Matrix *y = networkPredict(net, x);
-    printf("Output : ");
+    printf("Output :\n");
     matrixPrint(y);
 
     matrixFree(y);
