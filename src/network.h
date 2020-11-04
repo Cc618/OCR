@@ -27,6 +27,13 @@ Network *networkNew(size_t nLayers, Layer *const *layers,
 // Forward propagation
 Matrix *networkPredict(Network *net, const Matrix *x);
 
+// Backward propagation
+// Returns the error term
+float networkBackward(Network *net, const Matrix *x, const Matrix *y);
+
+// Optimize
+void networkUpdate(Network *net);
+
 void networkFree(Network *net);
 
 #endif // NETWORK_H
