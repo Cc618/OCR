@@ -14,6 +14,7 @@
 #include "optimizer.h"
 #include "data.h"
 #include "network.h"
+#include "train.h"
 
 int imgMain() {
     //Initialisation
@@ -102,6 +103,13 @@ void netMain() {
     Optimizer *opti = sgdNew(learningRate, batchSize);
 
     Network *net = networkNew(3, layers, opti, criterion);
+
+    // TODO : dataset
+    Dataset dataset;
+    dataset.count = 32;
+    train(net, &dataset, 2, 8, NULL);
+
+    return;
 
     // // Net predict (eval)
     // puts("--- Predict ---");
