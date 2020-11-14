@@ -29,7 +29,7 @@ Matrix *networkPredict(Network *net, const Matrix *x) {
     return y;
 }
 
-float networkBackward(Network *net, const Matrix *x, const Matrix *y) {
+float networkBackward(Network *net, const Matrix *x, char label) {
     // Create 2 stacks
     // Contains forward matrices
     Matrix **forwardStack = malloc(sizeof(Matrix*) * (net->nLayers + 1));
@@ -44,7 +44,7 @@ float networkBackward(Network *net, const Matrix *x, const Matrix *y) {
     }
 
     // Loss
-    Loss *error = net->criterion(forwardStack[net->nLayers], y);
+    Loss *error = net->criterion(forwardStack[net->nLayers], label);
 
     // Backward
     backwardStack[0] = matrixCopy(error->grad);

@@ -79,37 +79,37 @@ void netMain() {
             1, 0,
             1, 1,
         };
-    const float yData[] = {
+    const char ys[] = {
             0,
             1,
             1,
             0,
         };
     Matrix *xs[batchSize];
-    Matrix *ys[batchSize];
+    // Matrix *ys[batchSize];
 
     for (size_t i = 0; i < batchSize; ++i) {
         xs[i] = matrixCreate(2, 1, &xData[2 * i]);
-        ys[i] = matrixCreate(1, 1, &yData[i]);
+        // ys[i] = matrixCreate(1, 1, &yData[i]);
     }
 
     // Build network
     Layer *layers[] = {
             denseNew(2, 4),
             sigmoidNew(),
-            denseNew(4, 1)
+            denseNew(4, 2)
         };
     LossFunction criterion = mseLoss;
     Optimizer *opti = sgdNew(learningRate, batchSize);
 
     Network *net = networkNew(3, layers, opti, criterion);
 
-    // TODO : dataset
-    Dataset dataset;
-    dataset.count = 32;
-    train(net, &dataset, 2, 8, NULL);
+    // // TODO : dataset
+    // Dataset dataset;
+    // dataset.count = 32;
+    // train(net, &dataset, 2, 8, NULL);
 
-    return;
+    // return;
 
     // // Net predict (eval)
     // puts("--- Predict ---");
@@ -134,7 +134,8 @@ void netMain() {
         // For each sample
         for (size_t batch = 0; batch < batchSize; ++batch) {
             Matrix *x = xs[batch];
-            Matrix *y = ys[batch];
+            char y = ys[batch];
+            // Matrix *y = ys[batch];
 
             // Accumulate gradients
             avgLoss += networkBackward(net, x, y);
@@ -157,7 +158,7 @@ void netMain() {
         Matrix *pred = networkPredict(net, xs[i]);
 
         printf("x = %.2f %.2f\n", xs[i]->data[0], xs[i]->data[1]);
-        printf("y = %.2f (should be %.2f)\n\n", pred->data[0], ys[i]->data[0]);
+        printf("y = %.2f\n\n", pred->data[0]);
 
         matrixFree(pred);
     }
