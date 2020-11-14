@@ -11,20 +11,18 @@ void lossFree(Loss *l) {
     free(l);
 }
 
-// TODO : Reimplement
-/*
-Loss *mseLoss(const Matrix *y, const Matrix *target) {
-    ASSERT(y->rows == target->rows && y->cols == target->cols,
-            "mseLoss: y and target must have the same shape");
+Loss *mseLoss(const Matrix *y, unsigned int *target) {
+    ASSERT(target < y->rows && y->cols == 1,
+            "mseLoss : Target label outside of bounds");
 
     Loss *l = malloc(sizeof(Loss));
     l->loss = 0;
     l->grad = matrixLike(y);
 
     // Loss
-    size_t n = y->cols * y->rows;
+    size_t n = y->rows;
     for (size_t i = 0; i < n; ++i) {
-        float dist = y->data[i] - target->data[i];
+        float dist = i == target ? y->data[i] - 1 : y->data[i];
         l->loss += dist * dist;
     }
     l->loss /= 2 * n;
@@ -32,15 +30,16 @@ Loss *mseLoss(const Matrix *y, const Matrix *target) {
     // Grad
     float factor = 1.f / (float)n;
     for (size_t i = 0; i < n; ++i) {
-        l->grad->data[i] = factor * (y->data[i] - target->data[i]);
+        float dist = i == target ? y->data[i] - 1 : y->data[i];
+        l->grad->data[i] = factor * dist;
     }
 
     return l;
 }
-*/
 
 Loss *nllLoss(const Matrix *y, unsigned int target) {
-    ASSERT(target < y->rows, "nllLoss : Target label outside of bounds");
+    ASSERT(target < y->rows && y->cols == 1,
+            "nllLoss : Target label outside of bounds");
 
     Loss *l = malloc(sizeof(Loss));
 

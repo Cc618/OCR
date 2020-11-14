@@ -158,7 +158,7 @@ void netMain() {
         Matrix *pred = networkPredict(net, xs[i]);
 
         printf("x = %.2f %.2f\n", xs[i]->data[0], xs[i]->data[1]);
-        printf("y = %.2f\n\n", pred->data[0]);
+        printf("probs = %.2f %.2f\n\n", pred->data[0], pred->data[1]);
 
         matrixFree(pred);
     }
