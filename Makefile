@@ -41,6 +41,12 @@ $(BIN): $(OBJ)
 $(DIR_OBJ)/%.o: $(DIR_SRC)/%.c
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
 
+# Generates only the dataset
+# !!! No depedencies for this rule
+.PHONY: dataset
+dataset:
+	cd data && ./generate.sh
+
 .PHONY: clean
 clean:
 	rm -rf $(DIR_BIN) $(DIR_OBJ) data/dataset_{tex,pdf,bmp}
