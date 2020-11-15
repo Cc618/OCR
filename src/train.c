@@ -25,7 +25,7 @@ static size_t *randRange(size_t n) {
 }
 
 void train(Network *net, Dataset *dataset, size_t epochs, size_t batchSize,
-        Preprocessor preprocessor, TrainCallback traincb) {
+        TrainCallback traincb) {
     ASSERT(dataset->count >= batchSize, "train : Invalid batch size");
 
     size_t nBatch = dataset->count / batchSize;
@@ -42,14 +42,11 @@ void train(Network *net, Dataset *dataset, size_t epochs, size_t batchSize,
             for (size_t sample = 0; sample < batchSize; ++sample) {
                 size_t i = indices[batch * batchSize + sample];
 
-                Matrix *x = preprocessor(dataset->images[i]);
+                Matrix *x = dataset->images[i];
                 unsigned char y = dataset->labels[i];
 
                 // Accumulate gradients
                 avgLoss += networkBackward(net, x, y);
-
-                // Free preprocessed
-                matrixFree(x);
             }
 
             avgLoss /= batchSize;

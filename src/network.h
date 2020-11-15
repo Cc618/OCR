@@ -7,6 +7,9 @@
 #include "layers.h"
 #include "losses.h"
 
+// Preprocess the input matrix x (before network)
+typedef Matrix *(*Preprocessor)(const Matrix *x);
+
 typedef struct Network_t {
     // All layers ordered sequentially
     size_t nLayers;
@@ -15,6 +18,9 @@ typedef struct Network_t {
     // Training components, may be NULL
     Optimizer *opti;
     LossFunction criterion;
+
+    // Other components
+    Preprocessor preprocess;
 } Network;
 
 // TODO : Load network (setup only eval mode)
@@ -22,7 +28,7 @@ typedef struct Network_t {
 // Layers will be freed within networkFree
 // Training components may be NULL
 Network *networkNew(size_t nLayers, Layer *const *layers,
-        Optimizer *opti, LossFunction criterion);
+        Preprocessor preprocess, Optimizer *opti, LossFunction criterion);
 
 // Forward propagation
 Matrix *networkPredict(Network *net, const Matrix *x);

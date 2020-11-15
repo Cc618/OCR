@@ -78,11 +78,15 @@ Layer *denseNew(size_t in, size_t out) {
     l->free = (void (*)(Layer *l))denseFree;
 
     // Init weights and gradients
-    // TODO : Xavier initialisation for weight
-    l->weight = randNormal(out, in);
     l->gradWeight = matrixZero(out, in);
     l->bias = matrixZero(out, 1);
     l->gradBias = matrixZero(out, 1);
+
+    // Xavier initialisation for weight
+    l->weight = randNormal(out, in);
+    float var = 2 / (in + out);
+    float std = sqrt(var);
+    matrixMul(l->weight, std);
 
     // Init training context
     l->x = NULL;

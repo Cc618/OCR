@@ -2,13 +2,14 @@
 #include <string.h>
 
 Network *networkNew(size_t nLayers, Layer *const *layers,
-        Optimizer *opti, LossFunction criterion) {
+        Preprocessor preprocess, Optimizer *opti, LossFunction criterion) {
     Network *net = malloc(sizeof(Network));
 
     net->nLayers = nLayers;
     net->layers = malloc(nLayers * sizeof(Layer*));
     memcpy(net->layers, layers, nLayers * sizeof(Layer*));
 
+    net->preprocess = preprocess;
     net->opti = opti;
     net->criterion = criterion;
 
@@ -16,7 +17,7 @@ Network *networkNew(size_t nLayers, Layer *const *layers,
 }
 
 Matrix *networkPredict(Network *net, const Matrix *x) {
-    Matrix *y = matrixCopy(x);
+    Matrix *y = net->preprocess(x);
 
     // Sequentially apply all layers to x
     for (size_t layer = 0; layer < net->nLayers; ++layer) {
@@ -37,7 +38,7 @@ float networkBackward(Network *net, const Matrix *x, char label) {
     Matrix **backwardStack = malloc(sizeof(Matrix*) * (net->nLayers + 1));
 
     // Forward
-    forwardStack[0] = matrixCopy(x);
+    forwardStack[0] = net->preprocess(x);
     for (size_t i = 0; i < net->nLayers; ++i) {
         forwardStack[i + 1] = layerForward(net->layers[i],
                 forwardStack[i], true);

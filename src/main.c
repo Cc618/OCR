@@ -16,6 +16,8 @@
 #include "network.h"
 #include "train.h"
 
+#define PRINT_SIZE(X) printf("Size(%zu, %zu)\n", (X)->rows, (X)->cols);
+
 int imgMain() {
     //Initialisation
     SDL_Window *win = 0;
@@ -68,15 +70,15 @@ int imgMain() {
 // Hyper parameters
 static const size_t dispFreq = 1;
 static const size_t logFreq = 1;
-static const float learningRate = 1e-3;
-static const unsigned int batchSize = 1;
-static const size_t epochs = 32;
+static const float learningRate = 2e-3;
+static const unsigned int batchSize = 16;
+static const size_t epochs = 10;
 
 static void trainCallback(size_t epoch, size_t batch, float loss) {
     if (batch % dispFreq == 0) {
         printf("\rEpoch %4zu, batch %3zu, loss %.1e", epoch, batch, loss);
 
-        if (epoch % dispFreq == 0 && batch == 0)
+        if (epoch % logFreq == 0 && batch == 0)
             puts("");
     }
 }
@@ -86,33 +88,39 @@ void netMain() {
     Dataset *dataset = datasetNew("data/dataset_bmp");
 
     // Build network
+    // TODO : Reduce size (detect nLabels)
     Layer *layers[] = {
-            denseNew(32 * 32, 128),
+            denseNew(32 * 32, 512),
             sigmoidNew(),
-            denseNew(128, 32),
-            sigmoidNew(),
-            denseNew(32, 256),
+            // denseNew(256, 128),
+            // sigmoidNew(),
+            // denseNew(128, 32),
+            // sigmoidNew(),
+            denseNew(512, 256),
             softmaxNew(),
         };
-    // TODO : Use nll and remove exploding gradient
-    LossFunction criterion = mseLoss;
+    // LossFunction criterion = nllLoss;
+    LossFunction criterion = nllLoss;
     Optimizer *opti = sgdNew(learningRate, batchSize);
 
-    Network *net = networkNew(sizeof(layers) / sizeof(Layer*),
-            layers, opti, criterion);
+    Network *net = networkNew(sizeof(layers) / sizeof(Layer*), layers, flatten,
+            opti, criterion);
 
     // Net train
     puts("--- Train ---");
-    train(net, dataset, epochs, batchSize, flatten, trainCallback);
+    train(net, dataset, epochs, batchSize, trainCallback);
     puts("");
 
     // Show results
-    for (size_t i = 0; i < dataset->count; ++i) {
+    for (size_t i = 19; i < 19 + 6; ++i) {
+        // PRINT_SIZE(dataset->images[i]);
         Matrix *pred = networkPredict(net, dataset->images[i]);
+        // PRINT_SIZE(pred);
 
-        printf("x = %.2f %.2f\n", dataset->images[i]->data[0],
-                dataset->images[i]->data[1]);
-        printf("probs = %.2f %.2f\n\n", pred->data[0], pred->data[1]);
+        // printf("x = %.2f %.2f\n", dataset->images[i]->data[0],
+        //         dataset->images[i]->data[1]);
+        // TODO : Argmax
+        printf("probs = %.3f %.3f\n", pred->data['a'], pred->data['A']);
 
         matrixFree(pred);
     }
