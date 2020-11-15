@@ -12,7 +12,7 @@ typedef struct Dataset_t {
 
     // Arrays containing images and labels of size count
     Matrix **images;
-    char *labels;
+    unsigned char *labels;
 } Dataset;
 
 // Generates a dataset with a path to a folder containing bmp files

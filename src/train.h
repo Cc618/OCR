@@ -11,4 +11,7 @@ typedef Matrix *(*Preprocessor)(const Matrix *x);
 void train(Network *net, Dataset *dataset, size_t epochs, size_t batchSize,
         Preprocessor preprocessor);
 
+// Flatten input preprocessor
+Matrix *flatten(const Matrix *x);
+
 #endif // TRAIN_H

@@ -37,19 +37,22 @@ void train(Network *net, Dataset *dataset, size_t epochs, size_t batchSize,
 
             // For each sample
             for (size_t sample = 0; sample < batchSize; ++sample) {
-                size_t i = batch * batchSize + sample;
+                size_t i = indices[batch * batchSize + sample];
 
-                // TODO : Dataset + preprocessor
-                // Matrix *x = xs[sample];
-                // Matrix *y = ys[sample];
+                Matrix *x = preprocessor(dataset->images[batch]);
+                unsigned char y = dataset->labels[batch];
 
-                // // Accumulate gradients
-                // avgLoss += networkBackward(net, x, y);
+                // Accumulate gradients
+                avgLoss += networkBackward(net, x, y);
+
+                // Free preprocessed
+                matrixFree(x);
             }
 
             avgLoss /= batchSize;
 
             // Display result
+            // TODO : Callback
             printf("Epoch %4lu", e);
             printf(", Loss : %.1e\n", avgLoss);
 
@@ -60,4 +63,13 @@ void train(Network *net, Dataset *dataset, size_t epochs, size_t batchSize,
         free(indices);
     }
 
+}
+
+Matrix *flatten(const Matrix *x) {
+    Matrix *y = matrixCopy(x);
+
+    y->rows = x->rows * x->cols;
+    y->cols = 1;
+
+    return y;
 }

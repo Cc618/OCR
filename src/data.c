@@ -12,7 +12,7 @@ Dataset *datasetNew(const char *dirPath) {
     // This is a singly linked list with back links
     typedef struct ImageItem_t {
         Matrix *image;
-        char label;
+        unsigned char label;
 
         struct ImageItem_t *previous;
     } ImageItem;
@@ -40,7 +40,7 @@ Dataset *datasetNew(const char *dirPath) {
                 strcmp("..", dir->d_name) == 0)
             continue;
 
-        char label = dir->d_name[0];
+        unsigned char label = dir->d_name[0];
 
         // Update path
         size_t nameLen = strlen(dir->d_name);

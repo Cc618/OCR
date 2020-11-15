@@ -79,16 +79,22 @@ void netMain() {
             1, 0,
             1, 1,
         };
-    const char ys[] = {
+    const unsigned char ys[] = {
             0,
             1,
             1,
             0,
         };
-    Matrix *xs[batchSize];
 
-    for (size_t i = 0; i < batchSize; ++i) {
-        xs[i] = matrixCreate(2, 1, &xData[2 * i]);
+    // Replace by datasetNew for images
+    Dataset *dataset = malloc(sizeof(Dataset));
+    dataset->count = sizeof(ys);
+    dataset->images = malloc(sizeof(Matrix*) * dataset->count);
+    dataset->labels = malloc(dataset->count);
+
+    for (size_t i = 0; i < dataset->count; ++i) {
+        dataset->images[i] = matrixCreate(2, 1, &xData[2 * i]);
+        dataset->labels[i] = ys[i];
     }
 
     // Build network
@@ -104,60 +110,16 @@ void netMain() {
     Network *net = networkNew(sizeof(layers) / sizeof(Layer*),
             layers, opti, criterion);
 
-    // // TODO : dataset
-    // Dataset dataset;
-    // dataset.count = 32;
-    // train(net, &dataset, 2, 8, NULL);
-
-    // return;
-
-    // // Net predict (eval)
-    // puts("--- Predict ---");
-
-    // Matrix *x = xs[0];
-    // printf("Predicting value for matrix :\n");
-    // matrixPrint(x);
-
-    // Matrix *y = networkPredict(net, x);
-    // printf("Output :\n");
-    // matrixPrint(y);
-
-    // matrixFree(y);
-
     // Net train
     puts("--- Train ---");
-
-    for (size_t e = 1; e <= epochs; ++e) {
-        float avgLoss = 0;
-
-        // TODO : Use multiple batches for one epoch
-        // For each sample
-        for (size_t batch = 0; batch < batchSize; ++batch) {
-            Matrix *x = xs[batch];
-            char y = ys[batch];
-            // Matrix *y = ys[batch];
-
-            // Accumulate gradients
-            avgLoss += networkBackward(net, x, y);
-        }
-
-        avgLoss /= batchSize;
-
-        // Display result
-        if (e % dispFreq == 0) {
-            printf("Epoch %4lu", e);
-            printf(", Loss : %.1e\n", avgLoss);
-        }
-
-        // Optimize
-        networkUpdate(net);
-    }
+    train(net, dataset, epochs, batchSize, flatten);
 
     // Show results
     for (size_t i = 0; i < batchSize; ++i) {
-        Matrix *pred = networkPredict(net, xs[i]);
+        Matrix *pred = networkPredict(net, dataset->images[i]);
 
-        printf("x = %.2f %.2f\n", xs[i]->data[0], xs[i]->data[1]);
+        printf("x = %.2f %.2f\n", dataset->images[i]->data[0],
+                dataset->images[i]->data[1]);
         printf("probs = %.2f %.2f\n\n", pred->data[0], pred->data[1]);
 
         matrixFree(pred);
@@ -165,11 +127,7 @@ void netMain() {
 
     // Free
     networkFree(net);
-
-    // Free batch (each phase)
-    for (size_t i = 0; i < batchSize; ++i) {
-        matrixFree(xs[i]);
-    }
+    datasetFree(dataset);
 }
 
 int dataMain() {
