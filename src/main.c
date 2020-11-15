@@ -65,53 +65,37 @@ int imgMain() {
     return 0;
 }
 
-static void trainCallback(size_t epoch, size_t batch, float loss) {
-    printf("\rEpoch %4zu, batch %2zu, loss %.1e", epoch, batch, loss);
+// Hyper parameters
+static const size_t dispFreq = 1;
+static const size_t logFreq = 1;
+static const float learningRate = 1e-3;
+static const unsigned int batchSize = 1;
+static const size_t epochs = 32;
 
-    if (batch == 0 && epoch % 200 == 0)
-        puts("");
+static void trainCallback(size_t epoch, size_t batch, float loss) {
+    if (batch % dispFreq == 0) {
+        printf("\rEpoch %4zu, batch %3zu, loss %.1e", epoch, batch, loss);
+
+        if (epoch % dispFreq == 0 && batch == 0)
+            puts("");
+    }
 }
 
 void netMain() {
-    // Hyper parameters
-    static const float learningRate = 5e-2;
-    static const unsigned int batchSize = 1;
-    static const size_t epochs = 3000;
-    // static const size_t dispFreq = 100;
-
-    // Dataset
-    const float xData[] = {
-            0, 0,
-            0, 1,
-            1, 0,
-            1, 1,
-        };
-    const unsigned char ys[] = {
-            0,
-            1,
-            1,
-            0,
-        };
-
     // Replace by datasetNew for images
-    Dataset *dataset = malloc(sizeof(Dataset));
-    dataset->count = sizeof(ys);
-    dataset->images = malloc(sizeof(Matrix*) * dataset->count);
-    dataset->labels = malloc(dataset->count);
-
-    for (size_t i = 0; i < dataset->count; ++i) {
-        dataset->images[i] = matrixCreate(2, 1, &xData[2 * i]);
-        dataset->labels[i] = ys[i];
-    }
+    Dataset *dataset = datasetNew("data/dataset_bmp");
 
     // Build network
     Layer *layers[] = {
-            denseNew(2, 4),
+            denseNew(32 * 32, 128),
             sigmoidNew(),
-            denseNew(4, 2),
+            denseNew(128, 32),
+            sigmoidNew(),
+            denseNew(32, 256),
             softmaxNew(),
         };
-    LossFunction criterion = nllLoss;
+    // TODO : Use nll and remove exploding gradient
+    LossFunction criterion = mseLoss;
     Optimizer *opti = sgdNew(learningRate, batchSize);
 
     Network *net = networkNew(sizeof(layers) / sizeof(Layer*),
