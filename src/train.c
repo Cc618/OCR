@@ -1,6 +1,7 @@
 #include "train.h"
 #include <stdio.h>
 #include <math.h>
+#include "error.h"
 
 // Returns a random permutation of [0, n)
 static size_t *randRange(size_t n) {
@@ -24,12 +25,14 @@ static size_t *randRange(size_t n) {
 }
 
 void train(Network *net, Dataset *dataset, size_t epochs, size_t batchSize,
-        Preprocessor preprocessor) {
+        Preprocessor preprocessor, TrainCallback traincb) {
+    ASSERT(dataset->count >= batchSize, "train : Invalid batch size");
+
     size_t nBatch = dataset->count / batchSize;
 
     for (size_t e = 1; e <= epochs; ++e) {
         // Generate all indices of each sample
-        size_t *indices = randRange((dataset->count / batchSize) * batchSize);
+        size_t *indices = randRange(nBatch * batchSize);
 
         // For each batch
         for (size_t batch = 0; batch < nBatch; ++batch) {
@@ -39,8 +42,8 @@ void train(Network *net, Dataset *dataset, size_t epochs, size_t batchSize,
             for (size_t sample = 0; sample < batchSize; ++sample) {
                 size_t i = indices[batch * batchSize + sample];
 
-                Matrix *x = preprocessor(dataset->images[batch]);
-                unsigned char y = dataset->labels[batch];
+                Matrix *x = preprocessor(dataset->images[i]);
+                unsigned char y = dataset->labels[i];
 
                 // Accumulate gradients
                 avgLoss += networkBackward(net, x, y);
@@ -51,10 +54,8 @@ void train(Network *net, Dataset *dataset, size_t epochs, size_t batchSize,
 
             avgLoss /= batchSize;
 
-            // Display result
-            // TODO : Callback
-            printf("Epoch %4lu", e);
-            printf(", Loss : %.1e\n", avgLoss);
+            // Display infos / save weights
+            traincb(e, batch, avgLoss);
 
             // Optimize
             networkUpdate(net);
@@ -62,7 +63,6 @@ void train(Network *net, Dataset *dataset, size_t epochs, size_t batchSize,
 
         free(indices);
     }
-
 }
 
 Matrix *flatten(const Matrix *x) {

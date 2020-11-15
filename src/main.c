@@ -65,12 +65,19 @@ int imgMain() {
     return 0;
 }
 
+static void trainCallback(size_t epoch, size_t batch, float loss) {
+    printf("\rEpoch %4zu, batch %2zu, loss %.1e", epoch, batch, loss);
+
+    if (batch == 0 && epoch % 200 == 0)
+        puts("");
+}
+
 void netMain() {
     // Hyper parameters
-    static const float learningRate = 2e-2;
-    static const unsigned int batchSize = 4;
-    static const size_t epochs = 2000;
-    static const size_t dispFreq = 100;
+    static const float learningRate = 5e-2;
+    static const unsigned int batchSize = 1;
+    static const size_t epochs = 3000;
+    // static const size_t dispFreq = 100;
 
     // Dataset
     const float xData[] = {
@@ -112,10 +119,11 @@ void netMain() {
 
     // Net train
     puts("--- Train ---");
-    train(net, dataset, epochs, batchSize, flatten);
+    train(net, dataset, epochs, batchSize, flatten, trainCallback);
+    puts("");
 
     // Show results
-    for (size_t i = 0; i < batchSize; ++i) {
+    for (size_t i = 0; i < dataset->count; ++i) {
         Matrix *pred = networkPredict(net, dataset->images[i]);
 
         printf("x = %.2f %.2f\n", dataset->images[i]->data[0],
