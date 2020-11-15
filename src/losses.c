@@ -11,7 +11,7 @@ void lossFree(Loss *l) {
     free(l);
 }
 
-Loss *mseLoss(const Matrix *y, unsigned int *target) {
+Loss *mseLoss(const Matrix *y, unsigned int target) {
     ASSERT(target < y->rows && y->cols == 1,
             "mseLoss : Target label outside of bounds");
 
@@ -46,11 +46,11 @@ Loss *nllLoss(const Matrix *y, unsigned int target) {
     // Probability for the target class
     float prob = EPSILON + matrixGet(y, target, 0);
 
-    l->loss = -log(prob);
+    l->loss = -log(prob) / (float)y->rows;
 
     // d(-log Y_x ) / dY = -1 / Y_x
     l->grad = matrixZero(y->rows, y->cols);
-    matrixSet(l->grad, target, 0, -1.f / prob);
+    matrixSet(l->grad, target, 0, -1.f / (prob * y->rows));
 
     return l;
 }

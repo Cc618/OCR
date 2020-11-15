@@ -1,4 +1,5 @@
 #include "layers.h"
+#include <math.h>
 #include "error.h"
 #include "initializer.h"
 
@@ -139,4 +140,64 @@ static Layer *activationNew(
 
 Layer *sigmoidNew() {
     return activationNew(matrixSigmoid, matrixSigmoidPrime);
+}
+
+// --- Softmax ---
+static Matrix *softmaxForward(Softmax *l, const Matrix *x,
+        bool training) {
+    ASSERT(x->cols == 1, "softmaxForward : x must be a vector");
+
+    // y[i] = exp(y[i]) / sum(exp(y[j]))
+    Matrix *y = matrixZero(x->rows, x->cols);
+    float ratio = 0;
+    for (size_t i = 0; i < y->rows; ++i) {
+        y->data[i] = exp(x->data[i]);
+        ratio += y->data[i];
+    }
+
+    for (size_t i = 0; i < y->rows; ++i)
+        y->data[i] /= ratio;
+
+    // Update training context
+    if (training)
+        l->y = matrixCopy(y);
+
+    return y;
+}
+
+static Matrix *softmaxBackward(Softmax *l, const Matrix *grad) {
+    // dLoss / dX = dY / dX * dLoss / dY
+    Matrix *prevGrad = matrixLike(l->y);
+
+    // dLoss / dXi = grad[i] * y[i] * (1 - y[i]) - sum(grad[j] * y[i] * y[j])
+    for (size_t i = 0; i < grad->rows; ++i) {
+        float result = grad->data[i] * l->y->data[i] * (1 - l->y->data[i]);
+
+        for (size_t j = 0; j < grad->rows; ++j)
+            if (i != j)
+                result -= grad->data[j] * l->y->data[i] * l->y->data[j];
+
+        prevGrad->data[i] = result;
+    }
+
+    // Free training context
+    matrixFree(l->y);
+    l->y = NULL;
+
+    return prevGrad;
+}
+
+Layer *softmaxNew() {
+    Softmax *l = malloc(sizeof(Softmax));
+
+    // Override virtual functions
+    l->forward = (Matrix *(*)(Layer *l, const Matrix*, bool))softmaxForward;
+    l->backward = (Matrix *(*)(Layer *l, const Matrix*))softmaxBackward;
+    l->update = NULL;
+    l->free = NULL;
+
+    // Init training context
+    l->y = NULL;
+
+    return (Layer*)l;
 }

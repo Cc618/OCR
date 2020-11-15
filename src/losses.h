@@ -21,7 +21,7 @@ void lossFree(Loss *l);
 
 // Mean squared error : 1 / (2 * N) * (sum of (y_i - target_i) ^ 2)
 // dLoss / dY_i : 1 / N * (y_i - target_i)
-Loss *mseLoss(const Matrix *y, unsigned int *target);
+Loss *mseLoss(const Matrix *y, unsigned int target);
 
 // Negative log likelihood loss
 // Used with softmax to make a categorical crossentropy loss

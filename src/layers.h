@@ -52,6 +52,15 @@ typedef struct Activation_t {
     Matrix *x;
 } Activation;
 
+// Softmax layer
+typedef struct Softmax_t {
+    // Inherit from Layer
+    LAYER_ATTRIBUTES;
+
+    // Copy of y in forward
+    Matrix *y;
+} Softmax;
+
 // Forward propagation
 // - training : If true, allocates data for the backward pass
 Matrix *layerForward(Layer *l, const Matrix *x, bool training);
@@ -73,5 +82,8 @@ Layer *denseNew(size_t in, size_t out);
 
 // Sigmoid activation layer
 Layer *sigmoidNew();
+
+// Softmax "activation" (not a subclass) layer
+Layer *softmaxNew();
 
 #endif // LAYERS_H

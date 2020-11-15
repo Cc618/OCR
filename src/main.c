@@ -67,7 +67,7 @@ int imgMain() {
 
 void netMain() {
     // Hyper parameters
-    static const float learningRate = 1e-2;
+    static const float learningRate = 2e-2;
     static const unsigned int batchSize = 4;
     static const size_t epochs = 2000;
     static const size_t dispFreq = 100;
@@ -86,23 +86,23 @@ void netMain() {
             0,
         };
     Matrix *xs[batchSize];
-    // Matrix *ys[batchSize];
 
     for (size_t i = 0; i < batchSize; ++i) {
         xs[i] = matrixCreate(2, 1, &xData[2 * i]);
-        // ys[i] = matrixCreate(1, 1, &yData[i]);
     }
 
     // Build network
     Layer *layers[] = {
             denseNew(2, 4),
             sigmoidNew(),
-            denseNew(4, 2)
+            denseNew(4, 2),
+            softmaxNew(),
         };
-    LossFunction criterion = mseLoss;
+    LossFunction criterion = nllLoss;
     Optimizer *opti = sgdNew(learningRate, batchSize);
 
-    Network *net = networkNew(3, layers, opti, criterion);
+    Network *net = networkNew(sizeof(layers) / sizeof(Layer*),
+            layers, opti, criterion);
 
     // // TODO : dataset
     // Dataset dataset;
@@ -169,7 +169,6 @@ void netMain() {
     // Free batch (each phase)
     for (size_t i = 0; i < batchSize; ++i) {
         matrixFree(xs[i]);
-        matrixFree(ys[i]);
     }
 }
 
