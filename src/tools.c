@@ -36,7 +36,7 @@ void printImage(SDL_Renderer *ren,SDL_Surface *sur, int x, int y)
     dst.x = x;
     dst.y = y;
     dst.w = 1000;
-    dst.h = 800;
+    dst.h = 1000;
     SDL_RenderCopy(ren, tex, NULL, &dst);
     SDL_RenderPresent(ren);
 }
@@ -208,11 +208,12 @@ void matrixToGrey(SDL_Surface *surface, Matrix *matrix) {
 	}
 }
 
-//Put the lines into a
+//Put the lines in a dynamic array.
 dyn_arr getLines(Matrix *matrix) {
 	int cols = matrix->cols;
     	int rows = matrix->rows;
 	int accu = 0;
+	//1) Stocks all the black pixels in a array.
    	dyn_arr array_lines;
     	array_lines.array = (int*) malloc(sizeof(int) * 2000);
     	array_lines.length = 0;
@@ -222,19 +223,21 @@ dyn_arr getLines(Matrix *matrix) {
 		while (is_empty == 0 && j < cols) {
 			float pixel_color = matrixGet(matrix, i, j);
 			if (pixel_color != 1)
-				is_empty = -1;
+				is_empty--;
 			j++;
 		}
-		if (is_empty == -1) {
+		if (is_empty < 0) {
 			array_lines.array[accu] = i;
 			array_lines.length++;
 			accu++;
 		}
 	}
+	//2)On this array, we take only the pixels that are far away from one another.
 	dyn_arr array_lines2;
     	array_lines2.array = (int*) malloc(sizeof(int) * 500);
-	array_lines2.length = 0;
-	accu = 0;
+	array_lines2.length = 1;
+	array_lines2.array[0] = array_lines.array[0];
+	accu = 1;
 	//We add a number if two pixels are far from one another.
 	for (int j = 1; j < array_lines.length - 1; j++) {
 		if (array_lines.array[j - 1] != array_lines.array[j] - 1) {
@@ -244,7 +247,8 @@ dyn_arr getLines(Matrix *matrix) {
 			accu++;
 		}
 	}
-	array_lines2.length = accu;
+	array_lines2.length = accu + 1;
+	array_lines2.array[array_lines2.length - 1] = array_lines.array[array_lines.length - 1];
 	free(array_lines.array);
 	return array_lines2;
 
@@ -263,7 +267,7 @@ void drawLines(Matrix *matrix, dyn_arr arraylines) {
     free(arraylines.array);
 }
 
-dyn_arr getCaracters(Matrix *matrix,int top, int down) {
+dyn_arr getCaracters(Matrix *matrix, int top, int down) {
 	int cols = matrix->cols;
 	int accu = 0;
    	dyn_arr array_lines;
@@ -273,7 +277,6 @@ dyn_arr getCaracters(Matrix *matrix,int top, int down) {
 		int is_empty = 0;
 		int i = top;
 		while (is_empty == 0 && i < down) {
-            //printf("i j %d %d\n",i,j);
 			float pixel_color = matrixGet(matrix, i, j);
 			if (pixel_color != 1)
 				is_empty = -1;

@@ -21,34 +21,36 @@ int imgMain() {
     SDL_Renderer *ren = 0;
     if (SDL_Init(SDL_INIT_EVERYTHING)<0)
     {
-        fprintf(stderr,"Erreur initialisation\n");
+        fprintf(stderr,"Initialisation error.\n");
         return -1;
     }
     //Image Loading
     SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
     if (!sur)
     {
-        fprintf(stderr,"Ne trouve pas l'image\n");
+        fprintf(stderr,"Doesn't find the image.\n");
         return -1;
     }
     imageToGrey(sur);
     Matrix *matrix = greyToMatrix(sur);
     matrixToGrey(sur, matrix);
     dyn_arr dar = getLines(matrix);
-    dyn_arr dar2 = getCaracters(matrix,0,dar.array[0]);
-        drawCaracters(matrix,dar2,0,dar.array[0]);
+
+    //Character analysis
+    /*dyn_arr dar2 = getCaracters(matrix,0,dar.array[0]);
+    drawCaracters(matrix,dar2,0,dar.array[0]);
     for (int i = 1; i+1 < dar.length; i+=2)
         {
             dyn_arr dar2 = getCaracters(matrix,dar.array[i],dar.array[i+1]);
             drawCaracters(matrix,dar2,dar.array[i],dar.array[i+1]);
-        }
+	}*/
     drawLines(matrix, dar);
     matrixToGrey(sur, matrix);
     matrixFree(matrix);
-    SDL_CreateWindowAndRenderer(1000, 800,0,&win,&ren);
+    SDL_CreateWindowAndRenderer(1000, 1000,0,&win,&ren);
     if (!win || !ren)
     {
-        fprintf(stderr,"Erreur a la creation des fenetres\n");
+        fprintf(stderr,"Error when building windows.\n");
         SDL_Quit();
         return -1;
     }
@@ -56,7 +58,7 @@ int imgMain() {
     SDL_RenderClear(ren);
     printImage(ren,sur,0,0);
     SDL_RenderPresent(ren);
-    SDL_Delay(120000);
+    SDL_Delay(8000);
     //Closure
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
