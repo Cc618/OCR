@@ -267,6 +267,7 @@ void drawLines(Matrix *matrix, dyn_arr arraylines) {
     free(arraylines.array);
 }
 
+//Stores the characters in a dynamic array.
 dyn_arr getCaracters(Matrix *matrix, int top, int down) {
 	int cols = matrix->cols;
 	int accu = 0;
@@ -306,6 +307,7 @@ dyn_arr getCaracters(Matrix *matrix, int top, int down) {
 	return array_lines2;
 }
 
+//Separates the characters on the image.
 void drawCaracters(Matrix *matrix, dyn_arr arraylines,int top, int down)
 {
     for (int j = 0; j < arraylines.length; j++)
@@ -332,6 +334,47 @@ void matrixToBinary(Matrix *matrix) {
 		}
 	}
 }
+//Keeps the value between 0.0 and 1.0.
+float preventOverflow(float value) {
+	if (value > 1.0)
+		return 1.0;
+	if (value < 0.0)
+		return 0.0;
+	return value;
+}
+
+//Return the convolution matrix of matrix with convo
+Matrix *convolution(Matrix *matrix, Matrix *convo) {
+	size_t rows1 = matrix->rows;
+	size_t rows2 = convo->rows;
+	size_t cols1 = matrix->cols;
+	size_t cols2 = convo->cols;
+	Matrix *result = matrixZero(rows1, cols1);
+	//Indexes for matrix : i and j, for convo : k and l.
+	for (size_t i = 0; i < rows1; i++) {
+		for (size_t j = 0; j < cols1; j++) {
+			float accu = 0;
+			for (size_t k = 0; k < rows2; k++) {
+				for (size_t l = 0; l < cols2; l++) {
+					size_t x = i + k - (rows2 / 2);
+					size_t y = j + l - (cols2 / 2);
+					if (x < rows1 && y < cols1 
+					 && x > 0 && y > 0) {
+						float mat_val = 
+						       matrixGet(matrix, x, y);
+						float conv_val = 
+						       matrixGet(convo, k, l);	
+						accu += mat_val * conv_val;
+					}
+				}
+			}
+			accu = preventOverflow(accu);
+			matrixSet(result, i, j, accu);
+		}
+	}
+	return result;
+}
+
 /*
 int analysis(Matrix* mat, int top, int down, int left,int right,int** result)
 {
