@@ -25,7 +25,7 @@ int imgMain() {
         return -1;
     }
     //Image Loading
-    SDL_Surface *sur = SDL_LoadBMP("res/test.bmp");
+    SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
     if (!sur)
     {
         fprintf(stderr,"Doesn't find the image.\n");
@@ -33,7 +33,7 @@ int imgMain() {
     }
 
     //Matrix Initialisation
-    Matrix *convo = matrixZero(3, 3);
+    /*Matrix *convo = matrixZero(3, 3);
     matrixSet(convo, 0, 0, -1);
     matrixSet(convo, 0, 1, -1);
     matrixSet(convo, 0, 2, -1);
@@ -42,13 +42,17 @@ int imgMain() {
     matrixSet(convo, 1, 2, -1);
     matrixSet(convo, 2, 0, -1);
     matrixSet(convo, 2, 1, -1);
-    matrixSet(convo, 2, 2, -1);
+    matrixSet(convo, 2, 2, -1);*/
 
     //Image to Matrix
     imageToGrey(sur);
     Matrix *matrix = greyToMatrix(sur);
     matrixToGrey(sur, matrix);
-    Matrix *result = convolution(matrix, convo);
+    //Matrix *result = convolution(matrix, convo);
+	
+    //Line analysis
+    dyn_arr dar = getLines(matrix);
+    drawLines(matrix, dar);
 
     //Character analysis
     /*dyn_arr dar2 = getCaracters(matrix,0,dar.array[0]);
@@ -59,13 +63,14 @@ int imgMain() {
             drawCaracters(matrix,dar2,dar.array[i],dar.array[i+1]);
 	}*/
 	
-    matrixToGrey(sur, result);
+    //matrixToGrey(sur, result);
+    matrixToGrey(sur, matrix);
     matrixFree(matrix);
-    matrixFree(convo);
-    matrixFree(result);
+    //matrixFree(convo);
+    //matrixFree(result);
 
     //Image Printing
-    SDL_CreateWindowAndRenderer(1000, 1000,0,&win,&ren);
+    SDL_CreateWindowAndRenderer(1000, 1200,0,&win,&ren);
     if (!win || !ren)
     {
         fprintf(stderr,"Error when building windows.\n");

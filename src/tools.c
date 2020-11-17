@@ -36,7 +36,7 @@ void printImage(SDL_Renderer *ren,SDL_Surface *sur, int x, int y)
     dst.x = x;
     dst.y = y;
     dst.w = 1000;
-    dst.h = 1000;
+    dst.h = 1200;
     SDL_RenderCopy(ren, tex, NULL, &dst);
     SDL_RenderPresent(ren);
 }
