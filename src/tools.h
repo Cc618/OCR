@@ -9,7 +9,17 @@ typedef struct {
     int length;
 } dyn_arr;
 
-typedef struct CoordList CoordList;
+typedef struct{
+	size_t x;
+	size_t y;
+} point;
+
+typedef struct{
+	point b;
+	point c;
+} rectangle;
+
+/*typedef struct CoordList CoordList;
 typedef struct ValueList ValueList;
 struct CoordList
 {
@@ -22,7 +32,7 @@ struct ValueList
     int value;
     ValueList* fusion;
     ValueList* next;
-};
+};*/
 
 //Print the actual surface on the renderer.
 void printImage(SDL_Renderer * ren,SDL_Surface * sur, int x, int y);
@@ -70,5 +80,8 @@ float preventOverflow(float value);
 
 //Convolution on matrix with convo.
 Matrix *convolution(Matrix *matrix, Matrix *convo);
+
+//Draw a rectangle on the matrix
+void drawRectangle(Matrix *matrix, rectangle rec);
 
 #endif

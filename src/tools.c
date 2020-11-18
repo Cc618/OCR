@@ -328,12 +328,13 @@ void matrixToBinary(Matrix *matrix) {
 		for (int j = 0; j < cols; j++) {
 			float value = matrixGet(matrix, i, j);
 			if (value > 0.5)
-				matrixSet(matrix, i, j, 1);
+				matrixSet(matrix, i, j, 1.0);
 			else
-				matrixSet(matrix, i, j, 0);
+				matrixSet(matrix, i, j, 0.0);
 		}
 	}
 }
+
 //Keeps the value between 0.0 and 1.0.
 float preventOverflow(float value) {
 	if (value > 1.0)
@@ -372,8 +373,62 @@ Matrix *convolution(Matrix *matrix, Matrix *convo) {
 			matrixSet(result, i, j, accu);
 		}
 	}
+	//Edge Handeling
+	/*for (size_t j = 0; j < rows2 / 2; j++) {
+		for (size_t i = 0; i < rows1; i++) {
+			//float value1 = matrixGet(matrix, rows1 - 1 - i, cols1 - 1 - j);
+			//printf("value1 == %f\n", value1);
+			matrixSet(matrix, i, 0, 1);
+			//matrixSet(matrix, i, j, 1);// value1);
+		}
+	}
+	for (size_t i = 0; i < cols2 / 2; i++) {
+		for (size_t j = 0; j < cols1; j++) {
+			float value2 = matrixGet(matrix, rows1 - 1 - i, cols1 - 1 - j);
+			printf("value2 == %f\n", value2);
+			matrixSet(matrix, i, j, 1);//value2);
+		}
+	}*/
 	return result;
 }
+//Cut the square horizontally
+/*void horizontalCut(Matrix *matrix, rectangle rec, size_t threshold, square* array) {
+	point b = rec->b;
+	point c = rec->c;
+	size_t ax = c->x;
+	size_t ay = b->y;
+	size_t bx = b->x;
+	size_t cy = c->y;
+	//Test
+	size_t i = matrix->cols / 2;
+
+	verticalCut(sq);
+}
+
+void verticalCut(Matrix *matrix, rectangle rec, size_t threshold, square* array) {
+	
+}*/
+
+//Draw a rectangle on the matrix with a rectangle
+void drawRectangle(Matrix *matrix, rectangle rec) {
+	point b = rec.b;
+	point c = rec.c;
+	size_t ax = c.x;
+	size_t ay = b.y;
+	size_t bx = b.x;
+	size_t cy = c.y;
+	//AB and CD
+	for (size_t i = ax; i < bx; i++) {
+		matrixSet(matrix, ay, i, 0);
+		matrixSet(matrix, cy, i, 0);
+	}
+	//AC and BD
+	for (size_t j = ay; j < cy; j++) {
+		matrixSet(matrix, j, ax, 0);
+		matrixSet(matrix, j, bx, 0); 
+	}
+}
+
 
 /*
 int analysis(Matrix* mat, int top, int down, int left,int right,int** result)

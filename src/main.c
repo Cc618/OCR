@@ -32,42 +32,66 @@ int imgMain() {
         return -1;
     }
 
-    //Matrix Initialisation
-    /*Matrix *convo = matrixZero(3, 3);
-    matrixSet(convo, 0, 0, -1);
-    matrixSet(convo, 0, 1, -1);
-    matrixSet(convo, 0, 2, -1);
-    matrixSet(convo, 1, 0, -1);
-    matrixSet(convo, 1, 1, 8);
-    matrixSet(convo, 1, 2, -1);
-    matrixSet(convo, 2, 0, -1);
-    matrixSet(convo, 2, 1, -1);
-    matrixSet(convo, 2, 2, -1);*/
+    //Matrixes Initialisation
+    //Gommage
+    Matrix *convo = matrixZero(3, 3);
+    matrixSet(convo, 0, 0, 0.1111111);
+    matrixSet(convo, 0, 1, 0.1111111);
+    matrixSet(convo, 0, 2, 0.1111111);
+    matrixSet(convo, 1, 0, 0.1111111);
+    matrixSet(convo, 1, 1, 0.1111111);
+    matrixSet(convo, 1, 2, 0.1111111);
+    matrixSet(convo, 2, 0, 0.1111111);
+    matrixSet(convo, 2, 1, 0.1111111);
+    matrixSet(convo, 2, 2, 0.1111111);
+
+    //Contrast
+    Matrix *convo2 = matrixZero(3, 3);
+    matrixSet(convo2, 0, 0, 0);
+    matrixSet(convo2, 0, 1, -1);
+    matrixSet(convo2, 0, 2, 0);
+    matrixSet(convo2, 1, 0, -1);
+    matrixSet(convo2, 1, 1, 5);
+    matrixSet(convo2, 1, 2, -1);
+    matrixSet(convo2, 2, 0, 0);
+    matrixSet(convo2, 2, 1, -1);
+    matrixSet(convo2, 2, 2, 0);
 
     //Image to Matrix
     imageToGrey(sur);
     Matrix *matrix = greyToMatrix(sur);
     matrixToGrey(sur, matrix);
-    //Matrix *result = convolution(matrix, convo);
-	
+    Matrix *inter = convolution(matrix, convo);
+    Matrix *result = convolution(matrix, convo2);
+    //TEST
+    for (size_t i = 0; i < result->rows; i++)
+	    matrixSet(matrix, i, 0, 1);
+    for (size_t j = 0; j < result->cols; j++)
+	    matrixSet(matrix, 0, j, 1);
+    //FIN DE TEST
+    matrixToBinary(result);
+
     //Line analysis
-    dyn_arr dar = getLines(matrix);
-    drawLines(matrix, dar);
+    //dyn_arr dar = getLines(result);
+    //drawLines(result, dar);
 
     //Character analysis
     /*dyn_arr dar2 = getCaracters(matrix,0,dar.array[0]);
     drawCaracters(matrix,dar2,0,dar.array[0]);
-    for (int i = 1; i+1 < dar.length; i+=2)
+    for (int i = 1; i+1 < dar.length; i+=1)
         {
             dyn_arr dar2 = getCaracters(matrix,dar.array[i],dar.array[i+1]);
             drawCaracters(matrix,dar2,dar.array[i],dar.array[i+1]);
 	}*/
-	
-    //matrixToGrey(sur, result);
-    matrixToGrey(sur, matrix);
+    //matrixToGrey(sur, matrix);    
+    //matrixToGrey(sur, inter);
+    matrixToGrey(sur, result);
     matrixFree(matrix);
-    //matrixFree(convo);
-    //matrixFree(result);
+    matrixFree(convo);
+    matrixFree(convo2);
+    matrixFree(inter);
+    matrixFree(result);
+    SDL_SaveBMP(sur, "res/testo");
 
     //Image Printing
     SDL_CreateWindowAndRenderer(1000, 1200,0,&win,&ren);
@@ -147,7 +171,7 @@ void netMain() {
     for (size_t e = 1; e <= epochs; ++e) {
         float avgLoss = 0;
 
-        // TODO : Use multiple batches for one epoch
+        // TODO : Use :multiple batches for one epoch
         // For each sample
         for (size_t batch = 0; batch < batchSize; ++batch) {
             Matrix *x = xs[batch];
