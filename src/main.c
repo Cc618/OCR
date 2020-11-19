@@ -71,7 +71,7 @@ int imgMain() {
 static const size_t dispFreq = 10;
 static const float learningRate = 2e-3;
 static const unsigned int batchSize = 10;
-static const size_t epochs = 10;
+static const size_t epochs = 1;
 static const float momentum = .4f;
 
 static void trainCallback(size_t epoch, size_t batch, float loss) {
@@ -88,11 +88,9 @@ void netMain() {
     Layer *layers[] = {
             denseNew(32 * 32, 512),
             sigmoidNew(),
-            // denseNew(256, 128),
-            // sigmoidNew(),
-            // denseNew(128, 32),
-            // sigmoidNew(),
             denseNew(512, 256),
+            sigmoidNew(),
+            denseNew(256, 256),
             softmaxNew(),
         };
     LossFunction criterion = nllLoss;
@@ -107,18 +105,31 @@ void netMain() {
     puts("");
 
     // Show results
-    for (size_t i = 19; i < 19 + 6; ++i) {
-        // PRINT_SIZE(dataset->images[i]);
+    puts("--- Results ---");
+    float loss = 0;
+    size_t ok = 0;
+    for (size_t i = 0; i < dataset->count; ++i) {
         Matrix *pred = networkPredict(net, dataset->images[i]);
-        // PRINT_SIZE(pred);
 
-        // printf("x = %.2f %.2f\n", dataset->images[i]->data[0],
-        //         dataset->images[i]->data[1]);
-        // TODO : Argmax
-        printf("probs = %.3f %.3f\n", pred->data['a'], pred->data['A']);
+        Loss *error = criterion(pred, dataset->labels[i]);
+        loss += error->loss;
+        lossFree(error);
+
+        // Argmax
+        size_t imax = 0;
+        for (size_t j = 1; j < pred->rows; ++j)
+            if (pred->data[j] > pred->data[imax])
+                imax = j;
+
+        if (imax == dataset->labels[i])
+            ++ok;
 
         matrixFree(pred);
     }
+    loss /= dataset->count;
+    printf("%zu / %zu correct predictions (%.1f %%)\n", ok, dataset->count,
+            (float)ok / dataset->count * 100);
+    printf("Total loss : %.4e\n", loss);
 
     // Free
     networkFree(net);
