@@ -1,8 +1,17 @@
 #!/usr/bin/env python3
 
-# Generates all tex files
-# Fonts location (arch) : /usr/share/fonts/*
+# * Generates all tex files
+# * Fonts location (arch) : /usr/share/fonts/*
 # https://wiki.archlinux.org/index.php/Fonts
+# * Fonts with texlive :
+# https://tex.stackexchange.com/questions/59403/ \
+# what-font-packages-are-installed-in-tex-live
+# * We can add fontspec fonts like these :
+# Hack
+# Roboto
+# DejaVuSansMono
+# FreeMono
+# FreeSerif
 
 with open('fonts.txt') as f:
     fonts = f.read().strip().split('\n')
@@ -24,7 +33,8 @@ for font in fonts:
     path = 'dataset_tex/' + font + '.tex'
     print('Generating', path)
 
-    template[i_setfont] = r'\setmainfont{' + font + '}\n'
+    # If using fontspec : template[i_setfont] = r'\setmainfont{' + font + '}\n'
+    template[i_setfont] = r'\usepackage{' + font + '}\n'
     data = ''.join(template)
 
     with open(path, 'w') as f:
