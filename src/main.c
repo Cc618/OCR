@@ -72,6 +72,7 @@ static const size_t dispFreq = 10;
 static const float learningRate = 2e-3;
 static const unsigned int batchSize = 10;
 static const size_t epochs = 10;
+static const float momentum = .4f;
 
 static void trainCallback(size_t epoch, size_t batch, float loss) {
     if (batch % dispFreq == 0)
@@ -94,9 +95,8 @@ void netMain() {
             denseNew(512, 256),
             softmaxNew(),
         };
-    // LossFunction criterion = nllLoss;
     LossFunction criterion = nllLoss;
-    Optimizer *opti = sgdNew(learningRate, batchSize);
+    Optimizer *opti = sgdNew(learningRate, batchSize, momentum);
 
     Network *net = networkNew(sizeof(layers) / sizeof(Layer*), layers, flatten,
             opti, criterion);

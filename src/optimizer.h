@@ -20,15 +20,15 @@ typedef struct SGD_t {
 
     // = learningRate / batchSize
     float learningRatio;
+    float momentum;
 } SGD;
 
 void optimizerUpdate(Optimizer *o, Matrix *weights, Matrix *grad);
 
 void optimizerFree(Optimizer *o);
 
-// TODO : Momentum
 // Stochastic Gradient Descent with momentum optimizer
 // w -= learningRate / batchSize * grad
-Optimizer *sgdNew(float learningRate, float batchSize);
+Optimizer *sgdNew(float learningRate, float batchSize, float momentum);
 
 #endif // OPTIMIZER_H
