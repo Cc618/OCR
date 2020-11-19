@@ -68,19 +68,14 @@ int imgMain() {
 }
 
 // Hyper parameters
-static const size_t dispFreq = 1;
-static const size_t logFreq = 1;
+static const size_t dispFreq = 10;
 static const float learningRate = 2e-3;
-static const unsigned int batchSize = 16;
+static const unsigned int batchSize = 10;
 static const size_t epochs = 10;
 
 static void trainCallback(size_t epoch, size_t batch, float loss) {
-    if (batch % dispFreq == 0) {
-        printf("\rEpoch %4zu, batch %3zu, loss %.1e", epoch, batch, loss);
-
-        if (epoch % logFreq == 0 && batch == 0)
-            puts("");
-    }
+    if (batch % dispFreq == 0)
+        printf("Epoch %4zu, batch %3zu, loss %.2e\n", epoch, batch, loss);
 }
 
 void netMain() {
