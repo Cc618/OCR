@@ -30,7 +30,9 @@ Matrix *networkPredict(Network *net, const Matrix *x) {
     return y;
 }
 
-float networkBackward(Network *net, const Matrix *x, char label) {
+float networkBackward(Network *net, const Matrix *x, unsigned char label) {
+    // printf("%f %f -> %d\n", x->data[0], x->data[1], label);
+
     // Create 2 stacks
     // Contains forward matrices
     Matrix **forwardStack = malloc(sizeof(Matrix*) * (net->nLayers + 1));

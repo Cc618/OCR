@@ -7,6 +7,8 @@
 #include "error.h"
 #include "tools.h"
 
+#define NO_LABEL 0xff
+
 Dataset *datasetNew(const char *dirPath) {
     // Contains an image and a link to all previous images
     // This is a singly linked list with back links
@@ -62,11 +64,29 @@ Dataset *datasetNew(const char *dirPath) {
     dataset->images = malloc(itemCount * sizeof(Matrix*));
     dataset->labels = malloc(itemCount * sizeof(char));
 
+    dataset->labelCount = 0;
+    for (size_t i = 0; i < 256; ++i) {
+        dataset->label2char[i] = (char)NO_LABEL;
+        dataset->char2label[i] = NO_LABEL;
+    }
+
     // Iterate backwards the list
     size_t i = itemCount - 1;
     while (item) {
         dataset->images[i] = item->image;
-        dataset->labels[i] = item->label;
+
+        // Generate label
+        char chr = item->label;
+
+        // This char has no labels
+        if (dataset->char2label[chr] == NO_LABEL) {
+            // Link new label to this char
+            unsigned char label = dataset->labelCount++;
+            dataset->char2label[chr] = label;
+            dataset->label2char[label] = chr;
+        }
+
+        dataset->labels[i] = dataset->char2label[(unsigned char)chr];
 
         // Take previous item and free the current one (not its content)
         ImageItem *oldItem = item;

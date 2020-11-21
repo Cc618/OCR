@@ -35,7 +35,7 @@ Matrix *networkPredict(Network *net, const Matrix *x);
 
 // Backward propagation
 // Returns the error term
-float networkBackward(Network *net, const Matrix *x, char label);
+float networkBackward(Network *net, const Matrix *x, unsigned char label);
 
 // Optimize
 void networkUpdate(Network *net);

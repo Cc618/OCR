@@ -68,32 +68,86 @@ int imgMain() {
 }
 
 // Hyper parameters
-static const size_t dispFreq = 10;
-static const float learningRate = 2e-3;
-static const unsigned int batchSize = 10;
-static const size_t epochs = 1;
-static const float momentum = .4f;
+static const size_t dispFreq = 5;
+static const float learningRate = 1e-3;
+static const unsigned int batchSize = 100;
+static const size_t epochs = 10;
+static const float momentum = .1f;
+
+// static const size_t dispFreq = 10;
+// static const float learningRate = 1e-2;
+// static const unsigned int batchSize = 4;
+// static const size_t epochs = 3000;
+// static const float momentum = .1f;
 
 static void trainCallback(size_t epoch, size_t batch, float loss) {
     if (batch % dispFreq == 0)
         printf("Epoch %4zu, batch %3zu, loss %.2e\n", epoch, batch, loss);
 }
 
+// TODO : Function to predict best char (using label2char)
 void netMain() {
+    // Matrix* m = matrixZero(4, 1);
+    // m->data[0] = 0;
+    // m->data[1] = 1;
+    // m->data[2] = 1;
+    // Loss* l = mseLoss(m, 0);
+    // printf("%f\n", l->loss);
+    // matrixPrint(l->grad);
+
+    // // 1 / 8 * (1)
+
+    // return;
+
+
+
     // Replace by datasetNew for images
     Dataset *dataset = datasetNew("data/dataset_bmp");
 
+    // // TODO
+    // dataset->count = 100;
+    // dataset->count = 4;
+    // dataset->images[0] = matrixZero(2, 1);
+    // dataset->images[1] = matrixZero(2, 1);
+    // dataset->images[1]->data[0] = 1;
+    // dataset->images[2] = matrixZero(2, 1);
+    // dataset->images[2]->data[1] = 1;
+    // dataset->images[3] = matrixZero(2, 1);
+    // dataset->images[3]->data[0] = 1;
+    // dataset->images[3]->data[1] = 1;
+    // dataset->labels[1] = dataset->labels[2] = 1;
+    // dataset->labels[0] = dataset->labels[3] = 0;
+
+    // Display all classes
+    for (int i = 0; i < 256; ++i) {
+        if (dataset->label2char[i] != (char)0xff) {
+            printf("Label %d -> %c\n", i, dataset->label2char[i]);
+        }
+    }
+
+    size_t nClasses = dataset->labelCount;
+    printf("Loaded dataset containing %zu classes, %zu images\n",
+            nClasses, dataset->count);
+
     // Build network
-    // TODO : Reduce size (detect nLabels)
     Layer *layers[] = {
-            denseNew(32 * 32, 512),
+            // denseNew(2, 4),
+            // sigmoidNew(),
+            // denseNew(4, 2),
+            //
+            // sigmoidNew(),
+            // softmaxNew(),
+
+            denseNew(32 * 32, 128),
             sigmoidNew(),
-            denseNew(512, 256),
-            sigmoidNew(),
-            denseNew(256, 256),
+            // denseNew(256, 256),
+            // sigmoidNew(),
+            denseNew(128, nClasses),
             softmaxNew(),
         };
+    // matrixPrint(((Dense*)layers[0])->weight);
     LossFunction criterion = nllLoss;
+    // LossFunction criterion = mseLoss;
     Optimizer *opti = sgdNew(learningRate, batchSize, momentum);
 
     Network *net = networkNew(sizeof(layers) / sizeof(Layer*), layers, flatten,
@@ -108,8 +162,11 @@ void netMain() {
     puts("--- Results ---");
     float loss = 0;
     size_t ok = 0;
+    float avgProb = 0;
     for (size_t i = 0; i < dataset->count; ++i) {
         Matrix *pred = networkPredict(net, dataset->images[i]);
+
+        avgProb += pred->data[dataset->labels[i]];
 
         Loss *error = criterion(pred, dataset->labels[i]);
         loss += error->loss;
@@ -126,10 +183,25 @@ void netMain() {
 
         matrixFree(pred);
     }
+
+    // --- TODO ---
+    for (int i = 0; i < 4; i += 1) {
+        puts("---");
+        Matrix *pred = networkPredict(net, dataset->images[i]);
+        printf("Pred for %d -> %c\n", dataset->labels[i],
+                dataset->label2char[dataset->labels[i]]);
+        matrixPrint(pred);
+    }
+    // --- TODO ---
+
+    puts("");
     loss /= dataset->count;
+    avgProb /= dataset->count;
+
     printf("%zu / %zu correct predictions (%.1f %%)\n", ok, dataset->count,
             (float)ok / dataset->count * 100);
     printf("Total loss : %.4e\n", loss);
+    printf("Average prob : %.2e\n", avgProb);
 
     // Free
     networkFree(net);

@@ -84,7 +84,7 @@ Layer *denseNew(size_t in, size_t out) {
 
     // Xavier initialisation for weight
     l->weight = randNormal(out, in);
-    float var = 2 / (in + out);
+    float var = 2.f / (in + out);
     float std = sqrt(var);
     matrixMul(l->weight, std);
 
