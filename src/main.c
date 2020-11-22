@@ -72,7 +72,7 @@ int imgMain() {
 static const size_t dispFreq = 5;
 static const float learningRate = 1e-3;
 static const unsigned int batchSize = 100;
-static const size_t epochs = 12;
+static const size_t epochs = 15;
 static const float momentum = .1f;
 
 static void trainCallback(size_t epoch, size_t batch, float loss) {
@@ -140,9 +140,11 @@ void netMain() {
 
     // Single image result
     puts("\n--- Single Prediction ---");
-    size_t indices[] = { 10, 16, 20, 32, 42, 50, 64, 70, 80, 96 };
+    size_t indices[] = { 20, 40, 60, 80, 100, 200, 300, 400, 500, 600 };
     for (size_t i = 0; i < sizeof(indices) / sizeof(size_t); ++i) {
         size_t imageIndex = indices[i];
+        ASSERT(imageIndex < dataset->count, "Too large index, not enough "
+                "samples in the dataset");
 
         Matrix *x = dataset->images[imageIndex];
         unsigned char y = dataset->labels[imageIndex];
