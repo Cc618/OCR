@@ -79,10 +79,10 @@ Dataset *datasetNew(const char *dirPath) {
         char chr = item->label;
 
         // This char has no labels
-        if (dataset->char2label[chr] == NO_LABEL) {
+        if (dataset->char2label[(unsigned)chr] == NO_LABEL) {
             // Link new label to this char
             unsigned char label = dataset->labelCount++;
-            dataset->char2label[chr] = label;
+            dataset->char2label[(unsigned)chr] = label;
             dataset->label2char[label] = chr;
         }
 

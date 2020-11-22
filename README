@@ -53,3 +53,6 @@ bin/ocr net
 
 + Makefile - File for GNU Make.
         Simply use the command make to compile the code.
+
+### Training
+To build the dataset use make dataset (before make).
