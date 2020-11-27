@@ -16,6 +16,7 @@
 #include "network.h"
 #include "train.h"
 #include "ai.h"
+#include "save.h"
 
 #define PRINT_SIZE(X) printf("Size(%zu, %zu)\n", (X)->rows, (X)->cols);
 
