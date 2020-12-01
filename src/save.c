@@ -4,6 +4,8 @@
 #include "save.h"
 #include "error.h"
 
+#define WEIGHT_SUFFIX ".matrix"
+
 // May be not defined by the system
 #ifndef strdup
 char *strdup(const char *s) {
@@ -28,8 +30,6 @@ void saveContextFree(SaveContext *ctx) {
     free(ctx);
 }
 
-#define WEIGHT_SUFFIX ".matrix"
-
 char *saveContextNextPath(SaveContext *ctx) {
     ASSERT(ctx->weightId < 10000, "Invalid weight id (too big)");
 
@@ -39,6 +39,22 @@ char *saveContextNextPath(SaveContext *ctx) {
     ++ctx->weightId;
 
     return path;
+}
+
+void saveContextSave(SaveContext *ctx, const Matrix *m) {
+    char *path = saveContextNextPath(ctx);
+
+    matrixSave(path, m);
+    free(path);
+}
+
+Matrix *saveContextLoad(SaveContext *ctx) {
+    char *path = saveContextNextPath(ctx);
+
+    Matrix *m = matrixLoad(path);
+    free(path);
+
+    return m;
 }
 
 void matrixSave(char name[], const Matrix *m) {

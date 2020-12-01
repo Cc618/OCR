@@ -23,6 +23,10 @@ void saveContextFree(SaveContext *ctx);
 // to the next weight
 char *saveContextNextPath(SaveContext *ctx);
 
+// Saves / loads the next matrix
+void saveContextSave(SaveContext *ctx, const Matrix *m);
+Matrix *saveContextLoad(SaveContext *ctx);
+
 void matrixSave(char name[], const Matrix *m);
 
 Matrix *matrixLoad(char name[]);
