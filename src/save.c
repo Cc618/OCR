@@ -76,10 +76,10 @@ Matrix *matrixLoad(char name[]) {
 	fscanf(file, "%zu", &rows);
 	fscanf(file, "%zu", &cols);
 
-	auto range = rows*cols;
+	size_t range = rows*cols;
 	float values[range];
 
-	for (auto k=0; k<range; k++) {
+	for (size_t k=0; k<range; k++) {
 		fscanf(file, "%f", &values[k]);
 	}
 
