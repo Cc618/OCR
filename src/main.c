@@ -213,6 +213,35 @@ int dataMain() {
     return 0;
 }
 
+int saveMain() {
+    Layer *layers[] = {
+            denseNew(2 * 2, 2),
+            softmaxNew(),
+        };
+    LossFunction criterion = nllLoss;
+    Optimizer *opti = sgdNew(learningRate, batchSize, momentum);
+
+    Network *net = networkNew(sizeof(layers) / sizeof(Layer*), layers, flatten,
+            opti, criterion);
+
+    // Directories must be created
+    SaveContext *ctx = saveContextNew("weights/1/");
+
+    char *firstWeightPath = saveContextNextPath(ctx);
+    char *secondWeightPath = saveContextNextPath(ctx);
+    char *thirdWeightPath = saveContextNextPath(ctx);
+
+    printf("%s\n%s\n%s\n", firstWeightPath, secondWeightPath, thirdWeightPath);
+
+    free(firstWeightPath);
+    free(secondWeightPath);
+    free(thirdWeightPath);
+    saveContextFree(ctx);
+    networkFree(net);
+
+    return 0;
+}
+
 int main(int argc,
         char **argv) {
     // Initialization
@@ -227,6 +256,8 @@ int main(int argc,
         return imgMain();
     else if (strcmp(argv[1], "net") == 0)
         netMain();
+    else if (strcmp(argv[1], "save") == 0)
+        saveMain();
     else
         err = 1;
 

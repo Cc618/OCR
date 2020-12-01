@@ -1,6 +1,45 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "save.h"
+#include "error.h"
+
+// May be not defined by the system
+#ifndef strdup
+char *strdup(const char *s) {
+    size_t len = strlen(s) + 1;
+    void *str = malloc(len);
+
+    return (char*)memcpy(str, s, len);
+}
+#endif
+
+SaveContext *saveContextNew(const char *directory) {
+    SaveContext *ctx = malloc(sizeof(SaveContext));
+    ctx->directory = strdup(directory);
+    ctx->directoryLen = strlen(directory);
+    ctx->weightId = 0;
+
+    return ctx;
+}
+
+void saveContextFree(SaveContext *ctx) {
+    free(ctx->directory);
+    free(ctx);
+}
+
+#define WEIGHT_SUFFIX ".matrix"
+
+char *saveContextNextPath(SaveContext *ctx) {
+    ASSERT(ctx->weightId < 10000, "Invalid weight id (too big)");
+
+    char *path = malloc(ctx->directoryLen + 4 + sizeof(WEIGHT_SUFFIX) + 1);
+    sprintf(path, "%s%zu%s", ctx->directory, ctx->weightId, WEIGHT_SUFFIX);
+
+    ++ctx->weightId;
+
+    return path;
+}
 
 void matrixSave(char name[], const Matrix *m) {
 	size_t rows = m->rows;
