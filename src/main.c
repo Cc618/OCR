@@ -227,15 +227,34 @@ int saveMain() {
     // Directories must be created
     SaveContext *ctx = saveContextNew("weights/1/");
 
-    char *firstWeightPath = saveContextNextPath(ctx);
-    char *secondWeightPath = saveContextNextPath(ctx);
-    char *thirdWeightPath = saveContextNextPath(ctx);
+    // // Test paths
+    // char *firstWeightPath = saveContextNextPath(ctx);
+    // char *secondWeightPath = saveContextNextPath(ctx);
+    // char *thirdWeightPath = saveContextNextPath(ctx);
 
-    printf("%s\n%s\n%s\n", firstWeightPath, secondWeightPath, thirdWeightPath);
+    // printf("%s\n%s\n%s\n", firstWeightPath, secondWeightPath, thirdWeightPath);
 
-    free(firstWeightPath);
-    free(secondWeightPath);
-    free(thirdWeightPath);
+    // free(firstWeightPath);
+    // free(secondWeightPath);
+    // free(thirdWeightPath);
+
+    // Test save / load matrix
+    const float data[] = { 1, 2, 3, 4 };
+    Matrix *tosave = matrixCreate(2, 2, data);
+    puts("tosave :");
+    matrixPrint(tosave);
+    saveContextSave(ctx, tosave);
+
+    // Reset context
+    ctx->weightId = 0;
+
+    Matrix *toload = saveContextLoad(ctx);
+    puts("toload :");
+    matrixPrint(toload);
+
+    matrixFree(toload);
+    matrixFree(tosave);
+
     saveContextFree(ctx);
     networkFree(net);
 

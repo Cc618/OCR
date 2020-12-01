@@ -6,16 +6,21 @@
 #include <stdbool.h>
 #include "matrix.h"
 #include "optimizer.h"
+#include "save.h"
 
 typedef struct Layer_t Layer;
 struct Layer_t {
     // - free : Frees only data, l is freed in layerFree, can be NULL
     // - update : Can be NULL
+    // - save : Can be NULL
+    // - load : Can be NULL
 #define LAYER_ATTRIBUTES \
     Matrix *(*forward)(Layer *l, const Matrix *x, bool training); \
     Matrix *(*backward)(Layer *l, const Matrix *grad); \
     void (*update)(Layer *l, Optimizer *o); \
-    void (*free)(Layer *l);
+    void (*free)(Layer *l); \
+    void (*load)(Layer *l, SaveContext *ctx); \
+    void (*save)(Layer *l, SaveContext *ctx);
 
     // Declare attributes (always at the top)
     LAYER_ATTRIBUTES;
@@ -73,6 +78,12 @@ Matrix *layerBackward(Layer *l, const Matrix *grad);
 
 // Updates weights with computed gradients
 void layerUpdate(Layer *l, Optimizer *opti);
+
+// Saves all weights of the layer
+void layerSave(Layer *l, SaveContext *ctx);
+
+// Loads all weights of the layer
+void layerLoad(Layer *l, SaveContext *ctx);
 
 void layerFree(Layer *l);
 

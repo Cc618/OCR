@@ -24,6 +24,16 @@ void layerFree(Layer *l) {
     free(l);
 }
 
+void layerSave(Layer *l, SaveContext *ctx) {
+    if (l->save != NULL)
+        l->save(l, ctx);
+}
+
+void layerLoad(Layer *l, SaveContext *ctx) {
+    if (l->load != NULL)
+        l->load(l, ctx);
+}
+
 // --- Dense ---
 static Matrix *denseForward(Dense *l, const Matrix *x, bool training) {
     ASSERT(x->rows == l->weight->cols && x->cols == 1,
@@ -68,6 +78,14 @@ static void denseFree(Dense *l) {
     matrixFree(l->gradBias);
 }
 
+static void denseSave(Dense *l, SaveContext *ctx) {
+    // TODO Raph : Save weight + bias matrices
+}
+
+static void denseLoad(Dense *l, SaveContext *ctx) {
+    // TODO Raph : Load weight + bias matrices
+}
+
 Layer *denseNew(size_t in, size_t out) {
     Dense *l = malloc(sizeof(Dense));
 
@@ -76,6 +94,8 @@ Layer *denseNew(size_t in, size_t out) {
     l->backward = (Matrix *(*)(Layer *l, const Matrix*))denseBackward;
     l->update = (void (*)(Layer *l, Optimizer *o))denseUpdate;
     l->free = (void (*)(Layer *l))denseFree;
+    l->save = (void (*)(Layer *l, SaveContext *ctx))denseSave;
+    l->load = (void (*)(Layer *l, SaveContext *ctx))denseSave;
 
     // Init weights and gradients
     l->gradWeight = matrixZero(out, in);
@@ -135,6 +155,8 @@ static Layer *activationNew(
     l->backward = (Matrix *(*)(Layer *l, const Matrix*))activationBackward;
     l->update = NULL;
     l->free = NULL;
+    l->save = NULL;
+    l->load = NULL;
 
     // Init training context
     l->x = NULL;
@@ -199,6 +221,8 @@ Layer *softmaxNew() {
     l->backward = (Matrix *(*)(Layer *l, const Matrix*))softmaxBackward;
     l->update = NULL;
     l->free = NULL;
+    l->save = NULL;
+    l->load = NULL;
 
     // Init training context
     l->y = NULL;
