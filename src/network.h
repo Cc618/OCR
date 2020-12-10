@@ -23,8 +23,6 @@ typedef struct Network_t {
     Preprocessor preprocess;
 } Network;
 
-// TODO : Load network (setup only eval mode)
-
 // Layers will be freed within networkFree
 // Training components may be NULL
 Network *networkNew(size_t nLayers, Layer *const *layers,
@@ -39,6 +37,12 @@ float networkBackward(Network *net, const Matrix *x, unsigned char label);
 
 // Optimize
 void networkUpdate(Network *net);
+
+// IO save / load
+// path is '/' terminated
+void networkSave(const Network *net, const char *path);
+
+void networkLoad(Network *net, const char *path);
 
 void networkFree(Network *net);
 

@@ -216,6 +216,7 @@ int dataMain() {
 int saveMain() {
     Layer *layers[] = {
             denseNew(2 * 2, 2),
+            denseNew(2, 2),
             softmaxNew(),
         };
     LossFunction criterion = nllLoss;
@@ -223,6 +224,30 @@ int saveMain() {
 
     Network *net = networkNew(sizeof(layers) / sizeof(Layer*), layers, flatten,
             opti, criterion);
+
+
+    matrixPrint(((Dense*) net->layers[0])->weight);
+    networkSave(net, "weights/1/");
+
+    ((Dense*) net->layers[0])->weight->data[0] = 42;
+    matrixPrint(((Dense*) net->layers[0])->weight);
+
+    networkLoad(net, "weights/1/");
+    matrixPrint(((Dense*) net->layers[0])->weight);
+
+    puts("done");
+
+
+
+
+
+
+
+
+    return 0;
+
+
+
 
     // Directories must be created
     SaveContext *ctx = saveContextNew("weights/1/");

@@ -31,8 +31,6 @@ Matrix *networkPredict(Network *net, const Matrix *x) {
 }
 
 float networkBackward(Network *net, const Matrix *x, unsigned char label) {
-    // printf("%f %f -> %d\n", x->data[0], x->data[1], label);
-
     // Create 2 stacks
     // Contains forward matrices
     Matrix **forwardStack = malloc(sizeof(Matrix*) * (net->nLayers + 1));
@@ -77,6 +75,24 @@ void networkUpdate(Network *net) {
     for (size_t layer = 0; layer < net->nLayers; ++layer) {
         layerUpdate(net->layers[layer], net->opti);
     }
+}
+
+void networkSave(const Network *net, const char *path) {
+    SaveContext *ctx = saveContextNew(path);
+
+    for (size_t layer = 0; layer < net->nLayers; ++layer)
+        layerSave(net->layers[layer], ctx);
+
+    saveContextFree(ctx);
+}
+
+void networkLoad(Network *net, const char *path) {
+    SaveContext *ctx = saveContextNew(path);
+
+    for (size_t layer = 0; layer < net->nLayers; ++layer)
+        layerLoad(net->layers[layer], ctx);
+
+    saveContextFree(ctx);
 }
 
 void networkFree(Network *net) {

@@ -79,11 +79,16 @@ static void denseFree(Dense *l) {
 }
 
 static void denseSave(Dense *l, SaveContext *ctx) {
-    // TODO Raph : Save weight + bias matrices
+    saveContextSave(ctx, l->weight);
+    saveContextSave(ctx, l->bias);
 }
 
 static void denseLoad(Dense *l, SaveContext *ctx) {
-    // TODO Raph : Load weight + bias matrices
+    matrixFree(l->weight);
+    matrixFree(l->bias);
+
+    l->weight = saveContextLoad(ctx);
+    l->bias = saveContextLoad(ctx);
 }
 
 Layer *denseNew(size_t in, size_t out) {
@@ -95,7 +100,7 @@ Layer *denseNew(size_t in, size_t out) {
     l->update = (void (*)(Layer *l, Optimizer *o))denseUpdate;
     l->free = (void (*)(Layer *l))denseFree;
     l->save = (void (*)(Layer *l, SaveContext *ctx))denseSave;
-    l->load = (void (*)(Layer *l, SaveContext *ctx))denseSave;
+    l->load = (void (*)(Layer *l, SaveContext *ctx))denseLoad;
 
     // Init weights and gradients
     l->gradWeight = matrixZero(out, in);
