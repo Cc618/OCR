@@ -81,90 +81,6 @@ static void trainCallback(size_t epoch, size_t batch, float loss) {
         printf("Epoch %4zu, batch %3zu, loss %.2e\n", epoch, batch, loss);
 }
 
-void netMain() {
-    Dataset *dataset = datasetNew("data/dataset_bmp");
-
-    size_t nClasses = dataset->labelCount;
-    printf("Loaded dataset containing %zu classes, %zu images\n",
-            nClasses, dataset->count);
-
-    // Build network
-    Layer *layers[] = {
-            denseNew(32 * 32, 128),
-            sigmoidNew(),
-            denseNew(128, nClasses),
-            softmaxNew(),
-        };
-    LossFunction criterion = nllLoss;
-    Optimizer *opti = sgdNew(learningRate, batchSize, momentum);
-
-    Network *net = networkNew(sizeof(layers) / sizeof(Layer*), layers, flatten,
-            opti, criterion);
-
-    // Net train
-    puts("--- Train ---");
-    train(net, dataset, epochs, batchSize, trainCallback);
-
-    // Show results (accuracy)
-    puts("\n--- Accuracy ---");
-    float loss = 0;
-    size_t ok = 0;
-    float avgProb = 0;
-    for (size_t i = 0; i < dataset->count; ++i) {
-        Matrix *pred = networkPredict(net, dataset->images[i]);
-
-        avgProb += pred->data[dataset->labels[i]];
-
-        Loss *error = criterion(pred, dataset->labels[i]);
-        loss += error->loss;
-        lossFree(error);
-
-        // Argmax
-        size_t imax = 0;
-        for (size_t j = 1; j < pred->rows; ++j)
-            if (pred->data[j] > pred->data[imax])
-                imax = j;
-
-        if (imax == dataset->labels[i])
-            ++ok;
-
-        matrixFree(pred);
-    }
-
-    loss /= dataset->count;
-    avgProb /= dataset->count;
-
-    printf("%zu / %zu correct predictions (%.1f %%)\n", ok, dataset->count,
-            (float)ok / dataset->count * 100);
-    printf("Total loss : %.4e\n", loss);
-    printf("Average prob : %.2e\n", avgProb);
-
-    // Single image result
-    puts("\n--- Single Prediction ---");
-    size_t indices[] = { 20, 40, 60, 80, 100, 200, 300, 400, 500, 600 };
-    for (size_t i = 0; i < sizeof(indices) / sizeof(size_t); ++i) {
-        size_t imageIndex = indices[i];
-        ASSERT(imageIndex < dataset->count, "Too large index, not enough "
-                "samples in the dataset");
-
-        Matrix *x = dataset->images[imageIndex];
-        unsigned char y = dataset->labels[imageIndex];
-        char class = dataset->label2char[y];
-
-        printf("Prediction #%zu\n", i + 1);
-        printf("Giving a '%c' image to the network\n", class);
-
-        Prediction imagePred = predict(net, dataset, x);
-
-        printf("Predicted a '%c' with probability %.1f %%\n\n",
-                imagePred.best, imagePred.prob * 100.f);
-    }
-
-    // Free
-    networkFree(net);
-    datasetFree(dataset);
-}
-
 // Display an image of the dataset
 int dataMain() {
     // Init sdl
@@ -329,22 +245,160 @@ int saveMain() {
     return 0;
 }
 
+// Builds the network used in the OCR
+Network *buildNetwork(size_t nClasses) {
+    Layer *layers[] = {
+            denseNew(32 * 32, 128),
+            sigmoidNew(),
+            denseNew(128, nClasses),
+            softmaxNew(),
+        };
+    LossFunction criterion = nllLoss;
+    Optimizer *opti = sgdNew(learningRate, batchSize, momentum);
+
+    Network *net = networkNew(sizeof(layers) / sizeof(Layer*), layers, flatten,
+            opti, criterion);
+
+    return net;
+}
+
+int trainMain() {
+#define SESSION "1"
+#define NET_DIR "weights/"
+#define NET_PATH (NET_DIR SESSION "/")
+#define DATA_PATH "data/dataset_bmp"
+
+    puts("----- Training Mode -----");
+    printf("> Training network (from scratch) in %s with dataset in %s\n",
+            NET_PATH, DATA_PATH);
+
+    Dataset *dataset = datasetNew(DATA_PATH);
+
+    size_t nClasses = dataset->labelCount;
+    printf("> Loaded dataset containing %zu classes, %zu images\n",
+            nClasses, dataset->count);
+
+    // Build network
+    Network *net = buildNetwork(nClasses);
+
+    // Config
+    printf("> Config :\n"
+            "- %zu layers\n"
+            "- Epochs : %zu\n"
+            "- Learning rate : %f\n"
+            "- Batch size : %u\n"
+            "- Momentum : %f\n",
+            net->nLayers,
+            epochs,
+            learningRate,
+            batchSize,
+            momentum);
+
+    // Net train
+    puts("--- Train ---");
+    train(net, dataset, epochs, batchSize, trainCallback);
+
+    aiSave(net, dataset, NET_PATH);
+    puts("> Network saved");
+
+    // Show results (accuracy)
+    puts("\n--- Accuracy ---");
+    float loss = 0;
+    size_t ok = 0;
+    float avgProb = 0;
+    for (size_t i = 0; i < dataset->count; ++i) {
+        Matrix *pred = networkPredict(net, dataset->images[i]);
+
+        avgProb += pred->data[dataset->labels[i]];
+
+        Loss *error = net->criterion(pred, dataset->labels[i]);
+        loss += error->loss;
+        lossFree(error);
+
+        // Argmax
+        size_t imax = 0;
+        for (size_t j = 1; j < pred->rows; ++j)
+            if (pred->data[j] > pred->data[imax])
+                imax = j;
+
+        if (imax == dataset->labels[i])
+            ++ok;
+
+        matrixFree(pred);
+    }
+
+    loss /= dataset->count;
+    avgProb /= dataset->count;
+
+    printf("> %zu / %zu correct predictions (%.1f %%)\n", ok, dataset->count,
+            (float)ok / dataset->count * 100);
+    printf("> Total loss : %.4e\n", loss);
+    printf("> Average prob : %.2e\n", avgProb);
+
+    // Single image result
+    puts("\n--- Single Prediction ---");
+    size_t indices[] = { 20, 40, 60, 80, 100, 200, 300, 400, 500, 600 };
+    for (size_t i = 0; i < sizeof(indices) / sizeof(size_t); ++i) {
+        size_t imageIndex = indices[i];
+        ASSERT(imageIndex < dataset->count, "> Too large index, not enough "
+                "samples in the dataset");
+
+        Matrix *x = dataset->images[imageIndex];
+        unsigned char y = dataset->labels[imageIndex];
+        char class = dataset->label2char[y];
+
+        printf("> Prediction #%zu\n", i + 1);
+        printf("- Giving a '%c' image to the network\n", class);
+
+        Prediction imagePred = predict(net, dataset, x);
+
+        printf("- Predicted a '%c' with probability %.1f %%\n\n",
+                imagePred.best, imagePred.prob * 100.f);
+    }
+
+    // Free
+    networkFree(net);
+    datasetFree(dataset);
+
+    return 0;
+}
+
+int appMain() {
+    // Load network part
+    Network *net = buildNetwork(1);
+    Dataset *dataset = malloc(sizeof(Dataset));
+
+    aiLoad(net, dataset, NET_PATH);
+
+    // TODO : App main
+
+    // Free everything
+    networkFree(net);
+    free(dataset);
+
+    return 0;
+}
+
 int main(int argc,
         char **argv) {
     // Initialization
     srand(time(NULL));
 
+    // TODO : Remove all *Main() except train
+
     int err = 0;
-    if (argc != 2)
+    if (argc == 1)
+        return appMain();
+    else if (argc != 2)
         err = 1;
     else if (strcmp(argv[1], "data") == 0)
         return dataMain();
     else if (strcmp(argv[1], "img") == 0)
         return imgMain();
-    else if (strcmp(argv[1], "net") == 0)
-        netMain();
     else if (strcmp(argv[1], "save") == 0)
         saveMain();
+    else if (strcmp(argv[1], "train") == 0)
+        trainMain();
     else
         err = 1;
 
