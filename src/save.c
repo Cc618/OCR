@@ -58,48 +58,48 @@ Matrix *saveContextLoad(SaveContext *ctx) {
 }
 
 void matrixSave(char name[], const Matrix *m) {
-	size_t rows = m->rows;
-	size_t cols = m->cols;
+    size_t rows = m->rows;
+    size_t cols = m->cols;
 
-	FILE *file;
+    FILE *file;
 
-	file = fopen(name, "w");
+    file = fopen(name, "w");
 
-	fprintf(file, "%zu", rows);
-	fprintf(file, " %zu", cols);
+    fprintf(file, "%zu", rows);
+    fprintf(file, " %zu", cols);
 
-	for (size_t i=0; i<rows; i++) {
-		for (size_t j=0; j<cols; j++) {
-			fprintf(file, " %f", MAT_GET(m, i, j));
-		}
-	}
+    for (size_t i=0; i<rows; i++) {
+        for (size_t j=0; j<cols; j++) {
+            fprintf(file, " %f", MAT_GET(m, i, j));
+        }
+    }
 
-	fclose(file);
+    fclose(file);
 }
 
 Matrix *matrixLoad(char name[]) {
-	size_t rows;
-	size_t cols;
+    size_t rows;
+    size_t cols;
 
-	FILE *file;
+    FILE *file;
 
-	file = fopen(name, "r");
+    file = fopen(name, "r");
 
-	if (file == NULL) {
-		exit(EXIT_FAILURE);
-	}
+    if (file == NULL) {
+        exit(EXIT_FAILURE);
+    }
 
-	fscanf(file, "%zu", &rows);
-	fscanf(file, "%zu", &cols);
+    fscanf(file, "%zu", &rows);
+    fscanf(file, "%zu", &cols);
 
-	size_t range = rows*cols;
-	float values[range];
+    size_t range = rows*cols;
+    float values[range];
 
-	for (size_t k=0; k<range; k++) {
-		fscanf(file, "%f", &values[k]);
-	}
+    for (size_t k=0; k<range; k++) {
+        fscanf(file, "%f", &values[k]);
+    }
 
-	fclose(file);
+    fclose(file);
 
-	return matrixCreate(rows, cols, values);
+    return matrixCreate(rows, cols, values);
 }
