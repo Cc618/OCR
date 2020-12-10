@@ -229,25 +229,7 @@ int saveMain() {
     Network *net = networkNew(sizeof(layers) / sizeof(Layer*), layers, flatten,
             opti, criterion);
 
-
-    matrixPrint(((Dense*) net->layers[0])->weight);
-    networkSave(net, "weights/1/");
-
-    ((Dense*) net->layers[0])->weight->data[0] = 42;
-    matrixPrint(((Dense*) net->layers[0])->weight);
-
-    networkLoad(net, "weights/1/");
-    matrixPrint(((Dense*) net->layers[0])->weight);
-
-    puts("done");
-
-
-
-
-    // Unsafe
-    puts("> Dataset :");
     Dataset *d = malloc(sizeof(Dataset));
-
     d->labelCount = 3;
     d->label2char[0] = 'A';
     d->label2char[1] = 'b';
@@ -256,14 +238,51 @@ int saveMain() {
     d->char2label['b'] = 1;
     d->char2label['C'] = 2;
 
-    datasetSave(d, "weights/1/dataset.data");
 
+    // AI IO tests
+    matrixPrint(((Dense*) net->layers[0])->weight);
+    printf("%zu %c\n", d->labelCount, d->label2char[0]);
+    puts("---");
+
+    aiSave(net, d, "weights/1/");
+
+    ((Dense*) net->layers[0])->weight->data[0] = 42;
     d->labelCount = 1;
     d->label2char[0] = 'z';
     d->label2char['z'] = 0;
-    datasetLoad(d, "weights/1/dataset.data");
 
+    matrixPrint(((Dense*) net->layers[0])->weight);
     printf("%zu %c\n", d->labelCount, d->label2char[0]);
+    puts("---");
+
+    aiLoad(net, d, "weights/1/");
+
+    matrixPrint(((Dense*) net->layers[0])->weight);
+    printf("%zu %c\n", d->labelCount, d->label2char[0]);
+
+    // // Net IO tests :
+    // matrixPrint(((Dense*) net->layers[0])->weight);
+    // networkSave(net, "weights/1/");
+
+    // ((Dense*) net->layers[0])->weight->data[0] = 42;
+    // matrixPrint(((Dense*) net->layers[0])->weight);
+
+    // networkLoad(net, "weights/1/");
+    // matrixPrint(((Dense*) net->layers[0])->weight);
+
+    // puts("done");
+
+    // // Dataset IO tests (unsafe)
+    // puts("> Dataset :");
+
+    // datasetSave(d, "weights/1/dataset.data");
+
+    // d->labelCount = 1;
+    // d->label2char[0] = 'z';
+    // d->label2char['z'] = 0;
+    // datasetLoad(d, "weights/1/dataset.data");
+
+    // printf("%zu %c\n", d->labelCount, d->label2char[0]);
 
     free(d);
 

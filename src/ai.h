@@ -18,4 +18,9 @@ typedef struct Prediction_t {
 // Returns the char with the highest probability to be within the image
 Prediction predict(Network *net, Dataset *dataset, const Matrix *image);
 
+// Main function to save / load everything in the network part
+void aiSave(Network *net, Dataset *dataset, const char *path);
+
+void aiLoad(Network *net, Dataset *dataset, const char *path);
+
 #endif // AI_H

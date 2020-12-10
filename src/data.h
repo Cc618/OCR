@@ -30,6 +30,7 @@ void datasetFree(Dataset *d);
 void imagePrint(const Matrix *img);
 
 // !!! Saves / loads only labels
+// - path is a file name
 void datasetSave(Dataset *d, const char *path);
 
 void datasetLoad(Dataset *d, const char *path);
