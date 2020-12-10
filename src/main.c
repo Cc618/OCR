@@ -199,8 +199,12 @@ int dataMain() {
     Dataset *dataset = datasetNew("data/dataset_bmp");
 
     printf("Labels of the dataset :");
-    for (size_t i = 0; i < dataset->count; ++i)
-        printf(" %c", dataset->label2char[dataset->labels[i]]);
+    // for (size_t i = 0; i < dataset->count; ++i)
+    //     printf(" %c", dataset->label2char[dataset->labels[i]]);
+    // puts("");
+
+    for (size_t i = 0; i < dataset->labelCount; ++i)
+        printf(" %c", dataset->label2char[i]);
     puts("");
 
     puts("First image :");
@@ -240,8 +244,28 @@ int saveMain() {
 
 
 
+    // Unsafe
+    puts("> Dataset :");
+    Dataset *d = malloc(sizeof(Dataset));
 
+    d->labelCount = 3;
+    d->label2char[0] = 'A';
+    d->label2char[1] = 'b';
+    d->label2char[2] = 'C';
+    d->char2label['A'] = 0;
+    d->char2label['b'] = 1;
+    d->char2label['C'] = 2;
 
+    datasetSave(d, "weights/1/dataset.data");
+
+    d->labelCount = 1;
+    d->label2char[0] = 'z';
+    d->label2char['z'] = 0;
+    datasetLoad(d, "weights/1/dataset.data");
+
+    printf("%zu %c\n", d->labelCount, d->label2char[0]);
+
+    free(d);
 
 
     return 0;

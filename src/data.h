@@ -29,4 +29,9 @@ void datasetFree(Dataset *d);
 // Show an image in ascii art
 void imagePrint(const Matrix *img);
 
+// !!! Saves / loads only labels
+void datasetSave(Dataset *d, const char *path);
+
+void datasetLoad(Dataset *d, const char *path);
+
 #endif // DATA_H

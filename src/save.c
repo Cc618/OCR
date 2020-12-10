@@ -65,6 +65,11 @@ void matrixSave(char name[], const Matrix *m) {
 
     file = fopen(name, "w");
 
+    if (file == NULL) {
+        fprintf(stderr, "File : %s\n", name);
+        ERROR("Can't open this file");
+    }
+
     fprintf(file, "%zu", rows);
     fprintf(file, " %zu", cols);
 
@@ -86,7 +91,8 @@ Matrix *matrixLoad(char name[]) {
     file = fopen(name, "r");
 
     if (file == NULL) {
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "File : %s\n", name);
+        ERROR("Can't open this file");
     }
 
     fscanf(file, "%zu", &rows);

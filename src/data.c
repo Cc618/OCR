@@ -125,3 +125,40 @@ void imagePrint(const Matrix *img) {
         putchar('-');
     putchar('\n');
 }
+
+// Just space separated values
+void datasetSave(Dataset *d, const char *path) {
+    FILE *file;
+    file = fopen(path, "w");
+
+    if (!file) {
+        fprintf(stderr, "File : %s\n", path);
+        ERROR("Can't open this file");
+    }
+
+    for (size_t i = 0; i < d->labelCount; ++i)
+        fprintf(file, "%c ", d->label2char[i]);
+
+    fclose(file);
+}
+
+void datasetLoad(Dataset *d, const char *path) {
+    FILE *file;
+    file = fopen(path, "r");
+
+    if (!file) {
+        fprintf(stderr, "File : %s\n", path);
+        ERROR("Can't open this file");
+    }
+
+    char c, space;
+    size_t i = 0;
+    for ( ; i < 256 && fscanf(file, "%c%c", &c, &space) != EOF; ++i) {
+        d->label2char[i] = c;
+        d->char2label[(unsigned char)c] = i;
+    }
+
+    d->labelCount = i;
+
+    fclose(file);
+}
