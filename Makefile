@@ -25,7 +25,7 @@ endif
 # Windows specific flags
 ifeq ($(OS), Windows_NT)
 	CFLAGS += -Ilib/include
-	LDFLAGS += -Llib/lib
+	LDFLAGS += -Llib/lib -lSDL2_ttf -lSDL2
 endif
 
 all: dirs $(BIN)

@@ -14,6 +14,7 @@
 #include "optimizer.h"
 #include "data.h"
 #include "network.h"
+#include "analysis.h"
 
 int imgMain() {
     //Initialisation
@@ -25,7 +26,7 @@ int imgMain() {
         return -1;
     }
     //Image Loading
-    SDL_Surface *sur = SDL_LoadBMP("res/bloc2.bmp");
+    SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
     if (!sur)
     {
         fprintf(stderr,"Doesn't find the image.\n");
@@ -66,7 +67,7 @@ int imgMain() {
     matrixToBinary(result);
 
     //Block analysis
-    rectangle bloc = {{result->cols - 1, 0}, {0, result->rows - 1}};
+    /*rectangle bloc = {{result->cols - 1, 0}, {0, result->rows - 1}};
     rectangle *array = malloc(500);
     rect_arr arr = {array, 0};
     horizontalCut(result, bloc, 40, &arr, 1);
@@ -79,11 +80,19 @@ int imgMain() {
 	point c = get_rect.c;
 	printf("b = (%li, %li) and c == (%li, %li)\n", 
 		b.x, b.y, c.x, c.y);
-    }
+    }*/
 
     //Line analysis
-    //dyn_arr dar = getLines(result);
-    //drawLines(result, dar);
+    dyn_arr dar = getLines(result);
+    drawLines(result, dar);
+
+    //Character analysis
+    // NE PAS UNCOMMENT SEGMENTATION FAULT !
+    /*CaractersAnalysis(ren, result, 0, dar.array[0] - 1);
+    SDL_Delay(1000);
+    for (int i = 0; i + 1 < dar.length; i++) {
+    	CaractersAnalysis(ren, matrix, dar.array[i], dar.array[i + 1] - 1);
+    }*/
 
     //Matrix Freedom
     matrixToGrey(sur, result);
@@ -92,7 +101,9 @@ int imgMain() {
     matrixFree(convo2);
     matrixFree(inter);
     matrixFree(result);
-    SDL_SaveBMP(sur, "res/bloc3.bmp");
+
+    //Saving the image
+    //SDL_SaveBMP(sur, "res/bloc3.bmp");
 
     //Image Printing
     SDL_CreateWindowAndRenderer(1000, 1200,0,&win,&ren);

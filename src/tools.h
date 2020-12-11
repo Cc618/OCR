@@ -1,5 +1,6 @@
 #ifndef TOOLS_H
 #define TOOLS_H
+
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include "matrix.h"
@@ -23,21 +24,6 @@ typedef struct {
 	rectangle *array;
 	size_t length;
 } rect_arr;
-
-/*typedef struct CoordList CoordList;
-typedef struct ValueList ValueList;
-struct CoordList
-{
-    int value;
-    int* coord;
-    CoordList* next;
-};
-struct ValueList
-{
-    int value;
-    ValueList* fusion;
-    ValueList* next;
-};*/
 
 //Print the actual surface on the renderer.
 void printImage(SDL_Renderer * ren,SDL_Surface * sur, int x, int y);
