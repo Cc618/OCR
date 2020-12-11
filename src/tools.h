@@ -14,10 +14,15 @@ typedef struct{
 	size_t y;
 } point;
 
-typedef struct{
+typedef struct {
 	point b;
 	point c;
 } rectangle;
+
+typedef struct {
+	rectangle *array;
+	size_t length;
+} rect_arr;
 
 /*typedef struct CoordList CoordList;
 typedef struct ValueList ValueList;
@@ -80,6 +85,13 @@ float preventOverflow(float value);
 
 //Convolution on matrix with convo.
 Matrix *convolution(Matrix *matrix, Matrix *convo);
+
+//krisbool signifie si on ne peut pas couper le bloc.
+//Cut the image horizontally if it can.
+void horizontalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr, short krisbool);
+
+//Cut the image vertically if it can.
+void verticalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr, short krisbool);
 
 //Draw a rectangle on the matrix
 void drawRectangle(Matrix *matrix, rectangle rec);

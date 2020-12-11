@@ -25,7 +25,7 @@ int imgMain() {
         return -1;
     }
     //Image Loading
-    SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
+    SDL_Surface *sur = SDL_LoadBMP("res/bloc2.bmp");
     if (!sur)
     {
         fprintf(stderr,"Doesn't find the image.\n");
@@ -63,35 +63,36 @@ int imgMain() {
     matrixToGrey(sur, matrix);
     Matrix *inter = convolution(matrix, convo);
     Matrix *result = convolution(matrix, convo2);
-    //TEST
-    for (size_t i = 0; i < result->rows; i++)
-	    matrixSet(matrix, i, 0, 1);
-    for (size_t j = 0; j < result->cols; j++)
-	    matrixSet(matrix, 0, j, 1);
-    //FIN DE TEST
     matrixToBinary(result);
+
+    //Block analysis
+    rectangle bloc = {{result->cols - 1, 0}, {0, result->rows - 1}};
+    rectangle *array = malloc(500);
+    rect_arr arr = {array, 0};
+    horizontalCut(result, bloc, 40, &arr, 1);
+    
+    //Print Rectangle Array
+    for (size_t i = 0; i < arr.length; i++) {
+	rectangle get_rect = arr.array[i];
+	drawRectangle(result, get_rect);
+	point b = get_rect.b;
+	point c = get_rect.c;
+	printf("b = (%li, %li) and c == (%li, %li)\n", 
+		b.x, b.y, c.x, c.y);
+    }
 
     //Line analysis
     //dyn_arr dar = getLines(result);
     //drawLines(result, dar);
 
-    //Character analysis
-    /*dyn_arr dar2 = getCaracters(matrix,0,dar.array[0]);
-    drawCaracters(matrix,dar2,0,dar.array[0]);
-    for (int i = 1; i+1 < dar.length; i+=1)
-        {
-            dyn_arr dar2 = getCaracters(matrix,dar.array[i],dar.array[i+1]);
-            drawCaracters(matrix,dar2,dar.array[i],dar.array[i+1]);
-	}*/
-    //matrixToGrey(sur, matrix);    
-    //matrixToGrey(sur, inter);
+    //Matrix Freedom
     matrixToGrey(sur, result);
     matrixFree(matrix);
     matrixFree(convo);
     matrixFree(convo2);
     matrixFree(inter);
     matrixFree(result);
-    SDL_SaveBMP(sur, "res/testo");
+    SDL_SaveBMP(sur, "res/bloc3.bmp");
 
     //Image Printing
     SDL_CreateWindowAndRenderer(1000, 1200,0,&win,&ren);
@@ -105,7 +106,7 @@ int imgMain() {
     SDL_RenderClear(ren);
     printImage(ren,sur,0,0);
     SDL_RenderPresent(ren);
-    SDL_Delay(8000);
+    SDL_Delay(3000);
     //Closure
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
