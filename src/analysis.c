@@ -893,10 +893,6 @@ static void charBox(const Matrix *image,
     if (matrixGet(image, startY + i, j) > .5f)
         return;
 
-    // printf("x = %zu, y = %zu, px = %.1f\n", j, i,
-    //         matrixGet(image, startY + i, j));
-
-
     // Update box
     box->b.x = MIN(box->b.x, j);
     box->b.y = MIN(box->b.y, i);
@@ -934,8 +930,6 @@ char *lineAnalysis(const Matrix *image, __attribute__((unused)) void *net,
     int height = endY - startY;
     int width = image->cols;
     int *visited = calloc(height * image->cols, sizeof(int));
-
-    // printf("From %zu to %zu (width = %zu)\n", startY, endY, image->cols);
 
     int nchars = 0;
     for (size_t i = 0; i < height; ++i) {
@@ -980,19 +974,6 @@ char *lineAnalysis(const Matrix *image, __attribute__((unused)) void *net,
 
     puts("---");
     for (size_t c = 0; c < nchars; ++c) {
-        // Disp raw box
-        // printf("> x = %d, y = %d\n", j, i + startY);
-        // LOGBOX(*boxes[c]);
-        // for (int y = box.b.y; y < box.c.y; ++y) {
-        //     for (int x = box.b.x; x < box.c.x; ++x) {
-        //         printf("%c", matrixGet(image, y, x) > .5f ?
-        //                 '.' : '#');
-        //     }
-        //     puts("");
-        // }
-        // puts("");
-        //
-
         // Resize
         Matrix *resized = charResize(image, boxes[c]);
 
@@ -1012,114 +993,11 @@ char *lineAnalysis(const Matrix *image, __attribute__((unused)) void *net,
         free(boxes[c]);
     }
 
-
     printf("nchars = %d\n", nchars);
-
 
     free(boxes);
 
     str[nchars] = 0;
 
-    return str;
-
-
-
-
-
-    // TODO : Order boxes by start x
-
-    // int nchars = 0;
-    for (size_t i = 0; i < height; ++i) {
-        for (size_t j = 0; j < image->cols; ++j) {
-            // printf("%c", matrixGet(image, height + i, j) > .5f ?
-            //         '.' : '#');
-            // continue;
-
-            // int i = lineY - startY;
-
-            if (!visited[i * image->cols + j]) {
-                // printf("i = %zu, j = %zu\n", i, j);
-
-                // White
-                if (matrixGet(image, startY + i, j) > .5f)
-                    visited[i * image->cols + j] = 1;
-                else {
-                    // Found a char
-                    rectangle box = {
-                        .b = { j, i },
-                        .c = { j, i }
-                    };
-
-                    // Get hitbox of the char and visit all pixels of it
-                    charBox(image, (size_t)startY, height,
-                            visited, i, j, &box);
-
-                    box.c.x++;
-                    box.c.y++;
-
-                    size_t x = box.b.x;
-                    size_t y = box.b.y;
-                    size_t w = box.c.x - box.b.x;
-                    size_t h = box.c.y - box.b.y;
-
-                    // // Too small
-                    // if (w < 2 || h < 2)
-                    //     continue;
-
-                    box.b.y += startY;
-                    box.c.y += startY;
-
-                    printf("Char %f\n", matrixGet(image, startY + i, j));
-                    LOGBOX(box);
-
-                    // continue;
-
-
-                    // // Disp box
-                    // for (size_t i = box.b.y; i < box.c.y; ++i) {
-                    //     for (size_t j = box.b.x; j < box.c.x; ++j)
-                    //         printf("%c", matrixGet(image, i, j) > .5f ?
-                    //                 '.' : '#');
-                    //     puts("");
-                    // }
-                    // puts("---");
-
-                    // TODO : If too small, continue
-
-                    // Matrix *resized = charResize(image, &box);
-
-                    // Disp resized
-                    // for (size_t i = 0; i < 32; ++i) {
-                    //     for (size_t j = 0; j < 32; ++j)
-                    //         printf("%c", matrixGet(resized, i, j) > .5f ?
-                    //                 '.' : '#');
-                    //     puts("");
-                    // }
-                    // puts("---");
-
-                    // return str;
-
-
-
-                    // TODO : Detect
-                    str[nchars] = '?';
-
-                    ++nchars;
-                    // matrixFree(resized);
-                }
-            }
-        }
-
-        // puts("");
-    }
-
-
-    printf("Found %d chars\n", nchars);
-
-    free(visited);
-
-    str[nchars] = 0;
-
-    // TODO
     return str;
 }
