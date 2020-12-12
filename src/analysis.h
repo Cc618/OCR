@@ -30,4 +30,10 @@ int analysis(SDL_Renderer *renderer, Matrix *mat, int top, int down, int right, 
 
 void CaractersAnalysis(SDL_Renderer *ren, Matrix *mat, int top, int down);
 
+// --- Cc --- //
+// TODO : Network
+// Returns the text within image between startY to endY
+char *lineAnalysis(const Matrix *image, __attribute__((unused)) void *net,
+        int startY, int endY);
+
 #endif

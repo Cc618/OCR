@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "matrix.h"
 #include "analysis.h"
+#include "tools.h"
 
 CoordList* newCoordList()
 {
@@ -804,4 +805,94 @@ void CaractersAnalysis(SDL_Renderer *ren,Matrix* mat, int top, int down)
     SDL_Delay(800);
     free(result[0]);
     free(result);
+}
+
+
+
+
+
+
+
+
+
+// --- Cc --- //
+#define MAX(a, b) ((a) >= (b) ? (a) : (b))
+#define MIN(a, b) ((a) <= (b) ? (a) : (b))
+
+// Fetches the hitbox of the character
+// Modifies box
+static void charBox(const Matrix *image,
+        size_t height, int *visited,
+        size_t i, size_t j, rectangle *box) {
+    if (visited[i * image->cols + j])
+        return;
+
+    visited[i * image->cols + j] = 1;
+
+    // Not char
+    if (matrixGet(image, height + i, j) > .5f)
+        return;
+
+    // Update box
+    box->b.x = MIN(box->b.x, j);
+    box->b.y = MIN(box->b.y, i);
+    box->c.x = MAX(box->c.x, j);
+    box->c.y = MAX(box->c.y, i);
+
+    // Test each neighbour
+    if (i > 0)
+        charBox(image, height, visited, i - 1, j, box);
+
+    if (j > 0)
+        charBox(image, height, visited, i, j - 1, box);
+
+    if (i < height - 1)
+        charBox(image, height, visited, i + 1, j, box);
+
+    if (j < image->cols - 1)
+        charBox(image, height, visited, i, j - 1, box);
+}
+
+char *lineAnalysis(const Matrix *image, __attribute__((unused)) void *net,
+        int startY, int endY) {
+    // We use a traversal like it were a graph with 2 classes
+    // (black / white pixels)
+    // We suppose that the first pixel is white
+    int height = endY - startY;
+    int *visited = calloc(height * image->cols, sizeof(int));
+
+    printf("From %zu to %zu (width = %zu)\n", startY, endY, image->cols);
+
+    int nchars = 0;
+    for (size_t i = 0; i < height; ++i)
+        for (size_t j = 0; j < image->cols; ++j) {
+            if (!visited[i * image->cols + j]) {
+                // printf("i = %zu, j = %zu\n", i, j);
+
+                // White
+                if (matrixGet(image, height + i, j) > .5f)
+                    visited[i * image->cols + j] = 1;
+                else {
+                    // Found a char
+                    ++nchars;
+                    rectangle box = {
+                        .b = { j, i },
+                        .c = { j, i }
+                    };
+
+                    // Get hitbox of the char and visit all pixels of it
+                    charBox(image, height, visited, i, j, &box);
+
+                    box.b.y += height;
+                    box.c.y += height;
+                }
+            }
+        }
+
+    printf("Found %d chars\n", nchars);
+
+    free(visited);
+
+    // TODO
+    return "";
 }

@@ -71,20 +71,41 @@ int imgMain() {
     rectangle *array = malloc(500);
     rect_arr arr = {array, 0};
     horizontalCut(result, bloc, 40, &arr, 1);
-    
+
     //Print Rectangle Array
     for (size_t i = 0; i < arr.length; i++) {
 	rectangle get_rect = arr.array[i];
 	drawRectangle(result, get_rect);
 	point b = get_rect.b;
 	point c = get_rect.c;
-	printf("b = (%li, %li) and c == (%li, %li)\n", 
+	printf("b = (%li, %li) and c == (%li, %li)\n",
 		b.x, b.y, c.x, c.y);
     }*/
 
     //Line analysis
     dyn_arr dar = getLines(result);
-    drawLines(result, dar);
+    // TODO : Remove free : drawLines(result, dar);
+
+
+
+
+    // for (int line = 0; line < dar.length; ++line) {
+    for (int line = 0; line < 2; ++line) {
+        // TODO : Network
+        char *lineStr = lineAnalysis(result, NULL,
+                line == 0 ? 0 : dar.array[line - 1],
+                dar.array[line]);
+
+        printf("Line %d : '%s'\n", line, lineStr);
+
+        // TODO : Save / free lineStr
+    }
+
+    // TODO : rm
+    return 0;
+
+
+
 
     //Character analysis
     // NE PAS UNCOMMENT SEGMENTATION FAULT !
