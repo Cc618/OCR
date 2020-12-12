@@ -838,6 +838,8 @@ static Matrix *charResize(const Matrix *image, rectangle *box) {
     // Set new width to 32
     // Keep aspect ratio
     if (w > h) {
+        // TODO : Verify with a dash...
+
         // w2 / h2 = w / h
         // 1 / h2 = w / h / w2
         // h2 = h * w2 / w = h * 32 / w
@@ -845,8 +847,9 @@ static Matrix *charResize(const Matrix *image, rectangle *box) {
 
         for (size_t i = 0; i < newHeight; ++i)
             for (size_t j = 0; j < 32; ++j) {
-                // Take val at (x + j * w / 32, y + i * h / 32)
-                float val = matrixGet(image, x + j * w / 32, y + i * h / 32);
+                // Take val at (x + j * w / 32, y + i * h / newHeight)
+                float val = matrixGet(image, y + i * h / newHeight,
+                        x + j * w / 32);
                 matrixSet(mat, i, j, val);
             }
 
@@ -856,11 +859,12 @@ static Matrix *charResize(const Matrix *image, rectangle *box) {
                 matrixSet(mat, i, j, 1.f);
     } else {
         size_t newWidth = w * 32 / h;
+        // printf("w = %d, h = %d, newWidth = %d\n", w, h, newWidth);
 
         for (size_t j = 0; j < newWidth; ++j)
             for (size_t i = 0; i < 32; ++i) {
-                // Take val at (x + j * w / 32, y + i * h / 32)
-                float val = matrixGet(image, x + j * w / 32, y + i * h / 32);
+                float val = matrixGet(image, y + i * h / 32,
+                        x + j * w / newWidth);
                 matrixSet(mat, i, j, val);
             }
 
@@ -951,19 +955,37 @@ char *lineAnalysis(const Matrix *image, __attribute__((unused)) void *net,
                     if (w <= 2 || height <= 2)
                         continue;
 
-                    printf("> x = %d, y = %d\n", j, i + startY);
-                    LOGBOX(box);
-                    for (int y = box.b.y; y < box.c.y; ++y) {
-                        for (int x = box.b.x; x < box.c.x; ++x) {
-                            printf("%c", matrixGet(image, y, x) > .5f ?
+                    // Disp raw box
+                    // printf("> x = %d, y = %d\n", j, i + startY);
+                    // LOGBOX(box);
+                    // for (int y = box.b.y; y < box.c.y; ++y) {
+                    //     for (int x = box.b.x; x < box.c.x; ++x) {
+                    //         printf("%c", matrixGet(image, y, x) > .5f ?
+                    //                 '.' : '#');
+                    //     }
+                    //     puts("");
+                    // }
+                    // puts("");
+                    //
+
+                    // Resize
+                    Matrix *resized = charResize(image, &box);
+
+                    // Disp resized
+                    for (size_t i = 0; i < 32; ++i) {
+                        for (size_t j = 0; j < 32; ++j)
+                            printf("%c", matrixGet(resized, i, j) > .5f ?
                                     '.' : '#');
-                        }
                         puts("");
                     }
-                    puts("");
+                    puts("---");
+
 
                     str[nchars] = '?';
                     ++nchars;
+
+                    matrixFree(resized);
+
 
                     // return "";
                 }

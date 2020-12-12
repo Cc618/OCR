@@ -27,7 +27,8 @@ int imgMain() {
     }
     //Image Loading
     // SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
-    SDL_Surface *sur = SDL_LoadBMP("res/hello.bmp");
+    // SDL_Surface *sur = SDL_LoadBMP("res/hello.bmp");
+    SDL_Surface *sur = SDL_LoadBMP("res/v_u.bmp");
     if (!sur)
     {
         fprintf(stderr,"Doesn't find the image.\n");
