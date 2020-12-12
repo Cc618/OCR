@@ -56,3 +56,9 @@ bin/ocr net
 
 ### Training
 To build the dataset use make dataset (before make).
+
+Some requirements are necessary, use this command to install :
+
+```sh
+python -m pip install -r requirements.txt
+```
