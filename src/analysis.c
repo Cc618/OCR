@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "matrix.h"
 #include "analysis.h"
 #include "tools.h"
@@ -916,10 +917,16 @@ static void charBox(const Matrix *image,
         charBox(image, startY, height, visited, i, j + 1, box);
 }
 
+// To sort boxes using the first x
+static int boxCmp(const rectangle **a, const rectangle **b) {
+    return (*a)->b.x >= (*b)->b.x;
+}
+
 char *lineAnalysis(const Matrix *image, __attribute__((unused)) void *net,
         int startY, int lineY, int endY) {
     // We suppose that there are less than 512 chars
     char *str = malloc(512);
+    rectangle **boxes = malloc(sizeof(rectangle*) * 512);
 
     // We use a traversal like it were a graph with 2 classes
     // (black / white pixels)
@@ -936,72 +943,80 @@ char *lineAnalysis(const Matrix *image, __attribute__((unused)) void *net,
             if (!visited[i * width + j]) {
                 // Found a char
                 if (matrixGet(image, startY + i, j) < .5f) {
-                    rectangle box = {
+                    rectangle *box = malloc(sizeof(rectangle));
+                    *box = (rectangle) {
                         .b = { j, i },
                         .c = { j, i },
                     };
 
-                    charBox(image, startY, height, visited, i, j, &box);
+                    charBox(image, startY, height, visited, i, j, box);
 
-                    ++box.c.x;
-                    ++box.c.y;
+                    ++box->c.x;
+                    ++box->c.y;
 
-                    box.b.y += startY;
-                    box.c.y += startY;
+                    box->b.y += startY;
+                    box->c.y += startY;
 
-                    size_t w = box.c.x - box.b.x;
-                    size_t h = box.c.y - box.b.y;
+                    size_t w = box->c.x - box->b.x;
+                    size_t h = box->c.y - box->b.y;
 
-                    if (w <= 2 || height <= 2)
+                    if (w <= 2 || height <= 2) {
+                        free(box);
                         continue;
-
-                    // Disp raw box
-                    // printf("> x = %d, y = %d\n", j, i + startY);
-                    // LOGBOX(box);
-                    // for (int y = box.b.y; y < box.c.y; ++y) {
-                    //     for (int x = box.b.x; x < box.c.x; ++x) {
-                    //         printf("%c", matrixGet(image, y, x) > .5f ?
-                    //                 '.' : '#');
-                    //     }
-                    //     puts("");
-                    // }
-                    // puts("");
-                    //
-
-                    // Resize
-                    Matrix *resized = charResize(image, &box);
-
-                    // Disp resized
-                    for (size_t i = 0; i < 32; ++i) {
-                        for (size_t j = 0; j < 32; ++j)
-                            printf("%c", matrixGet(resized, i, j) > .5f ?
-                                    '.' : '#');
-                        puts("");
                     }
-                    puts("---");
 
+                    boxes[nchars] = box;
+                    // LOGBOX(*boxes[nchars]);
 
-                    str[nchars] = '?';
                     ++nchars;
-
-                    matrixFree(resized);
-
-
-                    // return "";
                 }
                 else visited[i * width + j] = 1;
             }
         }
     }
 
+    // Sort by x
+    qsort(boxes, nchars, sizeof(rectangle*), boxCmp);
+
+    puts("---");
+    for (size_t c = 0; c < nchars; ++c) {
+        // Disp raw box
+        // printf("> x = %d, y = %d\n", j, i + startY);
+        // LOGBOX(*boxes[c]);
+        // for (int y = box.b.y; y < box.c.y; ++y) {
+        //     for (int x = box.b.x; x < box.c.x; ++x) {
+        //         printf("%c", matrixGet(image, y, x) > .5f ?
+        //                 '.' : '#');
+        //     }
+        //     puts("");
+        // }
+        // puts("");
+        //
+
+        // Resize
+        Matrix *resized = charResize(image, boxes[c]);
+
+        // Disp resized
+        for (size_t i = 0; i < 32; ++i) {
+            for (size_t j = 0; j < 32; ++j)
+                printf("%c", matrixGet(resized, i, j) > .5f ?
+                        '.' : '#');
+            puts("");
+        }
+        puts("---");
 
 
+        str[c] = '?';
 
-
+        matrixFree(resized);
+        free(boxes[c]);
+    }
 
 
     printf("nchars = %d\n", nchars);
 
+
+    free(boxes);
 
     str[nchars] = 0;
 

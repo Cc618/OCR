@@ -26,9 +26,9 @@ int imgMain() {
         return -1;
     }
     //Image Loading
-    // SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
+    SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
     // SDL_Surface *sur = SDL_LoadBMP("res/hello.bmp");
-    SDL_Surface *sur = SDL_LoadBMP("res/v_u.bmp");
+    // SDL_Surface *sur = SDL_LoadBMP("res/v_u.bmp");
     if (!sur)
     {
         fprintf(stderr,"Doesn't find the image.\n");
@@ -65,9 +65,7 @@ int imgMain() {
     Matrix *matrix = greyToMatrix(sur);
     matrixToGrey(sur, matrix);
     Matrix *inter = convolution(matrix, convo);
-    // Matrix *result = convolution(matrix, convo2);
-    // TODO
-    Matrix *result = matrixCopy(matrix);
+    Matrix *result = convolution(matrix, convo2);
     matrixToBinary(result);
 
     //Block analysis
@@ -94,9 +92,8 @@ int imgMain() {
 
     printf("  Found %zu lines\n\n", dar.length);
 
-    for (int line = 1; line < dar.length; line += 2) {
-        // TODO :
-        // line += 2;
+    // TODO : 1 not 3
+    for (int line = 3; line < dar.length; line += 2) {
 
         printf("Line %d -> %d\n", dar.array[line - 1], dar.array[line]);
         // TODO : Network
