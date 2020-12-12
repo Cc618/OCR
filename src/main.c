@@ -26,7 +26,8 @@ int imgMain() {
         return -1;
     }
     //Image Loading
-    SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
+    // SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
+    SDL_Surface *sur = SDL_LoadBMP("res/hello.bmp");
     if (!sur)
     {
         fprintf(stderr,"Doesn't find the image.\n");
@@ -63,7 +64,9 @@ int imgMain() {
     Matrix *matrix = greyToMatrix(sur);
     matrixToGrey(sur, matrix);
     Matrix *inter = convolution(matrix, convo);
-    Matrix *result = convolution(matrix, convo2);
+    // Matrix *result = convolution(matrix, convo2);
+    // TODO
+    Matrix *result = matrixCopy(matrix);
     matrixToBinary(result);
 
     //Block analysis
@@ -88,18 +91,43 @@ int imgMain() {
 
 
 
+    printf("  Found %zu lines\n\n", dar.length);
 
-    // for (int line = 0; line < dar.length; ++line) {
-    for (int line = 0; line < 2; ++line) {
+    for (int line = 1; line < dar.length; line += 2) {
+        // TODO :
+        // line += 2;
+
+        printf("Line %d -> %d\n", dar.array[line - 1], dar.array[line]);
         // TODO : Network
         char *lineStr = lineAnalysis(result, NULL,
-                line == 0 ? 0 : dar.array[line - 1],
-                dar.array[line]);
+                dar.array[line - 1], 0, dar.array[line]);
+                // line == 0 ? 0 : dar.array[line - 1],
+                // dar.array[line],
+                // line + 1 == dar.length ?
+                //     result->rows : dar.array[line + 1]);
 
-        printf("Line %d : '%s'\n", line, lineStr);
+        // TODO : Save lineStr
+        free(lineStr);
+        puts("");
 
-        // TODO : Save / free lineStr
+        return 0;
     }
+
+    // for (int line = 0; line < dar.length; ++line) {
+    // // for (int line = 2; line == 2; ++line) {
+    //     // TODO : Network
+    //     const char *lineStr = "";
+    //     // char *lineStr = lineAnalysis(result, NULL,
+    //     //         line == 0 ? 0 : dar.array[line - 1],
+    //     //         dar.array[line],
+    //     //         line + 1 == dar.length ?
+    //     //             result->rows : dar.array[line + 1]);
+
+    //     printf("Line %d (%d) : '%s'\n", line, dar.array[line], lineStr);
+
+    //     // TODO : Save lineStr
+    //     // free(lineStr);
+    // }
 
     // TODO : rm
     return 0;
