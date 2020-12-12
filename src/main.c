@@ -18,6 +18,7 @@
 #include "ai.h"
 #include "save.h"
 #include "analysis.h"
+#include "gui.h"
 
 #define PRINT_SIZE(X) printf("Size(%zu, %zu)\n", (X)->rows, (X)->cols);
 
@@ -314,7 +315,14 @@ int appMain() {
 
     aiLoad(net, dataset, NET_PATH);
 
-    // TODO : App main
+    // Load GUI
+    if (SDL_Init(SDL_INIT_EVERYTHING)<0)
+    {
+        fprintf(stderr,"Initialisation error.\n");
+        return -1;
+    }
+
+    gui();
 
     // Free everything
     networkFree(net);

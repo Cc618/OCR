@@ -15,7 +15,7 @@ endif
 CC = gcc
 CPPFLAGS = -MMD
 CFLAGS = -Wall -Wextra -std=c99 $(SANITIZE)
-LDLIBS = -lm -lSDL2
+LDLIBS = -lm -lSDL2 -lSDL2_ttf
 LDFLAGS = $(SANITIZE)
 
 ifeq ($(DEBUG),1)
