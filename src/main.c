@@ -189,170 +189,6 @@ static void trainCallback(size_t epoch, size_t batch, float loss) {
         printf("Epoch %4zu, batch %3zu, loss %.2e\n", epoch, batch, loss);
 }
 
-// Display an image of the dataset
-int dataMain() {
-    // Init sdl
-    if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
-    {
-        fprintf(stderr,"Can't initialize SDL\n");
-        return -1;
-    }
-
-    // // Load & print a bmp image //
-    // Matrix *img = loadImage("data/dataset_bmp/A_Roboto.bmp");
-    // printf("Loaded a %zux%zu image\n", img->cols, img->rows);
-
-    // // Pretty print the image
-    // for (size_t i = 0; i < img->cols; ++i)
-    //     putchar('-');
-    // putchar('\n');
-
-    // for (size_t i = 0; i < img->rows; ++i) {
-    //     for (size_t j = 0; j < img->cols; ++j)
-    //         putchar(matrixGet(img, i, j) > .5f ? ' ' : '.');
-    //     putchar('\n');
-    // }
-
-    // for (size_t i = 0; i < img->cols; ++i)
-    //     putchar('-');
-    // putchar('\n');
-
-    // matrixFree(img);
-
-    // Load & show images of a dataset //
-    Dataset *dataset = datasetNew("data/dataset_bmp");
-
-    printf("Labels of the dataset :");
-    // for (size_t i = 0; i < dataset->count; ++i)
-    //     printf(" %c", dataset->label2char[dataset->labels[i]]);
-    // puts("");
-
-    for (size_t i = 0; i < dataset->labelCount; ++i)
-        printf(" %c", dataset->label2char[i]);
-    puts("");
-
-    puts("First image :");
-    imagePrint(dataset->images[0]);
-
-    datasetFree(dataset);
-
-    SDL_Quit();
-
-    return 0;
-}
-
-int saveMain() {
-    Layer *layers[] = {
-            denseNew(2 * 2, 2),
-            denseNew(2, 2),
-            softmaxNew(),
-        };
-    LossFunction criterion = nllLoss;
-    Optimizer *opti = sgdNew(learningRate, batchSize, momentum);
-
-    Network *net = networkNew(sizeof(layers) / sizeof(Layer*), layers, flatten,
-            opti, criterion);
-
-    Dataset *d = malloc(sizeof(Dataset));
-    d->labelCount = 3;
-    d->label2char[0] = 'A';
-    d->label2char[1] = 'b';
-    d->label2char[2] = 'C';
-    d->char2label['A'] = 0;
-    d->char2label['b'] = 1;
-    d->char2label['C'] = 2;
-
-
-    // AI IO tests
-    matrixPrint(((Dense*) net->layers[0])->weight);
-    printf("%zu %c\n", d->labelCount, d->label2char[0]);
-    puts("---");
-
-    aiSave(net, d, "weights/1/");
-
-    ((Dense*) net->layers[0])->weight->data[0] = 42;
-    d->labelCount = 1;
-    d->label2char[0] = 'z';
-    d->label2char['z'] = 0;
-
-    matrixPrint(((Dense*) net->layers[0])->weight);
-    printf("%zu %c\n", d->labelCount, d->label2char[0]);
-    puts("---");
-
-    aiLoad(net, d, "weights/1/");
-
-    matrixPrint(((Dense*) net->layers[0])->weight);
-    printf("%zu %c\n", d->labelCount, d->label2char[0]);
-
-    // // Net IO tests :
-    // matrixPrint(((Dense*) net->layers[0])->weight);
-    // networkSave(net, "weights/1/");
-
-    // ((Dense*) net->layers[0])->weight->data[0] = 42;
-    // matrixPrint(((Dense*) net->layers[0])->weight);
-
-    // networkLoad(net, "weights/1/");
-    // matrixPrint(((Dense*) net->layers[0])->weight);
-
-    // puts("done");
-
-    // // Dataset IO tests (unsafe)
-    // puts("> Dataset :");
-
-    // datasetSave(d, "weights/1/dataset.data");
-
-    // d->labelCount = 1;
-    // d->label2char[0] = 'z';
-    // d->label2char['z'] = 0;
-    // datasetLoad(d, "weights/1/dataset.data");
-
-    // printf("%zu %c\n", d->labelCount, d->label2char[0]);
-
-    free(d);
-
-
-    return 0;
-
-
-
-
-    // Directories must be created
-    SaveContext *ctx = saveContextNew("weights/1/");
-
-    // // Test paths
-    // char *firstWeightPath = saveContextNextPath(ctx);
-    // char *secondWeightPath = saveContextNextPath(ctx);
-    // char *thirdWeightPath = saveContextNextPath(ctx);
-
-    // printf("%s\n%s\n%s\n", firstWeightPath, secondWeightPath, thirdWeightPath);
-
-    // free(firstWeightPath);
-    // free(secondWeightPath);
-    // free(thirdWeightPath);
-
-    // Test save / load matrix
-    const float data[] = { 1, 2, 3, 4 };
-    Matrix *tosave = matrixCreate(2, 2, data);
-    puts("tosave :");
-    matrixPrint(tosave);
-    saveContextSave(ctx, tosave);
-
-    // Reset context
-    ctx->weightId = 0;
-
-    Matrix *toload = saveContextLoad(ctx);
-    puts("toload :");
-    matrixPrint(toload);
-
-    matrixFree(toload);
-    matrixFree(tosave);
-
-    saveContextFree(ctx);
-    networkFree(net);
-
-    return 0;
-}
-
 // Builds the network used in the OCR
 Network *buildNetwork(size_t nClasses) {
     Layer *layers[] = {
@@ -499,12 +335,8 @@ int main(int argc,
         return appMain();
     else if (argc != 2)
         err = 1;
-    else if (strcmp(argv[1], "data") == 0)
-        return dataMain();
     else if (strcmp(argv[1], "img") == 0)
         return imgMain();
-    else if (strcmp(argv[1], "save") == 0)
-        saveMain();
     else if (strcmp(argv[1], "train") == 0)
         trainMain();
     else
@@ -512,8 +344,9 @@ int main(int argc,
 
     if (err) {
         puts("usage:");
-        puts("    ocr img   Run image processing demo");
-        puts("    ocr net   Run neural network demo");
+        puts("    ocr         Launch the GUI app");
+        puts("    ocr train   Train the network (use make dataset to generate"
+                " the training data)");
     }
 
     return 0;
