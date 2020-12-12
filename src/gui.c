@@ -28,6 +28,7 @@ int gui_analysis(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surf
     SDL_UpdateWindowSurface(ecran);
     char* result = NULL;
     int len = 0;
+    // TODO
     //Lancement de la fonction analyse sur SDL_Surface *surImage.
     //A retourner : la string result, et sa longueur len.
     result = "";

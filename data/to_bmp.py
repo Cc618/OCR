@@ -4,6 +4,71 @@ import os
 from glob import glob
 from pdf2image import convert_from_path
 
+
+def bounds_traversal(im, visited, box, i, j, y, w, h):
+    # Almost DFS to get other chars
+    s = [(i, j)]
+    while len(s) > 0:
+        i, j = s.pop()
+        visited[i * w + j] = True
+
+        if im.getpixel((j, y + i))[0] > .9:
+            continue
+
+        box[0] = min(box[0], j)
+        box[1] = min(box[1], i)
+        box[2] = max(box[2], j)
+        box[3] = max(box[3], i)
+
+        if i > 0 and not visited[(i - 1) * w + j]:
+            s.append((i - 1, j))
+
+        if j > 0 and not visited[i * w + j - 1]:
+            s.append((i, j - 1))
+
+        if i < h - 1 and not visited[(i + 1) * w + j]:
+            s.append((i + 1, j))
+
+        if j < w - 1 and not visited[i * w + j + 1]:
+            s.append((i, j + 1))
+
+
+def bounds(im, y, w, h):
+    '''
+    Returns the bounds of the character
+    '''
+    box = []
+    visited = [False] * w * h
+    for i in range(h):
+        for j in range(w):
+            # Found
+            if not visited[i * w + j] and im.getpixel((j, y + i))[0] < .9:
+                visited[i * w + j] = True
+
+                if box == []:
+                    box = [j, i, j, i]
+
+                bounds_traversal(im, visited, box, i, j, y, w, h)
+                print('Traversal', j, i)
+            else:
+                visited[i * w + j] = True
+
+    print(box)
+
+    # box[2] = box[2] - box[0]
+    # box[3] = box[3] - box[1]
+
+    box[1] += y
+    box[3] += y
+
+    box[2] += 1
+    box[3] += 1
+
+    assert box[2] > 2 and box[3] > 2, f'Too small char detected : {box}'
+
+    return box
+
+
 # Whole section height
 height = 73
 width = 24
@@ -32,8 +97,20 @@ for impath in impaths:
 
         # Retrieve the image of the char
         y = dy + di * height
-        char = im.crop((0, y, width, y + img_height))
+
+        try:
+            box = bounds(im, y, width, height)
+        except Exception as e:
+            raise Exception(f'Char {content[i]}, font {name} : {e}')
+
+        print(box)
+
+        char = im.crop(box)
+
+
+        # TODO : Nearest neighbor
         char = char.resize((32, 32))
 
         # Save char
         char.save(f'dataset_bmp/{content[i]}_{name}.bmp')
+        exit()
