@@ -1,5 +1,6 @@
 #ifndef TOOLS_H
 #define TOOLS_H
+
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include "matrix.h"
@@ -9,20 +10,20 @@ typedef struct {
     int length;
 } dyn_arr;
 
-typedef struct CoordList CoordList;
-typedef struct ValueList ValueList;
-struct CoordList
-{
-    int value;
-    int* coord;
-    CoordList* next;
-};
-struct ValueList
-{
-    int value;
-    ValueList* fusion;
-    ValueList* next;
-};
+typedef struct{
+	size_t x;
+	size_t y;
+} point;
+
+typedef struct {
+	point b;
+	point c;
+} rectangle;
+
+typedef struct {
+	rectangle *array;
+	size_t length;
+} rect_arr;
 
 //Print the actual surface on the renderer.
 void printImage(SDL_Renderer * ren,SDL_Surface * sur, int x, int y);
@@ -56,13 +57,29 @@ dyn_arr getLines(Matrix *matrix);
 //Draws the lines with an array that comes from getLines.
 void drawLines(Matrix *matrix, dyn_arr arraylines);
 
+//Stores the characters on a dynamic array.
 dyn_arr getCaracters(Matrix *matrix,int top, int down);
 
+//Separates the characters on the image.
 void drawCaracters(Matrix *matrix, dyn_arr arraylines,int top, int down);
 
 //Transforms a matrix into a binary matrix(changes directly the matrix).
 void matrixToBinary(Matrix *matrix);
 
-//Separates all symbols in a line.
-int analysis(Matrix* mat, int top, int down, int left,int right,int** result);
+//Keeps the value between 0.0 and 1.0.
+float preventOverflow(float value);
+
+//Convolution on matrix with convo.
+Matrix *convolution(Matrix *matrix, Matrix *convo);
+
+//krisbool signifie si on ne peut pas couper le bloc.
+//Cut the image horizontally if it can.
+void horizontalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr, short krisbool);
+
+//Cut the image vertically if it can.
+void verticalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr, short krisbool);
+
+//Draw a rectangle on the matrix
+void drawRectangle(Matrix *matrix, rectangle rec);
+
 #endif

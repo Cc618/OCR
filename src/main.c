@@ -17,6 +17,7 @@
 #include "train.h"
 #include "ai.h"
 #include "save.h"
+#include "analysis.h"
 
 #define PRINT_SIZE(X) printf("Size(%zu, %zu)\n", (X)->rows, (X)->cols);
 
@@ -26,34 +27,141 @@ int imgMain() {
     SDL_Renderer *ren = 0;
     if (SDL_Init(SDL_INIT_EVERYTHING)<0)
     {
-        fprintf(stderr,"Erreur initialisation\n");
+        fprintf(stderr,"Initialisation error.\n");
         return -1;
     }
     //Image Loading
     SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
+    // SDL_Surface *sur = SDL_LoadBMP("res/hello.bmp");
+    // SDL_Surface *sur = SDL_LoadBMP("res/v_u.bmp");
     if (!sur)
     {
-        fprintf(stderr,"Ne trouve pas l'image\n");
+        fprintf(stderr,"Doesn't find the image.\n");
         return -1;
     }
+
+    //Matrixes Initialisation
+    //Gommage
+    Matrix *convo = matrixZero(3, 3);
+    matrixSet(convo, 0, 0, 0.1111111);
+    matrixSet(convo, 0, 1, 0.1111111);
+    matrixSet(convo, 0, 2, 0.1111111);
+    matrixSet(convo, 1, 0, 0.1111111);
+    matrixSet(convo, 1, 1, 0.1111111);
+    matrixSet(convo, 1, 2, 0.1111111);
+    matrixSet(convo, 2, 0, 0.1111111);
+    matrixSet(convo, 2, 1, 0.1111111);
+    matrixSet(convo, 2, 2, 0.1111111);
+
+    //Contrast
+    Matrix *convo2 = matrixZero(3, 3);
+    matrixSet(convo2, 0, 0, 0);
+    matrixSet(convo2, 0, 1, -1);
+    matrixSet(convo2, 0, 2, 0);
+    matrixSet(convo2, 1, 0, -1);
+    matrixSet(convo2, 1, 1, 5);
+    matrixSet(convo2, 1, 2, -1);
+    matrixSet(convo2, 2, 0, 0);
+    matrixSet(convo2, 2, 1, -1);
+    matrixSet(convo2, 2, 2, 0);
+
+    //Image to Matrix
     imageToGrey(sur);
     Matrix *matrix = greyToMatrix(sur);
     matrixToGrey(sur, matrix);
-    dyn_arr dar = getLines(matrix);
-    dyn_arr dar2 = getCaracters(matrix,0,dar.array[0]);
-        drawCaracters(matrix,dar2,0,dar.array[0]);
-    for (int i = 1; i+1 < dar.length; i+=2)
-        {
-            dyn_arr dar2 = getCaracters(matrix,dar.array[i],dar.array[i+1]);
-            drawCaracters(matrix,dar2,dar.array[i],dar.array[i+1]);
-        }
-    drawLines(matrix, dar);
-    matrixToGrey(sur, matrix);
+    Matrix *inter = convolution(matrix, convo);
+    Matrix *result = convolution(matrix, convo2);
+    matrixToBinary(result);
+
+    //Block analysis
+    /*rectangle bloc = {{result->cols - 1, 0}, {0, result->rows - 1}};
+    rectangle *array = malloc(500);
+    rect_arr arr = {array, 0};
+    horizontalCut(result, bloc, 40, &arr, 1);
+
+    //Print Rectangle Array
+    for (size_t i = 0; i < arr.length; i++) {
+	rectangle get_rect = arr.array[i];
+	drawRectangle(result, get_rect);
+	point b = get_rect.b;
+	point c = get_rect.c;
+	printf("b = (%li, %li) and c == (%li, %li)\n",
+		b.x, b.y, c.x, c.y);
+    }*/
+
+    //Line analysis
+    dyn_arr dar = getLines(result);
+    // TODO : Remove free : drawLines(result, dar);
+
+
+
+    printf("  Found %zu lines\n\n", dar.length);
+
+    // TODO : 1 not 3
+    for (int line = 3; line < dar.length; line += 2) {
+
+        printf("Line %d -> %d\n", dar.array[line - 1], dar.array[line]);
+        // TODO : Network
+        char *lineStr = lineAnalysis(result, NULL,
+                dar.array[line - 1], 0, dar.array[line]);
+                // line == 0 ? 0 : dar.array[line - 1],
+                // dar.array[line],
+                // line + 1 == dar.length ?
+                //     result->rows : dar.array[line + 1]);
+
+        // TODO : Save lineStr
+        free(lineStr);
+        puts("");
+
+        return 0;
+    }
+
+    // for (int line = 0; line < dar.length; ++line) {
+    // // for (int line = 2; line == 2; ++line) {
+    //     // TODO : Network
+    //     const char *lineStr = "";
+    //     // char *lineStr = lineAnalysis(result, NULL,
+    //     //         line == 0 ? 0 : dar.array[line - 1],
+    //     //         dar.array[line],
+    //     //         line + 1 == dar.length ?
+    //     //             result->rows : dar.array[line + 1]);
+
+    //     printf("Line %d (%d) : '%s'\n", line, dar.array[line], lineStr);
+
+    //     // TODO : Save lineStr
+    //     // free(lineStr);
+    // }
+
+    // TODO : rm
+    return 0;
+
+
+
+
+    //Character analysis
+    // NE PAS UNCOMMENT SEGMENTATION FAULT !
+    /*CaractersAnalysis(ren, result, 0, dar.array[0] - 1);
+    SDL_Delay(1000);
+    for (int i = 0; i + 1 < dar.length; i++) {
+    	CaractersAnalysis(ren, matrix, dar.array[i], dar.array[i + 1] - 1);
+    }*/
+
+    //Matrix Freedom
+    matrixToGrey(sur, result);
     matrixFree(matrix);
-    SDL_CreateWindowAndRenderer(1000, 800,0,&win,&ren);
+    matrixFree(convo);
+    matrixFree(convo2);
+    matrixFree(inter);
+    matrixFree(result);
+
+    //Saving the image
+    //SDL_SaveBMP(sur, "res/bloc3.bmp");
+
+    //Image Printing
+    SDL_CreateWindowAndRenderer(1000, 1200,0,&win,&ren);
     if (!win || !ren)
     {
-        fprintf(stderr,"Erreur a la creation des fenetres\n");
+        fprintf(stderr,"Error when building windows.\n");
         SDL_Quit();
         return -1;
     }
@@ -61,7 +169,7 @@ int imgMain() {
     SDL_RenderClear(ren);
     printImage(ren,sur,0,0);
     SDL_RenderPresent(ren);
-    SDL_Delay(120000);
+    SDL_Delay(3000);
     //Closure
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
