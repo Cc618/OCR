@@ -3,6 +3,7 @@
 import os
 from glob import glob
 from pdf2image import convert_from_path
+from PIL import Image
 
 
 def bounds_traversal(im, visited, box, i, j, y, w, h):
@@ -37,10 +38,16 @@ def bounds(im, y, w, h):
     '''
     Returns the bounds of the character
     '''
+    if y + h > im.height:
+        h = im.height - y
+
     box = []
     visited = [False] * w * h
     for i in range(h):
         for j in range(w):
+            if y + i >= im.height:
+                print(y + i, im.height)
+
             # Found
             if not visited[i * w + j] and im.getpixel((j, y + i))[0] < .9:
                 visited[i * w + j] = True
@@ -49,11 +56,11 @@ def bounds(im, y, w, h):
                     box = [j, i, j, i]
 
                 bounds_traversal(im, visited, box, i, j, y, w, h)
-                print('Traversal', j, i)
+                # print('Traversal', j, i)
             else:
                 visited[i * w + j] = True
 
-    print(box)
+    # print(box)
 
     # box[2] = box[2] - box[0]
     # box[3] = box[3] - box[1]
@@ -101,16 +108,23 @@ for impath in impaths:
         try:
             box = bounds(im, y, width, height)
         except Exception as e:
-            raise Exception(f'Char {content[i]}, font {name} : {e}')
-
-        print(box)
+            raise Exception(f'!!! Char {content[i]}, font {name} : {e}')
 
         char = im.crop(box)
 
+        w = box[2] - box[0]
+        h = box[3] - box[1]
+        if w > h:
+            nwidth = 32
+            nheight = h * 32 // w
+        else:
+            nheight = 32
+            nwidth = w * 32 // h
 
         # TODO : Nearest neighbor
-        char = char.resize((32, 32))
+        char = char.resize((nwidth, nheight))
+        newimg = Image.new('RGB', (32, 32), color='#ffffff')
+        newimg.paste(char)
 
         # Save char
-        char.save(f'dataset_bmp/{content[i]}_{name}.bmp')
-        exit()
+        newimg.save(f'dataset_bmp/{content[i]}_{name}.bmp')
