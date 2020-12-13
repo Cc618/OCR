@@ -41,7 +41,9 @@ int imgMain() {
     //Image Loading
     // SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
     // SDL_Surface *sur = SDL_LoadBMP("res/arev.bmp"); // Too light
-    SDL_Surface *sur = SDL_LoadBMP("res/arev_bold.bmp");
+    // SDL_Surface *sur = SDL_LoadBMP("res/arev_bold.bmp");
+    SDL_Surface *sur = SDL_LoadBMP("res/cctext.bmp");
+    // SDL_Surface *sur = SDL_LoadBMP("res/cctext2.bmp");
     // SDL_Surface *sur = SDL_LoadBMP("res/soutenance.bmp");
     // SDL_Surface *sur = SDL_LoadBMP("res/neurones.bmp");
     // SDL_Surface *sur = SDL_LoadBMP("res/hello.bmp");
@@ -127,14 +129,14 @@ int imgMain() {
                 boxes, charMatrices, &nchars);
 
         for (size_t c = 0; c < nchars; ++c) {
-            // Disp resized
-            for (size_t i = 0; i < 32; ++i) {
-                for (size_t j = 0; j < 32; ++j)
-                    printf("%c", matrixGet(charMatrices[c], i, j) > .5f ?
-                            '.' : '#');
-                puts("");
-            }
-            puts("---");
+            // // Disp resized
+            // for (size_t i = 0; i < 32; ++i) {
+            //     for (size_t j = 0; j < 32; ++j)
+            //         printf("%c", matrixGet(charMatrices[c], i, j) > .5f ?
+            //                 '.' : '#');
+            //     puts("");
+            // }
+            // puts("---");
 
             Prediction pred = predict(net, dataset, charMatrices[c]);
             lineStr[c] = pred.best;
@@ -155,7 +157,7 @@ int imgMain() {
         free(lineStr);
         puts("");
 
-        return 0;
+        // return 0;
     }
 
     // Free net

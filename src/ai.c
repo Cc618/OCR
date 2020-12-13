@@ -10,8 +10,6 @@ Prediction predict(Network *net, Dataset *dataset, const Matrix *image) {
         if (pred->data[j] > pred->data[imax])
             imax = j;
 
-    printf("imax = %zu\n", imax);
-
     Prediction p = {
         .best = dataset->label2char[imax],
         .prob = pred->data[imax],
