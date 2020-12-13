@@ -10,9 +10,7 @@ ebgaramond
 fourier
 fouriernc
 helvet
-inconsolata
 kpfonts
-lato
 libertine
 librebaskerville
 lmodern
