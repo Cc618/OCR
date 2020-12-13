@@ -918,11 +918,10 @@ static int boxCmp(const rectangle **a, const rectangle **b) {
     return (*a)->b.x >= (*b)->b.x;
 }
 
-char *lineAnalysis(const Matrix *image, __attribute__((unused)) void *net,
-        int startY, int lineY, int endY) {
-    // We suppose that there are less than 512 chars
-    char *str = malloc(512);
-    rectangle **boxes = malloc(sizeof(rectangle*) * 512);
+void lineAnalysis(const Matrix *image, int startY, int endY,
+        rectangle **boxes, Matrix **matrices, size_t *nchars) {
+    // char *str = malloc(512);
+    // rectangle **boxes = malloc(sizeof(rectangle*) * 512);
 
     // We use a traversal like it were a graph with 2 classes
     // (black / white pixels)
@@ -931,7 +930,7 @@ char *lineAnalysis(const Matrix *image, __attribute__((unused)) void *net,
     int width = image->cols;
     int *visited = calloc(height * image->cols, sizeof(int));
 
-    int nchars = 0;
+    *nchars = 0;
     for (size_t i = 0; i < height; ++i) {
         for (size_t j = 0; j < image->cols; ++j) {
             if (!visited[i * width + j]) {
@@ -959,10 +958,10 @@ char *lineAnalysis(const Matrix *image, __attribute__((unused)) void *net,
                         continue;
                     }
 
-                    boxes[nchars] = box;
+                    boxes[*nchars] = box;
                     // LOGBOX(*boxes[nchars]);
 
-                    ++nchars;
+                    ++*nchars;
                 }
                 else visited[i * width + j] = 1;
             }
@@ -970,34 +969,25 @@ char *lineAnalysis(const Matrix *image, __attribute__((unused)) void *net,
     }
 
     // Sort by x
-    qsort(boxes, nchars, sizeof(rectangle*), boxCmp);
+    qsort(boxes, *nchars, sizeof(rectangle*), boxCmp);
 
-    puts("---");
-    for (size_t c = 0; c < nchars; ++c) {
+    // puts("---");
+    for (size_t c = 0; c < *nchars; ++c) {
         // Resize
-        Matrix *resized = charResize(image, boxes[c]);
-
-        // Disp resized
-        for (size_t i = 0; i < 32; ++i) {
-            for (size_t j = 0; j < 32; ++j)
-                printf("%c", matrixGet(resized, i, j) > .5f ?
-                        '.' : '#');
-            puts("");
-        }
-        puts("---");
+        matrices[c]= charResize(image, boxes[c]);
 
 
-        str[c] = '?';
+        // str[c] = '?';
 
-        matrixFree(resized);
-        free(boxes[c]);
+        // matrixFree(resized);
+        // free(boxes[c]);
     }
 
-    printf("nchars = %d\n", nchars);
+    // printf("nchars = %d\n", *nchars);
 
-    free(boxes);
+    // free(boxes);
 
-    str[nchars] = 0;
+    // str[nchars] = 0;
 
-    return str;
+    // return str;
 }

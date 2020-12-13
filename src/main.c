@@ -100,15 +100,34 @@ int imgMain() {
 
     // TODO : 1 not 3
     for (int line = 3; line < dar.length; line += 2) {
-
         printf("Line %d -> %d\n", dar.array[line - 1], dar.array[line]);
-        // TODO : Network
-        char *lineStr = lineAnalysis(result, NULL,
-                dar.array[line - 1], 0, dar.array[line]);
-                // line == 0 ? 0 : dar.array[line - 1],
-                // dar.array[line],
-                // line + 1 == dar.length ?
-                //     result->rows : dar.array[line + 1]);
+
+        // We suppose that there are less than 512 chars
+        char *lineStr = malloc(512);
+        rectangle **boxes = malloc(sizeof(rectangle*) * 512);
+        Matrix **charMatrices = malloc(sizeof(Matrix*) * 512);
+        size_t nchars;
+
+         lineAnalysis(result,
+                dar.array[line - 1], dar.array[line],
+                boxes, charMatrices, &nchars);
+
+        for (size_t c = 0; c < nchars; ++c) {
+            // Disp resized
+            for (size_t i = 0; i < 32; ++i) {
+                for (size_t j = 0; j < 32; ++j)
+                    printf("%c", matrixGet(charMatrices[c], i, j) > .5f ?
+                            '.' : '#');
+                puts("");
+            }
+            puts("---");
+
+            free(boxes[c]);
+            matrixFree(charMatrices[c]);
+        }
+
+        free(boxes);
+        free(charMatrices);
 
         // TODO : Save lineStr
         free(lineStr);
@@ -133,8 +152,6 @@ int imgMain() {
     //     // free(lineStr);
     // }
 
-    // TODO : rm
-    return 0;
 
 
 

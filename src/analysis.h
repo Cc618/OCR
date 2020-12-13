@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include "matrix.h"
-
+#include "tools.h"
 
 typedef struct CoordList
 {
@@ -31,9 +31,8 @@ int analysis(SDL_Renderer *renderer, Matrix *mat, int top, int down, int right, 
 void CaractersAnalysis(SDL_Renderer *ren, Matrix *mat, int top, int down);
 
 // --- Cc --- //
-// TODO : Network
-// Returns the text within image between startY to endY
-char *lineAnalysis(const Matrix *image, __attribute__((unused)) void *net,
-        int startY, int lineY, int endY);
+// Returns all chars between startY to endY
+void lineAnalysis(const Matrix *image, int startY, int endY,
+        rectangle **boxes, Matrix **matrices, size_t *nchars);
 
 #endif
