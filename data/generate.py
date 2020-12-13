@@ -25,6 +25,10 @@ with open('dataset.template.tex') as f:
 i_setfont = next(i for i, ln in enumerate(template) if 'SETFONT' in ln)
 i_content = next(i for i, ln in enumerate(template) if 'CONTENT' in ln)
 
+bold = True
+if bold:
+    content = ['\\textbf{' + c + '}' for c in content]
+
 content_raw = '\n\n'.join(content)
 template[i_content] = content_raw + '\n'
 

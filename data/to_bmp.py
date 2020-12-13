@@ -86,10 +86,11 @@ def bounds2(im, y, w, h):
                     box[2] = max(box[2], j)
                     box[3] = max(box[3], i)
 
-    box[0] = max(0, box[0] - 4)
-    box[1] += y - 4
-    box[2] += 4
-    box[3] += y + 4
+    pad = 2
+    box[0] = max(0, box[0] - 2)
+    box[1] += y - 2
+    box[2] += 2
+    box[3] += y + 2
 
     assert box[2] - box[0] > 2 and box[3] - box[1] > 2, \
             f'Too small char detected : {box}'

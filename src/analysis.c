@@ -947,8 +947,11 @@ void lineAnalysis(const Matrix *image, int startY, int endY,
                     ++box->c.x;
                     ++box->c.y;
 
-                    box->b.y += startY;
-                    box->c.y += startY;
+                    size_t pad = 2;
+                    box->b.y += startY - pad;
+                    box->c.y += startY + pad;
+                    box->b.x -= pad;
+                    box->c.x += pad;
 
                     size_t w = box->c.x - box->b.x;
                     size_t h = box->c.y - box->b.y;

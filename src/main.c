@@ -22,6 +22,13 @@
 
 #define PRINT_SIZE(X) printf("Size(%zu, %zu)\n", (X)->rows, (X)->cols);
 
+Network *buildNetwork(size_t nClasses);
+
+#define SESSION "1"
+#define NET_DIR "weights/"
+#define NET_PATH (NET_DIR SESSION "/")
+#define DATA_PATH "data/dataset_bmp"
+
 int imgMain() {
     //Initialisation
     SDL_Window *win = 0;
@@ -32,7 +39,11 @@ int imgMain() {
         return -1;
     }
     //Image Loading
-    SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
+    // SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
+    // SDL_Surface *sur = SDL_LoadBMP("res/arev.bmp"); // Too light
+    SDL_Surface *sur = SDL_LoadBMP("res/arev_bold.bmp");
+    // SDL_Surface *sur = SDL_LoadBMP("res/soutenance.bmp");
+    // SDL_Surface *sur = SDL_LoadBMP("res/neurones.bmp");
     // SDL_Surface *sur = SDL_LoadBMP("res/hello.bmp");
     // SDL_Surface *sur = SDL_LoadBMP("res/v_u.bmp");
     if (!sur)
@@ -95,12 +106,15 @@ int imgMain() {
     // TODO : Remove free : drawLines(result, dar);
 
 
+    // --- Init net ---
+    // Load network part
+    Network *net = buildNetwork(1);
+    Dataset *dataset = malloc(sizeof(Dataset));
 
-    printf("  Found %zu lines\n\n", dar.length);
+    aiLoad(net, dataset, NET_PATH);
 
-    // TODO : 1 not 3
-    for (int line = 3; line < dar.length; line += 2) {
-        printf("Line %d -> %d\n", dar.array[line - 1], dar.array[line]);
+    for (int line = 1; line < dar.length; line += 2) {
+        // printf("Line %d -> %d\n", dar.array[line - 1], dar.array[line]);
 
         // We suppose that there are less than 512 chars
         char *lineStr = malloc(512);
@@ -122,9 +136,17 @@ int imgMain() {
             }
             puts("---");
 
+            Prediction pred = predict(net, dataset, charMatrices[c]);
+            lineStr[c] = pred.best;
+            // printf("P = %.1f %%\n", pred.prob * 100);
+
             free(boxes[c]);
             matrixFree(charMatrices[c]);
         }
+
+        lineStr[nchars] = 0;
+
+        printf("> %s\n", lineStr);
 
         free(boxes);
         free(charMatrices);
@@ -136,33 +158,10 @@ int imgMain() {
         return 0;
     }
 
-    // for (int line = 0; line < dar.length; ++line) {
-    // // for (int line = 2; line == 2; ++line) {
-    //     // TODO : Network
-    //     const char *lineStr = "";
-    //     // char *lineStr = lineAnalysis(result, NULL,
-    //     //         line == 0 ? 0 : dar.array[line - 1],
-    //     //         dar.array[line],
-    //     //         line + 1 == dar.length ?
-    //     //             result->rows : dar.array[line + 1]);
+    // Free net
+    networkFree(net);
+    free(dataset);
 
-    //     printf("Line %d (%d) : '%s'\n", line, dar.array[line], lineStr);
-
-    //     // TODO : Save lineStr
-    //     // free(lineStr);
-    // }
-
-
-
-
-
-    //Character analysis
-    // NE PAS UNCOMMENT SEGMENTATION FAULT !
-    /*CaractersAnalysis(ren, result, 0, dar.array[0] - 1);
-    SDL_Delay(1000);
-    for (int i = 0; i + 1 < dar.length; i++) {
-    	CaractersAnalysis(ren, matrix, dar.array[i], dar.array[i + 1] - 1);
-    }*/
 
     //Matrix Freedom
     matrixToGrey(sur, result);
@@ -199,8 +198,8 @@ int imgMain() {
 static const size_t dispFreq = 5;
 static const float learningRate = 1e-3;
 static const unsigned int batchSize = 100;
-static const size_t epochs = 15;
-static const float momentum = .1f;
+static const size_t epochs = 50;
+static const float momentum = .08f;
 
 static void trainCallback(size_t epoch, size_t batch, float loss) {
     if (batch % dispFreq == 0)
@@ -210,7 +209,9 @@ static void trainCallback(size_t epoch, size_t batch, float loss) {
 // Builds the network used in the OCR
 Network *buildNetwork(size_t nClasses) {
     Layer *layers[] = {
-            denseNew(32 * 32, 128),
+            denseNew(32 * 32, 256),
+            sigmoidNew(),
+            denseNew(256, 128),
             sigmoidNew(),
             denseNew(128, nClasses),
             softmaxNew(),
@@ -225,11 +226,6 @@ Network *buildNetwork(size_t nClasses) {
 }
 
 int trainMain() {
-#define SESSION "1"
-#define NET_DIR "weights/"
-#define NET_PATH (NET_DIR SESSION "/")
-#define DATA_PATH "data/dataset_bmp"
-
     puts("----- Training Mode -----");
     printf("> Training network (from scratch) in %s with dataset in %s\n",
             NET_PATH, DATA_PATH);

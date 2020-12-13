@@ -1,1 +1,1 @@
-abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.,;!?"'
+abcdefghklmnopqrstuvwxyz.
