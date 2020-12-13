@@ -13,7 +13,7 @@ def bounds_traversal(im, visited, box, i, j, y, w, h):
         i, j = s.pop()
         visited[i * w + j] = True
 
-        if im.getpixel((j, y + i))[0] > .9:
+        if im.getpixel((j, y + i))[0] > .5:
             continue
 
         box[0] = min(box[0], j)
@@ -45,25 +45,16 @@ def bounds(im, y, w, h):
     visited = [False] * w * h
     for i in range(h):
         for j in range(w):
-            if y + i >= im.height:
-                print(y + i, im.height)
-
             # Found
-            if not visited[i * w + j] and im.getpixel((j, y + i))[0] < .9:
+            if not visited[i * w + j] and im.getpixel((j, y + i))[0] < .5:
                 visited[i * w + j] = True
 
                 if box == []:
                     box = [j, i, j, i]
 
                 bounds_traversal(im, visited, box, i, j, y, w, h)
-                # print('Traversal', j, i)
             else:
                 visited[i * w + j] = True
-
-    # print(box)
-
-    # box[2] = box[2] - box[0]
-    # box[3] = box[3] - box[1]
 
     box[1] += y
     box[3] += y
@@ -76,9 +67,40 @@ def bounds(im, y, w, h):
     return box
 
 
+def bounds2(im, y, w, h):
+    if y + h > im.height:
+        h = im.height - y
+
+    box = []
+    for i in range(h):
+        for j in range(w):
+            # Found
+            if im.getpixel((j, y + i))[0] < .9 or \
+                    im.getpixel((j, y + i))[1] < .9 or \
+                    im.getpixel((j, y + i))[2] < .9 :
+                if box == []:
+                    box = [j, i, j + 1, i + 1]
+                else:
+                    box[0] = min(box[0], j)
+                    box[1] = min(box[1], i)
+                    box[2] = max(box[2], j)
+                    box[3] = max(box[3], i)
+
+    box[0] = max(0, box[0] - 4)
+    box[1] += y - 4
+    box[2] += 4
+    box[3] += y + 4
+
+    assert box[2] - box[0] > 2 and box[3] - box[1] > 2, \
+            f'Too small char detected : {box}'
+
+    return box
+
+
 # Whole section height
 height = 73
 width = 24
+# width = 100
 # Gap before
 dy = 6
 # Height of the char
@@ -106,7 +128,8 @@ for impath in impaths:
         y = dy + di * height
 
         try:
-            box = bounds(im, y, width, height)
+            box = bounds2(im, y, width, height)
+            # box = 0, y, width, y + img_height
         except Exception as e:
             raise Exception(f'!!! Char {content[i]}, font {name} : {e}')
 
@@ -121,8 +144,7 @@ for impath in impaths:
             nheight = 32
             nwidth = w * 32 // h
 
-        # TODO : Nearest neighbor
-        char = char.resize((nwidth, nheight))
+        char = char.resize((nwidth, nheight), resample=Image.NEAREST)
         newimg = Image.new('RGB', (32, 32), color='#ffffff')
         newimg.paste(char)
 
