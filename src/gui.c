@@ -63,8 +63,13 @@ int gui_analysis(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surf
         }
         if (event.type == SDL_KEYDOWN)
         {
-            if(event.key.keysym.sym == SDLK_v && (SDL_GetModState() & KMOD_CTRL) && SDL_HasClipboardText())
+            // TODO : If not working, remove text
+            if(event.key.keysym.sym == SDLK_c &&
+                    (SDL_GetModState() & KMOD_CTRL) &&
+                    SDL_HasClipboardText())
             {
+                puts("CTRL C");
+
                 char *tmp = SDL_GetClipboardText();
                 size_t l = strlen(tmp);
                 size_t l_copy = len + l < 100 ? l : 100 - len;
@@ -109,6 +114,7 @@ int gui_analysis(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surf
 
             token = strtok(NULL, "\n");
         }
+        free(nresult);
 
         SDL_UpdateWindowSurface(ecran);
         SDL_Delay(10);
@@ -456,11 +462,10 @@ int gui(Network *net, Dataset *dataset)
                 // Segfault here
                 // page= gui_image_validation(ecran,texte,police,pSurf,surImage);
             }
+            printf("page = %d\n", page);
             break;
         case 5:
             page = gui_analysis(ecran,texte,police,pSurf,surImage);
-            // TODO
-            puts("gui_analysis ended, OK");
             break;
         }
     }

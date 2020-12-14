@@ -1,4 +1,5 @@
 #include "ocr.h"
+#include <math.h>
 #include "tools.h"
 #include "matrix.h"
 #include "error.h"
@@ -14,6 +15,9 @@
 #include "save.h"
 #include "analysis.h"
 #include "gui.h"
+
+#define SPACE_TEMPERATURE .9
+#define GAP(i) (boxes[i + 1]->b.x - boxes[i]->c.x)
 
 char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset) {
     //Matrixes Initialisation
@@ -41,8 +45,6 @@ char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset) {
     matrixSet(convo2, 2, 1, -1);
     matrixSet(convo2, 2, 2, 0);
 
-    puts("Cc 0");
-
     //Image to Matrix
     imageToGrey(sur);
     Matrix *matrix = greyToMatrix(sur);
@@ -50,8 +52,6 @@ char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset) {
     Matrix *inter = convolution(matrix, convo);
     Matrix *result = convolution(matrix, convo2);
     matrixToBinary(result);
-
-    puts("Cc 1");
 
     //Block analysis
     /*rectangle bloc = {{result->cols - 1, 0}, {0, result->rows - 1}};
@@ -72,7 +72,6 @@ char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset) {
     //Line analysis
     dyn_arr dar = getLines(result);
 
-    puts("Cc 3");
     char *text = malloc(10000);
     text[0] = 0;
     int textLen = 0;
@@ -83,50 +82,69 @@ char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset) {
         Matrix **charMatrices = malloc(sizeof(Matrix*) * 512);
         size_t nchars;
 
-         lineAnalysis(result,
+        lineAnalysis(result,
                 dar.array[line - 1], dar.array[line],
                 boxes, charMatrices, &nchars);
+
+        // TODO
+        // i j edge cases
+        // Pr tt couple caractere
+        //   Si char le plus haut .x >= bas.x et haut.x2 <= bas.x2
+        //     Merge boxes
+
+        // Stats
+        double avgGap = 0;
+        double stdGap = 0;
+        for (size_t i = 0; i < nchars - 1; ++i) {
+            double gap = GAP(i);
+            if (gap < 0)
+                continue;
+
+            avgGap += gap;
+        }
+        avgGap /= nchars;
+
+        for (size_t i = 0; i < nchars - 1; ++i) {
+            double gap = GAP(i);
+            if (gap < 0)
+                continue;
+
+            stdGap += (avgGap - gap) * (avgGap - gap);
+        }
+        stdGap = sqrt(stdGap / nchars);
 
         for (size_t c = 0; c < nchars; ++c) {
             Prediction pred = predict(net, dataset, charMatrices[c]);
             text[textLen++] = pred.best;
 
+            // Detect space
+            if (c < nchars - 1) {
+                double gap = GAP(c);
+                if (gap > avgGap + stdGap * SPACE_TEMPERATURE)
+                    text[textLen++] = ' ';
+            }
+
+
             free(boxes[c]);
             matrixFree(charMatrices[c]);
         }
 
-        // lineStr[nchars] = 0;
-
-        // printf("> %s\n", lineStr);
-
         free(boxes);
         free(charMatrices);
 
-        // TODO : Save lineStr
-        // free(lineStr);
-        // puts("");
-
-        // return 0;
-        //
         text[textLen++] = '\n';
     }
 
-    puts("Cc 4");
     text[textLen] = 0;
     printf("Text (%zu) : %s\n", strlen(text), text);
 
     //Matrix Freedom
-    // matrixToGrey(sur, result);
+    // TODO : matrixToGrey(sur, result);
     matrixFree(matrix);
     matrixFree(convo);
     matrixFree(convo2);
     matrixFree(inter);
     matrixFree(result);
-
-    puts("Cc 5");
-
-    //Saving the image
-    //SDL_SaveBMP(sur, "res/bloc3.bmp");
 
     return text;
 }
