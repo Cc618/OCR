@@ -920,10 +920,6 @@ static int boxCmp(const rectangle **a, const rectangle **b) {
 
 void lineAnalysis(const Matrix *image, int startY, int endY,
         rectangle **boxes, Matrix **matrices, size_t *nchars) {
-    // TODO : Clean code
-    // char *str = malloc(512);
-    // rectangle **boxes = malloc(sizeof(rectangle*) * 512);
-
     // We use a traversal like it were a graph with 2 classes
     // (black / white pixels)
     // We suppose that the first pixel is white
@@ -963,7 +959,6 @@ void lineAnalysis(const Matrix *image, int startY, int endY,
                     }
 
                     boxes[*nchars] = box;
-                    // LOGBOX(*boxes[nchars]);
 
                     ++*nchars;
                 }
@@ -978,23 +973,8 @@ void lineAnalysis(const Matrix *image, int startY, int endY,
     qsort(boxes, *nchars, sizeof(rectangle*),
             (int(*)(const void*, const void*))boxCmp);
 
-    // puts("---");
     for (size_t c = 0; c < *nchars; ++c) {
         // Resize
-        matrices[c]= charResize(image, boxes[c]);
-
-
-        // str[c] = '?';
-
-        // matrixFree(resized);
-        // free(boxes[c]);
+        matrices[c] = charResize(image, boxes[c]);
     }
-
-    // printf("nchars = %d\n", *nchars);
-
-    // free(boxes);
-
-    // str[nchars] = 0;
-
-    // return str;
 }

@@ -29,22 +29,32 @@ void print_text(char* str, SDL_Window *ecran,SDL_Surface *texte,int x, int y, TT
 }
 int gui_analysis(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf, SDL_Surface *surImage)
 {
+    puts("gui_analysis()");
+
     SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 200, 255));
     print_text("Analysis running, please wait...",ecran,texte,0,0,police, pSurf);
     SDL_UpdateWindowSurface(ecran);
+
     //Lancement de la fonction analyse sur SDL_Surface *surImage.
     //A retourner : la string result, et sa longueur len.
+    // TODO : Clean
+    puts("Starting to fetch text");
     char* result = ocr(surImage, guiNet, guiDataset);
-    // TODO
     puts("OK");
     printf("> Got result %s\n", result);
-    return;
     int len = strlen(result);
+
 
     FILE* fichier = NULL;
     fichier = fopen("result.txt", "w");
     fprintf(fichier,"%s",result);
     fclose(fichier);
+
+    puts("Saved text in result.txt");
+
+    // TODO
+    return 1;
+
     SDL_Event event;
     char continuer = 1;
     int choix = 0;
@@ -405,7 +415,7 @@ int gui(Network *net, Dataset *dataset)
     int page = 1;
     while (page)
     {
-        printf("%d",page);
+        printf("* GUI page = %d\n",page);
         switch(page)
         {
         case 1:
@@ -430,6 +440,8 @@ int gui(Network *net, Dataset *dataset)
             break;
         case 5:
             page = gui_analysis(ecran,texte,police,pSurf,surImage);
+            // TODO
+            puts("gui_analysis ended, OK");
             break;
         }
     }
