@@ -82,4 +82,7 @@ void verticalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr
 //Draw a rectangle on the matrix
 void drawRectangle(Matrix *matrix, rectangle rec);
 
+//Turns the matrix on a teta angle(degree).
+Matrix *rotation(Matrix *matrix, double angle);
+
 #endif

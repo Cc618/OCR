@@ -55,7 +55,7 @@ int imgMain() {
     }
 
     //Matrixes Initialisation
-    //Gommage
+    //Erasing
     Matrix *convo = matrixZero(3, 3);
     matrixSet(convo, 0, 0, 0.1111111);
     matrixSet(convo, 0, 1, 0.1111111);
@@ -82,9 +82,17 @@ int imgMain() {
     //Image to Matrix
     imageToGrey(sur);
     Matrix *matrix = greyToMatrix(sur);
-    matrixToGrey(sur, matrix);
+    //matrixToGrey(sur, matrix);
+
+    //Rotation
+    /*double angle = 0.0;
+    Matrix *test = rotation(matrix, angle);*/
+
+
+    //Convolution
     Matrix *inter = convolution(matrix, convo);
-    Matrix *result = convolution(matrix, convo2);
+    Matrix *inter2 = convolution(inter, convo);
+    Matrix *result = convolution(inter2, convo2);
     matrixToBinary(result);
 
     //Block analysis
@@ -164,17 +172,17 @@ int imgMain() {
     networkFree(net);
     free(dataset);
 
+    //Saving the image
+    matrixToGrey(sur, result);
+    //SDL_SaveBMP(sur, "res/bloc3.bmp");
 
     //Matrix Freedom
-    matrixToGrey(sur, result);
     matrixFree(matrix);
     matrixFree(convo);
     matrixFree(convo2);
     matrixFree(inter);
+    matrixFree(inter2);
     matrixFree(result);
-
-    //Saving the image
-    //SDL_SaveBMP(sur, "res/bloc3.bmp");
 
     //Image Printing
     SDL_CreateWindowAndRenderer(1000, 1200,0,&win,&ren);

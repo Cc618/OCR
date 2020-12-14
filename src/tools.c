@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include "matrix.h"
 #include "tools.h"
 
@@ -397,7 +398,7 @@ void horizontalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *a
 			}
 			j++;
 		}
-		if (j == bx) {
+		if (j == bx) {//bx
 			accu++;
 		} 
 		i++;
@@ -428,16 +429,16 @@ void verticalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr
 	size_t by = b.y;
 	size_t cx = c.x;
 	size_t cy = c.y;
-	//On parcourt toute la ligne à la recherche d'une ligne blanche
+	//We search all the vertical line looking for a blank horizontal line.
 	size_t i = cx;
-	//accu représente le nombre de colonnes bonnes.
+	//accu represents the number of correct colomns.
 	size_t accu = 0;
-	//begin est un boolean qui indique si on a deja passé un pixel noir.
+	//begin is used as a boolean for if we already find a black pixel
 	short begin = 0;
 	while (begin != 1 && i < bx) {
 		size_t j = by;
 		while (begin != 1 && j < cy) {
-			//Si on a trouvé un pixel noir.
+			//If we find a black pixel
 			if (matrixGet(matrix, j, i) != 1) {
 				begin++;
 			}
@@ -446,12 +447,12 @@ void verticalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr
 		i++;
 	}
 	while (begin != 0 && i < bx && accu < threshold) {
-		//clean est un boolean correspondant si la ligne est vide ou non
+		//clear is used as a boolean for knowing if the line is empty or not
 		short clean = 1;
 		size_t j = by;
-		//Si elle est vide on continue jusqu'à threshold
+		//If it's empty, we continue until threshold
 		while (clean != 0 && j < cy) {
-			//Si elle ne l'est pas on recommence sur les lignes d'après
+			//If it's not, we restart on the following lines
 			if (matrixGet(matrix, j, i) != 1) {
 				clean--;
 				accu = 0;
@@ -463,21 +464,21 @@ void verticalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr
 		}
 		i++;
 	}
-	//Si on est arrivé jusqu'à threshold, on découpe en deux le bloc et on relance le découpage sur les deux
+	//If we arrive at threshold, we split the bloc in half and restart the slicing on both
 	if (accu == threshold && i != 1) {
 		rectangle left = {{i - 1, by}, c};
 		rectangle right = {b, {i, cy}};
 		verticalCut(matrix, left, threshold, arr, 0);
 		verticalCut(matrix, right, threshold, arr, 0);
 	}
-	//Si on peut pas le découper, on stocke le bloc dans l'array
+	//If we can't, we stock the array.
 	else if (accu != 0) {
 		if (krisbool != 0) {
 			arr->array[arr->length] = bloc;
 			arr->length++;
 		}
 		else {
-			horizontalCut(matrix, bloc, 40, arr, 1);
+			horizontalCut(matrix, bloc, 60, arr, 1);
 		}
 	}
 }
@@ -500,4 +501,30 @@ void drawRectangle(Matrix *matrix, rectangle rec) {
 		matrixSet(matrix, j, ax, 0);
 		matrixSet(matrix, j, bx, 0); 
 	}
+}
+
+//Turns the image on a teta angle
+Matrix *rotation(Matrix *matrix, double angle) {
+	double teta = (2 * 3.141559 * angle) / 360.0;
+	double costeta = cos(-teta);
+	double sinteta = sin(-teta);
+	int rows = (int)matrix->rows;
+	int cols = (int)matrix->cols;
+	int x0 = cols / 2;
+	int y0 = rows / 2;
+	Matrix *result = matrixZero(rows, cols);
+	matrixAdd(result, 1.0);
+	for (int x = 0; x < cols; x++) {
+		for (int y = 0; y < rows; y++) {
+			int xoff = x - x0;
+			int yoff = y - y0;
+			int x2 = (int)(xoff * costeta -yoff * sinteta + x0);
+			int y2 = (int)(xoff * sinteta +yoff * costeta + y0);
+			if (x2 >= 0 && y2 >= 0 && x2 < cols && y2 < rows) {
+				float value = matrixGet(matrix, y, x);
+				matrixSet(result, y2, x2, value);
+			}
+		}
+	}
+	return result;
 }
