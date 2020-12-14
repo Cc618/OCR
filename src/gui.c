@@ -13,11 +13,15 @@
 static Network *guiNet;
 static Dataset *guiDataset;
 
-void print_text(char* str, SDL_Window *ecran,SDL_Surface *texte,int x, int y, TTF_Font *police,SDL_Surface *pSurf)
+#define COL_BLACK ((SDL_Color){0,0,0, 255})
+#define COL_RED ((SDL_Color){230,50,30, 255})
+
+void print_text(char* str, SDL_Window *ecran,SDL_Surface *texte,int x, int y,
+        TTF_Font *police,SDL_Surface *pSurf, SDL_Color color)
 {
     if (str[0])
     {
-        texte = TTF_RenderText_Blended(police, str, (SDL_Color){0,0,0, 255});
+        texte = TTF_RenderText_Blended(police, str, color);
         SDL_Rect position;
         position.x = x;
         position.y = y;
@@ -33,7 +37,7 @@ int gui_analysis(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surf
     puts("gui_analysis()");
 
     SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 200, 255));
-    print_text("Analysis running, please wait...",ecran,texte,0,0,police, pSurf);
+    print_text("Analysis running, please wait...",ecran,texte,0,0,police, pSurf, COL_BLACK);
     SDL_UpdateWindowSurface(ecran);
 
     //Lancement de la fonction analyse sur SDL_Surface *surImage.
@@ -84,23 +88,27 @@ int gui_analysis(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surf
 
         SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 200, 255));
 
-        int dy = 100;
-        int textY = 0;
+        int dy = 60;
+        int textY = -dy;
+
+        print_text("New analysis",ecran,texte,70,textY += dy,police, pSurf, COL_BLACK);
+        print_text("Credits",ecran,texte,70,textY += dy,police, pSurf, COL_BLACK);
+        print_text("Exit",ecran,texte,70,textY += dy,police, pSurf, COL_BLACK);
+        print_text(">",ecran,texte,0,textY - (2 - choix) * dy,police, pSurf, COL_BLACK);
+
+        print_text("Result saved in the clipboard and in result.txt",
+                ecran,texte,0,textY += dy,police, pSurf, COL_BLACK);
+        print_text("* Result :",
+                ecran,texte,0,textY += dy,police, pSurf, COL_BLACK);
 
         // Display result line by line
         char *nresult = strdup(result);
         char *token = strtok(nresult, "\n");
         while (token != NULL) {
-            print_text(token, ecran, texte, 0, textY += dy, police, pSurf);
+            print_text(token, ecran, texte, 0, textY += dy, police, pSurf, COL_RED);
 
             token = strtok(NULL, "\n");
         }
-
-        print_text("New analysis",ecran,texte,70,textY += dy,police, pSurf);
-        print_text("Credits",ecran,texte,70,textY += dy,police, pSurf);
-        print_text("Exit",ecran,texte,70,textY += dy,police, pSurf);
-        print_text("Use Ctrl+V the result.txt file",ecran,texte,0,textY += dy,police, pSurf);
-        print_text(">",ecran,texte,0,textY - (3 - choix) * dy,police, pSurf);
 
         SDL_UpdateWindowSurface(ecran);
         SDL_Delay(10);
@@ -143,11 +151,11 @@ int gui_error_loading(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL
             }
         }
         SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 255, 200, 200));
-        print_text("No image found...",ecran,texte,0,0,police, pSurf);
-        print_text("Enter new location",ecran,texte,70,100,police, pSurf);
-        print_text("Cancel",ecran,texte,70,200,police, pSurf);
-        print_text("Exit",ecran,texte,70,300,police, pSurf);
-        print_text(">",ecran,texte,0,100+choix*100,police, pSurf);
+        print_text("No image found...",ecran,texte,0,0,police, pSurf, COL_BLACK);
+        print_text("Enter new location",ecran,texte,70,100,police, pSurf, COL_BLACK);
+        print_text("Cancel",ecran,texte,70,200,police, pSurf, COL_BLACK);
+        print_text("Exit",ecran,texte,70,300,police, pSurf, COL_BLACK);
+        print_text(">",ecran,texte,0,100+choix*100,police, pSurf, COL_BLACK);
         SDL_UpdateWindowSurface(ecran);
         SDL_Delay(10);
     }
@@ -190,7 +198,7 @@ int gui_image_validation(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,
     dst4.h = 80;
     //Préparation des images...
     SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 255, 200));
-    print_text(">",ecran,texte,0,0, police,pSurf);
+    print_text(">",ecran,texte,0,0, police,pSurf, COL_BLACK);
     SDL_Texture *texIcone = SDL_CreateTexture(ren,SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET,100,100);
     SDL_SetTextureBlendMode(texIcone,SDL_BLENDMODE_BLEND);
     SDL_Texture *texScreen = SDL_CreateTextureFromSurface(ren,pSurf);
@@ -198,9 +206,9 @@ int gui_image_validation(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,
     SDL_RenderCopy(ren, texScreen, NULL, &dst2);
     SDL_SetRenderTarget(ren,NULL);
     SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 255, 200));
-    print_text("Here is the image",ecran,texte,0,0,police, pSurf);
-    print_text("Confirm",ecran,texte,70,100,police, pSurf);
-    print_text("Abort",ecran,texte,70,200,police, pSurf);
+    print_text("Here is the image",ecran,texte,0,0,police, pSurf, COL_BLACK);
+    print_text("Confirm",ecran,texte,70,100,police, pSurf, COL_BLACK);
+    print_text("Abort",ecran,texte,70,200,police, pSurf, COL_BLACK);
     texScreen = SDL_CreateTextureFromSurface(ren,pSurf);
     //Début du code
     SDL_Event event;
@@ -250,11 +258,11 @@ int gui_credits(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surfa
 {
     SDL_Event event;
     SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 200, 255));
-    print_text("The team :",ecran,texte,0,0,police, pSurf);
-    print_text("Raphael Brenn",ecran,texte,70,100,police, pSurf);
-    print_text("Leandre Perrot",ecran,texte,70,200,police, pSurf);
-    print_text("Celian Raimbault",ecran,texte,70,300,police, pSurf);
-    print_text("Steve Suissa",ecran,texte,0,400,police, pSurf);
+    print_text("The team :",ecran,texte,0,0,police, pSurf, COL_BLACK);
+    print_text("Raphael Brenn",ecran,texte,70,100,police, pSurf, COL_BLACK);
+    print_text("Leandre Perrot",ecran,texte,70,200,police, pSurf, COL_BLACK);
+    print_text("Celian Raimbault",ecran,texte,70,300,police, pSurf, COL_BLACK);
+    print_text("Steve Suissa",ecran,texte,0,400,police, pSurf, COL_BLACK);
     SDL_UpdateWindowSurface(ecran);
     char continuer = 1;
     while (continuer==1)
@@ -283,11 +291,11 @@ int gui_home(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface 
     while (continuer==1)
     {
         SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 200, 255));
-        print_text("Welcome to Iron Minds' OCR !",ecran,texte,0,0,police, pSurf);
-        print_text("Start analysis",ecran,texte,70,100,police, pSurf);
-        print_text("Credits",ecran,texte,70,200,police, pSurf);
-        print_text("Exit",ecran,texte,70,300,police, pSurf);
-        print_text(">",ecran,texte,0,100+choix*100,police, pSurf);
+        print_text("Welcome to Iron Minds' OCR !",ecran,texte,0,0,police, pSurf, COL_BLACK);
+        print_text("Start analysis",ecran,texte,70,100,police, pSurf, COL_BLACK);
+        print_text("Credits",ecran,texte,70,200,police, pSurf, COL_BLACK);
+        print_text("Exit",ecran,texte,70,300,police, pSurf, COL_BLACK);
+        print_text(">",ecran,texte,0,100+choix*100,police, pSurf, COL_BLACK);
         SDL_UpdateWindowSurface(ecran);
         SDL_Delay(10);
         SDL_WaitEvent(&event);
@@ -339,7 +347,7 @@ int text_selection(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Su
     while(!ending)
     {
         SDL_FillRect(pSurf,&champ, SDL_MapRGB(pSurf->format, 200, 255, 200));
-        print_text(("%s",rep),ecran,texte,-1,100,police, pSurf);
+        print_text(("%s",rep),ecran,texte,-1,100,police, pSurf, COL_BLACK);
         SDL_UpdateWindowSurface(ecran);
         SDL_bool has_type = SDL_FALSE;
         SDL_WaitEvent(&event);
@@ -386,10 +394,10 @@ int gui_select_image(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_
 {
     SDL_Event event;
     SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 200, 255));
-    print_text("Please enter image location",ecran,texte,0,0,police, pSurf);
-    print_text("CTRL+C / CTRL+V : Copy / paste",ecran,texte,0,200,police, pSurf);
-    print_text("ENTER : Validate",ecran,texte,0,300,police, pSurf);
-    print_text("ECHAP : Cancel",ecran,texte,0,400,police, pSurf);
+    print_text("Please enter image location",ecran,texte,0,0,police, pSurf, COL_BLACK);
+    print_text("CTRL+C / CTRL+V : Copy / paste",ecran,texte,0,200,police, pSurf, COL_BLACK);
+    print_text("ENTER : Validate",ecran,texte,0,300,police, pSurf, COL_BLACK);
+    print_text("ECHAP : Cancel",ecran,texte,0,400,police, pSurf, COL_BLACK);
     int a = text_selection(ecran,texte,police,pSurf,adresse);
     printf("%d,%s\n",a,adresse);
     if (a==2)
@@ -414,8 +422,8 @@ int gui(Network *net, Dataset *dataset)
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
     char* adresse = (char*)malloc(sizeof(char)*(100 + 1));
-    ecran = SDL_CreateWindow("OCR - Iron Minds Corporations", 100, 100,
-            1080, 720, SDL_WINDOW_SHOWN);
+    ecran = SDL_CreateWindow("OCR - Iron Minds Corporations", 50, 50,
+            1620, 960, SDL_WINDOW_SHOWN);
     SDL_Surface *pSurf = SDL_GetWindowSurface(ecran);
     SDL_Surface *surImage = NULL;
     police = TTF_OpenFont("res/Roboto-Regular.ttf", 44);
