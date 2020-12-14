@@ -1,6 +1,7 @@
 # Convert all pdfs to bmps
 
 import os
+from random import randint
 from glob import glob
 from pdf2image import convert_from_path
 from PIL import Image
@@ -87,10 +88,13 @@ def bounds2(im, y, w, h):
                     box[3] = max(box[3], i)
 
     pad = 2
-    box[0] = max(0, box[0] - 2)
-    box[1] += y - 2
-    box[2] += 2
-    box[3] += y + 2
+    dx = 0 # randint(0, pad // 2)
+    dy = randint(-pad // 2, pad // 2)
+
+    box[0] = max(0, box[0] - pad) + dx
+    box[1] += y - pad + dy
+    box[2] += pad + dx
+    box[3] += y + pad + dy
 
     assert box[2] - box[0] > 2 and box[3] - box[1] > 2, \
             f'Too small char detected : {box}'
@@ -136,14 +140,16 @@ for impath in impaths:
 
         char = im.crop(box)
 
+        dstretch = randint(-2, 4)
+
         w = box[2] - box[0]
         h = box[3] - box[1]
         if w > h:
             nwidth = 32
-            nheight = h * 32 // w
+            nheight = max(0, min(32, h * 32 // w + dstretch))
         else:
             nheight = 32
-            nwidth = w * 32 // h
+            nwidth = max(0, min(32, w * 32 // h + dstretch))
 
         char = char.resize((nwidth, nheight), resample=Image.NEAREST)
         newimg = Image.new('RGB', (32, 32), color='#ffffff')

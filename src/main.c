@@ -205,11 +205,11 @@ int imgMain() {
 }
 
 // Hyper parameters
-static const size_t dispFreq = 10;
+static const size_t dispFreq = 5;
 static const float learningRate = 1e-3;
-static const unsigned int batchSize = 100;
+static const unsigned int batchSize = 200;
 static const size_t epochs = 75;
-static const float momentum = .08f;
+static const float momentum = .1f;
 
 static void trainCallback(size_t epoch, size_t batch, float loss) {
     if (batch % dispFreq == 0)
