@@ -6,6 +6,8 @@
 
 // To detect i / j we add a padding for more precision
 #define IJ_PAD 4
+#define MAX(a, b) ((a) >= (b) ? (a) : (b))
+#define MIN(a, b) ((a) <= (b) ? (a) : (b))
 
 CoordList* newCoordList()
 {
@@ -811,25 +813,6 @@ void CaractersAnalysis(SDL_Renderer *ren,Matrix* mat, int top, int down)
     free(result);
 }
 
-
-
-
-
-
-
-
-
-// --- Cc --- //
-// TODO : rm
-#define LOGBOX(box) printf("((%zu, %zu), (%zu, %zu)) => w = %zu, h = %zu\n", \
-        (box).b.x,(box).b.y,(box).c.x,(box).c.y,\
-        (box).c.x - (box).b.x, (box).c.y - (box).b.y);
-
-
-#define MAX(a, b) ((a) >= (b) ? (a) : (b))
-#define MIN(a, b) ((a) <= (b) ? (a) : (b))
-
-
 // Returns a 32x32 px matrix using nearest neighbors
 static Matrix *charResize(const Matrix *image, rectangle *box) {
     Matrix *mat = matrixNew(32, 32);
@@ -842,8 +825,6 @@ static Matrix *charResize(const Matrix *image, rectangle *box) {
     // Set new width to 32
     // Keep aspect ratio
     if (w > h) {
-        // TODO : Verify with a dash...
-
         // w2 / h2 = w / h
         // 1 / h2 = w / h / w2
         // h2 = h * w2 / w = h * 32 / w
@@ -863,7 +844,6 @@ static Matrix *charResize(const Matrix *image, rectangle *box) {
                 matrixSet(mat, i, j, 1.f);
     } else {
         size_t newWidth = w * 32 / h;
-        // printf("w = %d, h = %d, newWidth = %d\n", w, h, newWidth);
 
         for (size_t j = 0; j < newWidth; ++j)
             for (size_t i = 0; i < 32; ++i) {
@@ -931,7 +911,7 @@ void lineAnalysis(const Matrix *image, int startY, int endY,
     int *visited = calloc(height * image->cols, sizeof(int));
 
     *nchars = 0;
-    for (size_t i = 0; i < height; ++i) {
+    for (size_t i = 0; i < (size_t)height; ++i) {
         for (size_t j = 0; j < image->cols; ++j) {
             if (!visited[i * width + j]) {
                 // Found a char
@@ -954,7 +934,6 @@ void lineAnalysis(const Matrix *image, int startY, int endY,
                     box->c.x += pad;
 
                     size_t w = box->c.x - box->b.x;
-                    size_t h = box->c.y - box->b.y;
 
                     if (w <= 2 || height <= 2) {
                         free(box);
@@ -978,7 +957,6 @@ void lineAnalysis(const Matrix *image, int startY, int endY,
 
     // Detect Is and Js
     for (size_t c = 1; c < *nchars; ++c) {
-        // TODO : rm point
         rectangle *base = boxes[c - 1];
         rectangle *point = boxes[c];
 
@@ -1008,37 +986,8 @@ void lineAnalysis(const Matrix *image, int startY, int endY,
 
     free(cpy);
 
-
-    // int lastNull = -1;
-    // int charI = 0;
-    // for (; charI < *nchars; ++charI) {
-    //     if (!boxes[charI]) {
-    //         if (lastNull != -1) {
-    //             // Swap
-    //             boxes[lastNull] = boxes[charI];
-    //         }
-    //             puts("OK");
-
-    //         lastNull = charI;
-    //     }
-    // }
-
-    // if (lastNull != -1)
-    //     *nchars = lastNull;
-
+    // Resize
     for (size_t c = 0; c < *nchars; ++c) {
-        // Resize
         matrices[c] = charResize(image, boxes[c]);
-
-        // TODO : Rm
-        // for (size_t i = 0; i < 32; ++i) {
-        //     for (size_t j = 0; j < 32; ++j)
-        //         printf("%c", matrixGet(matrices[c], i, j) > .5f ?
-        //                 '.' : '#');
-        //     puts("");
-        // }
-        // puts("---");
     }
-
-    // *nchars = charI;
 }
