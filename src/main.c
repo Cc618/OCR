@@ -337,7 +337,7 @@ int appMain() {
         return -1;
     }
 
-    gui();
+    gui(net, dataset);
 
     // Free everything
     networkFree(net);

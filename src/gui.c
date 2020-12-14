@@ -5,6 +5,11 @@
 #include <string.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include "network.h"
+#include "data.h"
+
+static Network *guiNet;
+static Dataset *guiDataset;
 
 void print_text(char* str, SDL_Window *ecran,SDL_Surface *texte,int x, int y, TTF_Font *police,SDL_Surface *pSurf)
 {
@@ -26,12 +31,15 @@ int gui_analysis(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surf
     SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 200, 255));
     print_text("Analysis running, please wait...",ecran,texte,0,0,police, pSurf);
     SDL_UpdateWindowSurface(ecran);
-    char* result = NULL;
-    int len = 0;
-    // TODO
     //Lancement de la fonction analyse sur SDL_Surface *surImage.
     //A retourner : la string result, et sa longueur len.
-    result = "";
+    char* result = ocr(surImage, guiNet, guiDataset);
+    // TODO
+    puts("OK");
+    printf("> Got result %s\n", result);
+    return;
+    int len = strlen(result);
+
     FILE* fichier = NULL;
     fichier = fopen("result.txt", "w");
     fprintf(fichier,"%s",result);
@@ -81,6 +89,9 @@ int gui_analysis(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surf
         SDL_UpdateWindowSurface(ecran);
         SDL_Delay(10);
     }
+
+    // TODO : free(result);
+
     if (!continuer || choix==2)
         return 0;
     if (!choix)
@@ -373,8 +384,11 @@ int gui_select_image(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_
     return 0;
 }
 
-int gui ()
+int gui(Network *net, Dataset *dataset)
 {
+    guiNet = net;
+    guiDataset = dataset;
+
     SDL_Window *ecran = NULL;
     SDL_Surface *texte = NULL; //*fond = NULL;
     TTF_Font *police = NULL;
