@@ -7,6 +7,7 @@
 #include <SDL2/SDL_ttf.h>
 #include "network.h"
 #include "data.h"
+#include "ocr.h"
 
 static Network *guiNet;
 static Dataset *guiDataset;
@@ -15,7 +16,7 @@ void print_text(char* str, SDL_Window *ecran,SDL_Surface *texte,int x, int y, TT
 {
     if (str[0])
     {
-        texte = TTF_RenderText_Blended(police, str, (SDL_Color){0,0,0});
+        texte = TTF_RenderText_Blended(police, str, (SDL_Color){0,0,0, 255});
         SDL_Rect position;
         position.x = x;
         position.y = y;

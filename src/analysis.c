@@ -920,6 +920,7 @@ static int boxCmp(const rectangle **a, const rectangle **b) {
 
 void lineAnalysis(const Matrix *image, int startY, int endY,
         rectangle **boxes, Matrix **matrices, size_t *nchars) {
+    // TODO : Clean code
     // char *str = malloc(512);
     // rectangle **boxes = malloc(sizeof(rectangle*) * 512);
 
@@ -971,8 +972,11 @@ void lineAnalysis(const Matrix *image, int startY, int endY,
         }
     }
 
+    free(visited);
+
     // Sort by x
-    qsort(boxes, *nchars, sizeof(rectangle*), boxCmp);
+    qsort(boxes, *nchars, sizeof(rectangle*),
+            (int(*)(const void*, const void*))boxCmp);
 
     // puts("---");
     for (size_t c = 0; c < *nchars; ++c) {

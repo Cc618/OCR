@@ -113,7 +113,7 @@ char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset) {
 
     puts("Cc 4");
     text[textLen] = 0;
-    printf("Text (%d) : %s\n", strlen(text), text);
+    printf("Text (%zu) : %s\n", strlen(text), text);
 
     //Matrix Freedom
     // matrixToGrey(sur, result);
