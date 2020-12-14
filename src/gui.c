@@ -52,9 +52,6 @@ int gui_analysis(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surf
 
     puts("Saved text in result.txt");
 
-    // TODO
-    return 1;
-
     SDL_Event event;
     char continuer = 1;
     int choix = 0;
@@ -90,7 +87,11 @@ int gui_analysis(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surf
             }
         }
         SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 200, 255));
-        print_text("Analysis done",ecran,texte,0,0,police, pSurf);
+
+        // Display result
+        // TODO : Display lines
+        print_text(result, ecran, texte, 0, 0, police, pSurf);
+
         print_text("New analysis",ecran,texte,70,100,police, pSurf);
         print_text("Credits",ecran,texte,70,200,police, pSurf);
         print_text("Exit",ecran,texte,70,300,police, pSurf);
@@ -101,7 +102,7 @@ int gui_analysis(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surf
         SDL_Delay(10);
     }
 
-    // TODO : free(result);
+    free(result);
 
     if (!continuer || choix==2)
         return 0;
@@ -270,12 +271,23 @@ int gui_credits(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surfa
 
 int gui_home(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf)
 {
+    puts("gui_home()");
+
     SDL_Event event;
     char continuer = 1;
     int choix = 0;
     while (continuer==1)
     {
+        SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 200, 255));
+        print_text("Welcome to Iron Minds' OCR !",ecran,texte,0,0,police, pSurf);
+        print_text("Start analysis",ecran,texte,70,100,police, pSurf);
+        print_text("Credits",ecran,texte,70,200,police, pSurf);
+        print_text("Exit",ecran,texte,70,300,police, pSurf);
+        print_text(">",ecran,texte,0,100+choix*100,police, pSurf);
+        SDL_UpdateWindowSurface(ecran);
+        SDL_Delay(10);
         SDL_WaitEvent(&event);
+
         if(event.type==SDL_QUIT)
         {
             continuer = 0;
@@ -295,14 +307,6 @@ int gui_home(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface 
                     break;
             }
         }
-        SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 200, 255));
-        print_text("Welcome to Iron Minds' OCR !",ecran,texte,0,0,police, pSurf);
-        print_text("Start analysis",ecran,texte,70,100,police, pSurf);
-        print_text("Credits",ecran,texte,70,200,police, pSurf);
-        print_text("Exit",ecran,texte,70,300,police, pSurf);
-        print_text(">",ecran,texte,0,100+choix*100,police, pSurf);
-        SDL_UpdateWindowSurface(ecran);
-        SDL_Delay(10);
     }
     if (!continuer || choix==2)
         return 0;
@@ -410,11 +414,15 @@ int gui(Network *net, Dataset *dataset)
             1080, 720, SDL_WINDOW_SHOWN);
     SDL_Surface *pSurf = SDL_GetWindowSurface(ecran);
     SDL_Surface *surImage = NULL;
-    police = TTF_OpenFont("res/Roboto-Regular.ttf", 65);
+    police = TTF_OpenFont("res/Roboto-Regular.ttf", 44);
     printf("police : %d",police==NULL);
     int page = 1;
     while (page)
     {
+        // // TODO : rm
+        // page = 5;
+        // surImage = SDL_LoadBMP("res/hello.bmp");
+
         printf("* GUI page = %d\n",page);
         switch(page)
         {
@@ -435,7 +443,10 @@ int gui(Network *net, Dataset *dataset)
             }
             else
             {
-                page= gui_image_validation(ecran,texte,police,pSurf,surImage);
+                page = 5;
+
+                // Segfault here
+                // page= gui_image_validation(ecran,texte,police,pSurf,surImage);
             }
             break;
         case 5:
