@@ -8,6 +8,7 @@
 #include "network.h"
 #include "data.h"
 #include "ocr.h"
+#include "save.h"
 
 static Network *guiNet;
 static Dataset *guiDataset;
@@ -37,20 +38,14 @@ int gui_analysis(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surf
 
     //Lancement de la fonction analyse sur SDL_Surface *surImage.
     //A retourner : la string result, et sa longueur len.
-    // TODO : Clean
     puts("Starting to fetch text");
     char* result = ocr(surImage, guiNet, guiDataset);
-    puts("OK");
-    printf("> Got result %s\n", result);
     int len = strlen(result);
-
 
     FILE* fichier = NULL;
     fichier = fopen("result.txt", "w");
     fprintf(fichier,"%s",result);
     fclose(fichier);
-
-    puts("Saved text in result.txt");
 
     SDL_Event event;
     char continuer = 1;
@@ -86,18 +81,27 @@ int gui_analysis(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surf
                     break;
             }
         }
+
         SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 200, 255));
 
-        // Display result
-        // TODO : Display lines
-        print_text(result, ecran, texte, 0, 0, police, pSurf);
+        int dy = 100;
+        int textY = 0;
 
-        print_text("New analysis",ecran,texte,70,100,police, pSurf);
-        print_text("Credits",ecran,texte,70,200,police, pSurf);
-        print_text("Exit",ecran,texte,70,300,police, pSurf);
-        print_text("You can see your results by pressing Ctrl+V or reading "
-                "result.txt file.",ecran,texte,0,400,police, pSurf);
-        print_text(">",ecran,texte,0,100+choix*100,police, pSurf);
+        // Display result line by line
+        char *nresult = strdup(result);
+        char *token = strtok(nresult, "\n");
+        while (token != NULL) {
+            print_text(token, ecran, texte, 0, textY += dy, police, pSurf);
+
+            token = strtok(NULL, "\n");
+        }
+
+        print_text("New analysis",ecran,texte,70,textY += dy,police, pSurf);
+        print_text("Credits",ecran,texte,70,textY += dy,police, pSurf);
+        print_text("Exit",ecran,texte,70,textY += dy,police, pSurf);
+        print_text("Use Ctrl+V the result.txt file",ecran,texte,0,textY += dy,police, pSurf);
+        print_text(">",ecran,texte,0,textY - (3 - choix) * dy,police, pSurf);
+
         SDL_UpdateWindowSurface(ecran);
         SDL_Delay(10);
     }
@@ -419,10 +423,6 @@ int gui(Network *net, Dataset *dataset)
     int page = 1;
     while (page)
     {
-        // // TODO : rm
-        // page = 5;
-        // surImage = SDL_LoadBMP("res/hello.bmp");
-
         printf("* GUI page = %d\n",page);
         switch(page)
         {

@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include "matrix.h"
 
+#ifndef strdup
+char *strdup(const char *s);
+#endif
+
 // Used to store information relative to saving / loading
 typedef struct SaveContext_t {
     // Path to the directory where we save all matrices
