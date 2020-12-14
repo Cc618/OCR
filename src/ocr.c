@@ -17,7 +17,7 @@
 #include "gui.h"
 
 #define SPACE_TEMPERATURE .9
-#define GAP(i) (boxes[i + 1]->b.x - boxes[i]->c.x)
+#define GAP(i) ((int)boxes[i + 1]->b.x - (int)boxes[i]->c.x)
 
 char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset) {
     //Matrixes Initialisation
@@ -86,17 +86,12 @@ char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset) {
                 dar.array[line - 1], dar.array[line],
                 boxes, charMatrices, &nchars);
 
-        // TODO
-        // i j edge cases
-        // Pr tt couple caractere
-        //   Si char le plus haut .x >= bas.x et haut.x2 <= bas.x2
-        //     Merge boxes
-
         // Stats
         double avgGap = 0;
         double stdGap = 0;
         for (size_t i = 0; i < nchars - 1; ++i) {
             double gap = GAP(i);
+
             if (gap < 0)
                 continue;
 
@@ -120,10 +115,10 @@ char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset) {
             // Detect space
             if (c < nchars - 1) {
                 double gap = GAP(c);
+
                 if (gap > avgGap + stdGap * SPACE_TEMPERATURE)
                     text[textLen++] = ' ';
             }
-
 
             free(boxes[c]);
             matrixFree(charMatrices[c]);

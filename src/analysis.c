@@ -4,6 +4,9 @@
 #include "analysis.h"
 #include "tools.h"
 
+// To detect i / j we add a padding for more precision
+#define IJ_PAD 4
+
 CoordList* newCoordList()
 {
 	CoordList* newList = (CoordList*) malloc(sizeof(CoordList));
@@ -973,8 +976,69 @@ void lineAnalysis(const Matrix *image, int startY, int endY,
     qsort(boxes, *nchars, sizeof(rectangle*),
             (int(*)(const void*, const void*))boxCmp);
 
+    // Detect Is and Js
+    for (size_t c = 1; c < *nchars; ++c) {
+        // TODO : rm point
+        rectangle *base = boxes[c - 1];
+        rectangle *point = boxes[c];
+
+        // Found
+        if (point->c.y <= base->b.y &&
+                point->b.x >= base->b.x - IJ_PAD &&
+                point->c.x <= base->c.x + IJ_PAD) {
+            base->b.y = point->b.y;
+
+            // Remove point
+            free(boxes[c]);
+            boxes[c] = NULL;
+            c++;
+        }
+    }
+
+    // Remove NULLs
+    rectangle **cpy = malloc(sizeof(rectangle*) * *nchars);
+    memcpy(cpy, boxes, sizeof(rectangle*) * *nchars);
+    size_t oldNchars = *nchars;
+    *nchars = 0;
+    for (size_t i = 0; i < oldNchars; ++i) {
+        if (cpy[i]) {
+            boxes[(*nchars)++] = cpy[i];
+        }
+    }
+
+    free(cpy);
+
+
+    // int lastNull = -1;
+    // int charI = 0;
+    // for (; charI < *nchars; ++charI) {
+    //     if (!boxes[charI]) {
+    //         if (lastNull != -1) {
+    //             // Swap
+    //             boxes[lastNull] = boxes[charI];
+    //         }
+    //             puts("OK");
+
+    //         lastNull = charI;
+    //     }
+    // }
+
+    // if (lastNull != -1)
+    //     *nchars = lastNull;
+
     for (size_t c = 0; c < *nchars; ++c) {
         // Resize
         matrices[c] = charResize(image, boxes[c]);
+
+        // TODO : Rm
+        // for (size_t i = 0; i < 32; ++i) {
+        //     for (size_t j = 0; j < 32; ++j)
+        //         printf("%c", matrixGet(matrices[c], i, j) > .5f ?
+        //                 '.' : '#');
+        //     puts("");
+        // }
+        // puts("---");
     }
+
+    // *nchars = charI;
 }
