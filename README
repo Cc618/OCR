@@ -28,7 +28,27 @@ bin/ocr net
 
 + src - Folder for the source of the project. It contains our code :
   main.c = The all target, the program.
+  
+  ai.c = Contains the AI functions.
+  ai.h = Header for the ai.c with explanations of the functions.
+  
+  data.c = Contains the dataset functions.
+  data.h = Header for the data.c with explanations of the functions.
 
+  error.h = Used for detecting errors.
+  
+  gui.c = Contains the GUI functions.
+  gui.h = Header for the gui.c with explanations of the functions.
+  
+  ocr.c = Contains the wrapper functions.
+  ocr.h = Header for the ocr.c with explanations of the functions.
+  
+  save.c = Contains the saving functions.
+  save.h = Header for the save.c with explanations of the functions.
+  
+  train.c = Contains the training functions.
+  train.h = Header for the train.c with explanations of the functions.
+  
   matrix.c = Contains the matrix functions.
   matrix.h = Header for the matrix.c with explanations of the functions.
 
