@@ -438,7 +438,58 @@ int gui_angle(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface
         return -1;
     return a;
 }
-
+int gui_image_validation2(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf, SDL_Surface *surImage)
+{
+    SDL_Renderer* ren;
+    SDL_Window *picture = SDL_CreateWindow("OCR - Picture",0,0,surImage->w,surImage->h,SDL_WINDOW_SHOWN);
+    ren = SDL_CreateRenderer(picture,-1,SDL_RENDERER_ACCELERATED);
+    SDL_Texture *texImage = SDL_CreateTextureFromSurface(ren,surImage);
+    SDL_RenderCopy(ren, texImage, NULL, NULL);
+    SDL_RenderPresent(ren);
+    SDL_Event event;
+    char continuer = 1;
+    int choix = 0;
+    while (continuer==1)
+    {
+        SDL_WaitEvent(&event);
+        if(event.type==SDL_QUIT || (event.type == SDL_WINDOWEVENT
+        && event.window.event == SDL_WINDOWEVENT_CLOSE))
+        {
+            continuer = 0;
+        }
+        if (event.type == SDL_KEYDOWN)
+        {
+            switch(event.key.keysym.sym)
+            {
+                case SDLK_UP:
+                    choix = (choix+2)%3;
+                    break;
+                case SDLK_DOWN:
+                    choix = (choix+1)%3;
+                    break;
+                case SDLK_RETURN:
+                    continuer=2;
+                    break;
+            }
+        }
+        SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 200, 255));
+        print_text("Is the picture found the one you want ?",ecran,texte,0,0,police, pSurf);
+        print_text("Confirm",ecran,texte,70,100,police, pSurf);
+        print_text("Retry",ecran,texte,70,200,police, pSurf);
+        print_text("Exit",ecran,texte,70,300,police, pSurf);
+        print_text(">",ecran,texte,0,100+choix*100,police, pSurf);
+        SDL_UpdateWindowSurface(ecran);
+        SDL_Delay(10);
+    }
+    SDL_DestroyWindow(picture);
+    SDL_DestroyRenderer(ren);
+    SDL_DestroyTexture(texImage);
+    if (!continuer || choix==2)
+        return 0;
+    if (!choix)
+        return 6;
+    return 2;
+}
 int gui(Network *net, Dataset *dataset)
 {
     guiNet = net;
@@ -479,13 +530,15 @@ int gui(Network *net, Dataset *dataset)
             }
             else
             {
+                /*
                 SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, COL_BG));
                 print_text("Please close the image to continue",
                         ecran,texte,0,0,police, pSurf, COL_BLACK);
 
                 SDL_UpdateWindowSurface(ecran);
                 SDL_Delay(1000);
-                page = gui_image_validation(adresse);
+                page = gui_image_validation(adresse);*/
+                page = gui_image_validation2(ecran,texte,police,pSurf);
             }
             break;
         case 5:
