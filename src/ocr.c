@@ -69,8 +69,10 @@ char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset) {
 		b.x, b.y, c.x, c.y);
     }*/
 
+    rectangle winrect = { {result->cols - 1, 0}, {0, result->rows - 1} };
+
     //Line analysis
-    dyn_arr dar = getLines(result);
+    dyn_arr dar = getLines(result, winrect);
 
     char *text = malloc(10000);
     text[0] = 0;

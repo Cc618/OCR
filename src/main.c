@@ -96,25 +96,10 @@ int imgMain() {
     matrixToBinary(result);
 
     //Block analysis
-    /*rectangle bloc = {{result->cols - 1, 0}, {0, result->rows - 1}};
+    rectangle bloc = {{result->cols - 1, 0}, {0, result->rows - 1}};
     rectangle *array = malloc(500);
     rect_arr arr = {array, 0};
     horizontalCut(result, bloc, 40, &arr, 1);
-
-    //Print Rectangle Array
-    for (size_t i = 0; i < arr.length; i++) {
-	rectangle get_rect = arr.array[i];
-	drawRectangle(result, get_rect);
-	point b = get_rect.b;
-	point c = get_rect.c;
-	printf("b = (%li, %li) and c == (%li, %li)\n",
-		b.x, b.y, c.x, c.y);
-    }*/
-
-    //Line analysis
-    dyn_arr dar = getLines(result);
-    // TODO : Remove free : drawLines(result, dar);
-
 
     // --- Init net ---
     // Load network part
@@ -123,50 +108,66 @@ int imgMain() {
 
     aiLoad(net, dataset, NET_PATH);
 
-    for (int line = 1; line < dar.length; line += 2) {
-        // printf("Line %d -> %d\n", dar.array[line - 1], dar.array[line]);
+    //Print Rectangle Array
+    for (size_t i = 0; i < arr.length; i++) {
+        rectangle get_rect = arr.array[i];
+        //Line analysis
+        dyn_arr dar = getLines(result, get_rect);
+        // drawRectangle(result, get_rect);
+        point b = get_rect.b;
+        point c = get_rect.c;
 
-        // We suppose that there are less than 512 chars
-        char *lineStr = malloc(512);
-        rectangle **boxes = malloc(sizeof(rectangle*) * 512);
-        Matrix **charMatrices = malloc(sizeof(Matrix*) * 512);
-        size_t nchars;
+        for (int line = 1; line < dar.length; line += 2) {
+            // printf("Line %d -> %d\n", dar.array[line - 1], dar.array[line]);
 
-         lineAnalysis(result,
-                dar.array[line - 1], dar.array[line],
-                boxes, charMatrices, &nchars);
+            // We suppose that there are less than 512 chars
+            char *lineStr = malloc(512);
+            rectangle **boxes = malloc(sizeof(rectangle*) * 512);
+            Matrix **charMatrices = malloc(sizeof(Matrix*) * 512);
+            size_t nchars;
 
-        for (size_t c = 0; c < nchars; ++c) {
-            // // Disp resized
-            // for (size_t i = 0; i < 32; ++i) {
-            //     for (size_t j = 0; j < 32; ++j)
-            //         printf("%c", matrixGet(charMatrices[c], i, j) > .5f ?
-            //                 '.' : '#');
-            //     puts("");
-            // }
-            // puts("---");
+            lineAnalysis(result,
+                    dar.array[line - 1], dar.array[line],
+                    boxes, charMatrices, &nchars);
 
-            Prediction pred = predict(net, dataset, charMatrices[c]);
-            lineStr[c] = pred.best;
-            // printf("P = %.1f %%\n", pred.prob * 100);
+            for (size_t c = 0; c < nchars; ++c) {
+                // // Disp resized
+                // for (size_t i = 0; i < 32; ++i) {
+                //     for (size_t j = 0; j < 32; ++j)
+                //         printf("%c", matrixGet(charMatrices[c], i, j) > .5f ?
+                //                 '.' : '#');
+                //     puts("");
+                // }
+                // puts("---");
 
-            free(boxes[c]);
-            matrixFree(charMatrices[c]);
+                Prediction pred = predict(net, dataset, charMatrices[c]);
+                lineStr[c] = pred.best;
+                // printf("P = %.1f %%\n", pred.prob * 100);
+
+                free(boxes[c]);
+                matrixFree(charMatrices[c]);
+            }
+
+            lineStr[nchars] = 0;
+
+            printf("> %s\n", lineStr);
+
+            free(boxes);
+            free(charMatrices);
+
+            // TODO : Save lineStr
+            free(lineStr);
+            puts("");
+
+            // return 0;
         }
 
-        lineStr[nchars] = 0;
 
-        printf("> %s\n", lineStr);
 
-        free(boxes);
-        free(charMatrices);
-
-        // TODO : Save lineStr
-        free(lineStr);
-        puts("");
-
-        // return 0;
     }
+
+
+
 
     // Free net
     networkFree(net);
