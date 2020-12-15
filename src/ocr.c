@@ -65,12 +65,17 @@ char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset, int argangle) {
     //Angle detection
     if (cpu_angle != 0) {
         angle = angleDetection(matrix);
+        printf("DETECTED %f\n", angle);
     }
 
     //Rotation
     if (angle != 0.0) {
         Matrix *test = rotation(matrix, angle);
         matrix = matrixCopy(test);
+
+        // TODO
+        // matrixToGrey(sur, matrix);
+        // SDL_SaveBMP(sur, "weights/result.bmp");
     }
 
 

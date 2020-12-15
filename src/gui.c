@@ -71,8 +71,6 @@ int gui_analysis(int angle, SDL_Window *ecran,SDL_Surface *texte,
                     (SDL_GetModState() & KMOD_CTRL) &&
                     SDL_HasClipboardText())
             {
-                puts("CTRL C");
-
                 char *tmp = SDL_GetClipboardText();
                 size_t l = strlen(tmp);
                 size_t l_copy = len + l < 100 ? l : 100 - len;
@@ -465,7 +463,7 @@ int gui_image_validation(SDL_Window *ecran,SDL_Surface *texte,TTF_Font *police,
         r.h*=d;
     }
     int now=0;
-    SDL_Delay(1000);
+    SDL_Delay(700);
     SDL_Renderer* ren;
     SDL_Window *picture = SDL_CreateWindow("OCR - Picture",
                                            0,0,r.w,r.h,SDL_WINDOW_SHOWN);
@@ -541,7 +539,6 @@ int gui(Network *net, Dataset *dataset)
     int angle = 0;
     while (page)
     {
-        printf("page = %d\n", page);
         switch(page)
         {
         case 1:
