@@ -16,10 +16,11 @@
 #include "analysis.h"
 #include "gui.h"
 
-#define SPACE_TEMPERATURE .9
+#define SPACE_TEMPERATURE 1
 #define GAP(i) ((int)boxes[i + 1]->b.x - (int)boxes[i]->c.x)
 
-char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset) {
+char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset, int angle) {
+    // TODO : Steve : Implementer angle
     //Matrixes Initialisation
     //Gommage
     Matrix *convo = matrixZero(3, 3);

@@ -36,7 +36,8 @@ void print_text(char* str, SDL_Window *ecran,SDL_Surface *texte,int x, int y,
         SDL_BlitSurface(texte, NULL, pSurf, &position);
     }
 }
-int gui_analysis(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf, SDL_Surface *surImage)
+int gui_analysis(int angle, SDL_Window *ecran,SDL_Surface *texte,
+        TTF_Font *police,SDL_Surface *pSurf, SDL_Surface *surImage)
 {
     puts("gui_analysis()");
 
@@ -47,7 +48,7 @@ int gui_analysis(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surf
     //Lancement de la fonction analyse sur SDL_Surface *surImage.
     //A retourner : la string result, et sa longueur len.
     puts("Starting to fetch text");
-    char* result = ocr(surImage, guiNet, guiDataset);
+    char* result = ocr(surImage, guiNet, guiDataset, angle);
     int len = strlen(result);
 
     FILE* fichier = NULL;
@@ -345,7 +346,8 @@ int gui_select_image(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_
     return 0;
 }
 
-int gui_angle(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf)
+int gui_angle(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,
+        SDL_Surface *pSurf)
 {
     SDL_Event event;
     int a=0;
@@ -543,7 +545,7 @@ int gui(Network *net, Dataset *dataset)
             }
             break;
         case 5:
-            page = gui_analysis(ecran,texte,police,pSurf,surImage);
+            page = gui_analysis(ecran,texte,police,pSurf,surImage, angle);
             break;
         case 6:
             angle = gui_angle(ecran,texte,police,pSurf);

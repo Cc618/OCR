@@ -6,6 +6,6 @@
 #include "data.h"
 
 // Returns the text within sur
-char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset);
+char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset, int angle);
 
 #endif // OCR_H
