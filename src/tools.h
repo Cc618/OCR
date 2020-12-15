@@ -52,16 +52,13 @@ Matrix *loadImage(const char *path);
 void matrixToGrey(SDL_Surface *surface, Matrix *matrix);
 
 //Returns an array of lines with the length of this array.
-dyn_arr getLines(Matrix *matrix);
+dyn_arr getLines(Matrix *matrix, rectangle bloc);
 
 //Draws the lines with an array that comes from getLines.
 void drawLines(Matrix *matrix, dyn_arr arraylines);
 
-//Stores the characters on a dynamic array.
-dyn_arr getCaracters(Matrix *matrix,int top, int down);
-
 //Separates the characters on the image.
-void drawCaracters(Matrix *matrix, dyn_arr arraylines,int top, int down);
+void drawCaracters(Matrix *matrix, dyn_arr arraylines, int top, int down);
 
 //Transforms a matrix into a binary matrix(changes directly the matrix).
 void matrixToBinary(Matrix *matrix);
@@ -79,10 +76,13 @@ void horizontalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *a
 //Cut the image vertically if it can.
 void verticalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr, short krisbool);
 
-//Draw a rectangle on the matrix
+//Draw a rectangle on the matrix.
 void drawRectangle(Matrix *matrix, rectangle rec);
 
 //Turns the matrix on a teta angle(degree).
 Matrix *rotation(Matrix *matrix, double angle);
+
+//Find the angle in a rotated matrix.
+double angleDetection(Matrix *matrix);
 
 #endif
