@@ -473,11 +473,11 @@ int gui_image_validation2(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police
             }
         }
         SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 200, 255));
-        print_text("Is the picture found the one you want ?",ecran,texte,0,0,police, pSurf);
-        print_text("Confirm",ecran,texte,70,100,police, pSurf);
-        print_text("Retry",ecran,texte,70,200,police, pSurf);
-        print_text("Exit",ecran,texte,70,300,police, pSurf);
-        print_text(">",ecran,texte,0,100+choix*100,police, pSurf);
+        print_text("Is the picture found the one you want ?",ecran,texte,0,0,police, pSurf, COL_BLACK);
+        print_text("Confirm",ecran,texte,70,100,police, pSurf, COL_BLACK);
+        print_text("Retry",ecran,texte,70,200,police, pSurf, COL_BLACK);
+        print_text("Exit",ecran,texte,70,300,police, pSurf, COL_BLACK);
+        print_text(">",ecran,texte,0,100+choix*100,police, pSurf, COL_BLACK);
         SDL_UpdateWindowSurface(ecran);
         SDL_Delay(10);
     }
@@ -538,7 +538,7 @@ int gui(Network *net, Dataset *dataset)
                 SDL_UpdateWindowSurface(ecran);
                 SDL_Delay(1000);
                 page = gui_image_validation(adresse);*/
-                page = gui_image_validation2(ecran,texte,police,pSurf);
+                page = gui_image_validation2(ecran,texte,police,pSurf,surImage);
             }
             break;
         case 5:
