@@ -4,6 +4,7 @@
 #include <time.h>
 #include <string.h>
 #include <SDL2/SDL.h>
+#include <stdlib.h>
 #include <SDL2/SDL_ttf.h>
 #include "network.h"
 #include "data.h"
@@ -172,92 +173,16 @@ int gui_error_loading(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL
     return 1;
 }
 
-int gui_image_validation(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf, SDL_Surface *surImage)
+int gui_image_validation(char *path)
 {
-    SDL_Renderer* ren;
-    ren = SDL_CreateRenderer(ecran,-1,SDL_RENDERER_ACCELERATED);
-    SDL_Texture *texImage = SDL_CreateTextureFromSurface(ren,surImage);
-    float delta = 400.0f/surImage->w;
-    if (surImage->h>surImage->w)
-    {
-        delta = 400.0f/surImage->h;
-    }
-    SDL_Rect dst1;
-    dst1.x = 400;
-    dst1.y = 100;
-    dst1.w = (int)(delta*surImage->w);
-    dst1.h = (int)(delta*surImage->h);
-    SDL_Rect dst2;
-    dst2.x = 0;
-    dst2.y = 0;
-    dst2.w = 800;
-    dst2.h = 500;
-    SDL_Rect dst3;
-    dst3.x = 0;
-    dst3.y = 0;
-    dst3.w = 50;
-    dst3.h = 80;
-    SDL_Rect dst4;
-    dst4.x = 0;
-    dst4.y = 0;
-    dst4.w = 50;
-    dst4.h = 80;
-    //Préparation des images...
-    SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 255, 200));
-    print_text(">",ecran,texte,0,0, police,pSurf, COL_BLACK);
-    SDL_Texture *texIcone = SDL_CreateTexture(ren,SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET,100,100);
-    SDL_SetTextureBlendMode(texIcone,SDL_BLENDMODE_BLEND);
-    SDL_Texture *texScreen = SDL_CreateTextureFromSurface(ren,pSurf);
-    SDL_SetRenderTarget(ren,texIcone);
-    SDL_RenderCopy(ren, texScreen, NULL, &dst2);
-    SDL_SetRenderTarget(ren,NULL);
-    SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 255, 200));
-    print_text("Here is the image",ecran,texte,0,0,police, pSurf, COL_BLACK);
-    print_text("Confirm",ecran,texte,70,100,police, pSurf, COL_BLACK);
-    print_text("Abort",ecran,texte,70,200,police, pSurf, COL_BLACK);
-    texScreen = SDL_CreateTextureFromSurface(ren,pSurf);
-    //Début du code
-    SDL_Event event;
-    char continuer = 1;
-    int choix = 0;
-    while (continuer==1)
-    {
-        dst4.y=100+100*choix;
-        SDL_RenderCopy(ren, texScreen, NULL, &dst2);
-        SDL_RenderCopy(ren, texImage, NULL, &dst1);
-        SDL_RenderCopy(ren, texIcone, &dst3, &dst4);
-        SDL_RenderPresent(ren);
-        SDL_Delay(10);
-        SDL_WaitEvent(&event);
-        if(event.type==SDL_QUIT)
-        {
-            continuer = 0;
-        }
-        if (event.type == SDL_KEYDOWN)
-        {
-            switch(event.key.keysym.sym)
-            {
-                case SDLK_UP:
-                    choix = (choix+1)%2;
-                    break;
-                case SDLK_DOWN:
-                    choix = (choix+1)%2;
-                    break;
-                case SDLK_RETURN:
-                    continuer=2;
-                    break;
-            }
-        }
-    }
-    SDL_DestroyTexture(texImage);
-    SDL_DestroyTexture(texScreen);
-    SDL_DestroyTexture(texIcone);
-    SDL_DestroyRenderer(ren);
-    if (!continuer || choix==2)
-        return 0;
-    if (!choix)
-        return 5;
-    return 1;
+    char *cmd = malloc(2048 + 5);
+
+    sprintf(cmd, "feh %s", path);
+    system(cmd);
+
+    free(cmd);
+
+    return 5;
 }
 
 int gui_credits(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf)
@@ -427,7 +352,7 @@ int gui(Network *net, Dataset *dataset)
     TTF_Font *police = NULL;
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
-    char* adresse = (char*)malloc(sizeof(char)*(100 + 1));
+    char* adresse = (char*)malloc(sizeof(char)*(1024 + 1));
     ecran = SDL_CreateWindow("OCR - Iron Minds Corporations", 50, 50,
             1620, 960, SDL_WINDOW_SHOWN);
     SDL_Surface *pSurf = SDL_GetWindowSurface(ecran);
@@ -437,7 +362,6 @@ int gui(Network *net, Dataset *dataset)
     int page = 1;
     while (page)
     {
-        printf("* GUI page = %d\n",page);
         switch(page)
         {
         case 1:
@@ -457,12 +381,8 @@ int gui(Network *net, Dataset *dataset)
             }
             else
             {
-                page = 5;
-
-                // Segfault here
-                // page= gui_image_validation(ecran,texte,police,pSurf,surImage);
+                page= gui_image_validation(adresse);
             }
-            printf("page = %d\n", page);
             break;
         case 5:
             page = gui_analysis(ecran,texte,police,pSurf,surImage);
