@@ -24,11 +24,9 @@ CoordList* newCoordList();
 
 ValueList* newValueList();
 
-void matrixImage(SDL_Renderer *renderer, Matrix *m);
+int analysis(Matrix *mat, int top, int down, int right, int left, int **result);
 
-int analysis(SDL_Renderer *renderer, Matrix *mat, int top, int down, int right, int left, int **result);
-
-void CaractersAnalysis(SDL_Renderer *ren, Matrix *mat, int top, int down);
+void CaractersAnalysis(Matrix *mat, int top, int down, int left, int right);
 
 // --- Cc --- //
 // Returns all chars between startY to endY

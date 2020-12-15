@@ -42,11 +42,10 @@ int gui_analysis(int angle, SDL_Window *ecran,SDL_Surface *texte,
     puts("gui_analysis()");
 
     SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, COL_BG));
-    print_text("Analysis running, please wait...",ecran,texte,0,0,police, pSurf, COL_BLACK);
+    print_text("Analysis running, please wait...",
+               ecran,texte,0,0,police, pSurf, COL_BLACK);
     SDL_UpdateWindowSurface(ecran);
 
-    //Lancement de la fonction analyse sur SDL_Surface *surImage.
-    //A retourner : la string result, et sa longueur len.
     puts("Starting to fetch text");
     char* result = ocr(surImage, guiNet, guiDataset, angle);
     int len = strlen(result);
@@ -68,7 +67,6 @@ int gui_analysis(int angle, SDL_Window *ecran,SDL_Surface *texte,
         }
         if (event.type == SDL_KEYDOWN)
         {
-            // TODO : If not working, remove text
             if(event.key.keysym.sym == SDLK_c &&
                     (SDL_GetModState() & KMOD_CTRL) &&
                     SDL_HasClipboardText())
@@ -101,10 +99,14 @@ int gui_analysis(int angle, SDL_Window *ecran,SDL_Surface *texte,
         int dy = 60;
         int textY = -dy;
 
-        print_text("New analysis",ecran,texte,70,textY += dy,police, pSurf, COL_BLACK);
-        print_text("Credits",ecran,texte,70,textY += dy,police, pSurf, COL_BLACK);
-        print_text("Exit",ecran,texte,70,textY += dy,police, pSurf, COL_BLACK);
-        print_text(">",ecran,texte,0,textY - (2 - choix) * dy,police, pSurf, COL_BLACK);
+        print_text("New analysis",ecran,texte,70,textY += dy,
+                   police, pSurf, COL_BLACK);
+        print_text("Credits",ecran,texte,70,textY += dy,
+                   police, pSurf, COL_BLACK);
+        print_text("Exit",ecran,texte,70,textY += dy,
+                   police, pSurf, COL_BLACK);
+        print_text(">",ecran,texte,0,textY - (2 - choix) * dy,
+                   police, pSurf, COL_BLACK);
 
         print_text("Result saved in the clipboard and in result.txt",
                 ecran,texte,0,textY += dy,police, pSurf, COL_BLACK);
@@ -115,8 +117,8 @@ int gui_analysis(int angle, SDL_Window *ecran,SDL_Surface *texte,
         char *nresult = strdup(result);
         char *token = strtok(nresult, "\n");
         while (token != NULL) {
-            print_text(token, ecran, texte, 0, textY += dy, police, pSurf, COL_RED);
-
+            print_text(token, ecran, texte, 0, textY += dy,
+                       police, pSurf, COL_RED);
             token = strtok(NULL, "\n");
         }
         free(nresult);
@@ -134,7 +136,8 @@ int gui_analysis(int angle, SDL_Window *ecran,SDL_Surface *texte,
     return 3;
 }
 
-int gui_error_loading(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf)
+int gui_error_loading(SDL_Window *ecran,SDL_Surface *texte,
+                       TTF_Font *police,SDL_Surface *pSurf)
 {
     SDL_Event event;
     char continuer = 1;
@@ -161,12 +164,18 @@ int gui_error_loading(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL
                     break;
             }
         }
-        SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, COL_BG));
-        print_text("No image found...",ecran,texte,0,0,police, pSurf, COL_BLACK);
-        print_text("Enter new location",ecran,texte,70,100,police, pSurf, COL_BLACK);
-        print_text("Cancel",ecran,texte,70,200,police, pSurf, COL_BLACK);
-        print_text("Exit",ecran,texte,70,300,police, pSurf, COL_BLACK);
-        print_text(">",ecran,texte,0,100+choix*100,police, pSurf, COL_BLACK);
+        SDL_FillRect(pSurf, NULL,
+                     SDL_MapRGB(pSurf->format, COL_BG));
+        print_text("No image found...",ecran,
+                   texte,0,0,police, pSurf, COL_BLACK);
+        print_text("Enter new location",ecran,texte,
+                   70,100,police, pSurf, COL_BLACK);
+        print_text("Cancel",ecran,texte,70,200,
+                   police, pSurf, COL_BLACK);
+        print_text("Exit",ecran,texte,70,300,
+                   police, pSurf, COL_BLACK);
+        print_text(">",ecran,texte,0,100+choix*100,
+                   police, pSurf, COL_BLACK);
         SDL_UpdateWindowSurface(ecran);
         SDL_Delay(10);
     }
@@ -177,21 +186,8 @@ int gui_error_loading(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL
     return 1;
 }
 
-int gui_image_validation(char *path)
-{
-    char *cmd = malloc(2048 + 5);
-
-    sprintf(cmd,
-            "i3-msg workspace 10 && feh %s && i3-msg workspace 1",
-            path);
-    system(cmd);
-
-    free(cmd);
-
-    return 6;
-}
-
-int gui_credits(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf)
+int gui_credits(SDL_Window *ecran,SDL_Surface *texte,
+                 TTF_Font *police,SDL_Surface *pSurf)
 {
     SDL_Event event;
     SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, COL_BG));
@@ -218,7 +214,8 @@ int gui_credits(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surfa
     return (continuer==2);
 }
 
-int gui_home(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf)
+int gui_home(SDL_Window *ecran,SDL_Surface *texte,
+              TTF_Font *police,SDL_Surface *pSurf)
 {
     SDL_Event event;
     char continuer = 1;
@@ -226,8 +223,10 @@ int gui_home(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface 
     while (continuer==1)
     {
         SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, COL_BG));
-        print_text("Welcome to Iron Minds' OCR !",ecran,texte,0,0,police, pSurf, COL_BLACK);
-        print_text("Start analysis",ecran,texte,70,100,police, pSurf, COL_BLACK);
+        print_text("Welcome to Iron Minds' OCR !",ecran,texte,
+                   0,0,police, pSurf, COL_BLACK);
+        print_text("Start analysis",ecran,texte,70,100,
+                   police, pSurf, COL_BLACK);
         print_text("Credits",ecran,texte,70,200,police, pSurf, COL_BLACK);
         print_text("Exit",ecran,texte,70,300,police, pSurf, COL_BLACK);
         print_text(">",ecran,texte,0,100+choix*100,police, pSurf, COL_BLACK);
@@ -262,7 +261,8 @@ int gui_home(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface 
     return 3;
 }
 
-int text_selection(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf,char* rep)
+int text_selection(SDL_Window *ecran,SDL_Surface *texte,
+                   TTF_Font *police,SDL_Surface *pSurf,char* rep)
 {
     SDL_Rect champ;
     champ.x=0;
@@ -296,7 +296,8 @@ int text_selection(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Su
                 len--;
                 has_type = SDL_TRUE;
             }
-            if(event.key.keysym.sym == SDLK_v && (SDL_GetModState() & KMOD_CTRL) && SDL_HasClipboardText())
+            if(event.key.keysym.sym == SDLK_v &&
+               (SDL_GetModState() & KMOD_CTRL) && SDL_HasClipboardText())
             {
                 char *tmp = SDL_GetClipboardText();
                 size_t l = strlen(tmp);
@@ -306,7 +307,8 @@ int text_selection(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Su
                 SDL_free(tmp);
                 has_type = SDL_TRUE;
             }
-            if(event.key.keysym.sym == SDLK_c && (SDL_GetModState() & KMOD_CTRL))
+            if(event.key.keysym.sym == SDLK_c &&
+               (SDL_GetModState() & KMOD_CTRL))
                 SDL_SetClipboardText(rep);
             if(event.key.keysym.sym == SDLK_RETURN && len)
                 ending=2;
@@ -325,12 +327,15 @@ int text_selection(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Su
     return ending;
 }
 
-int gui_select_image(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf,char*adresse)
+int gui_select_image(SDL_Window *ecran,SDL_Surface *texte,
+                     TTF_Font *police,SDL_Surface *pSurf,char*adresse)
 {
     SDL_Event event;
     SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, COL_BG));
-    print_text("Please enter image location",ecran,texte,0,0,police, pSurf, COL_BLACK);
-    print_text("CTRL+C / CTRL+V : Copy / paste",ecran,texte,0,200,police, pSurf, COL_BLACK);
+    print_text("Please enter image location",
+               ecran,texte,0,0,police, pSurf, COL_BLACK);
+    print_text("CTRL+C / CTRL+V : Copy / paste",
+               ecran,texte,0,200,police, pSurf, COL_BLACK);
     print_text("ENTER : Validate",ecran,texte,0,300,police, pSurf, COL_BLACK);
     print_text("ECHAP : Cancel",ecran,texte,0,400,police, pSurf, COL_BLACK);
     int a = text_selection(ecran,texte,police,pSurf,adresse);
@@ -427,9 +432,11 @@ int gui_angle(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,
                 ecran,texte,70,200,police, pSurf, COL_BLACK);
         print_text("Confirm",ecran,texte,70,300,police, pSurf, COL_BLACK);
         if (choix<3)
-            print_text(">",ecran,texte,0,100+choix*100,police, pSurf, COL_BLACK);
+            print_text(">",ecran,texte,0,100+choix*100,police,
+                        pSurf, COL_BLACK);
 
-        print_text("*",ecran,texte,40,100+finalchoix*100,police, pSurf, COL_BLACK);
+        print_text("*",ecran,texte,40,100+finalchoix*100,
+                   police, pSurf, COL_BLACK);
 
         SDL_UpdateWindowSurface(ecran);
         SDL_Delay(10);
@@ -440,7 +447,8 @@ int gui_angle(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,
         return -1;
     return a;
 }
-int gui_image_validation2(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf, SDL_Surface *surImage)
+int gui_image_validation(SDL_Window *ecran,SDL_Surface *texte,TTF_Font *police,
+                         SDL_Surface *pSurf, SDL_Surface *surImage)
 {
     SDL_Rect r;
     r.x=0; r.y=0; r.w=surImage->w; r.h=surImage->h;
@@ -458,7 +466,8 @@ int gui_image_validation2(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police
     int now=0;
     SDL_Delay(1000);
     SDL_Renderer* ren;
-    SDL_Window *picture = SDL_CreateWindow("OCR - Picture",0,0,r.w,r.h,SDL_WINDOW_SHOWN);
+    SDL_Window *picture = SDL_CreateWindow("OCR - Picture",
+                                           0,0,r.w,r.h,SDL_WINDOW_SHOWN);
     ren = SDL_CreateRenderer(picture,-1,SDL_RENDERER_ACCELERATED);
     SDL_Texture *texImage = SDL_CreateTextureFromSurface(ren,surImage);
     SDL_RenderCopy(ren, texImage, NULL, NULL);
@@ -492,7 +501,8 @@ int gui_image_validation2(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police
         if (event.type == SDL_KEYUP && event.key.keysym.sym==SDLK_RETURN)
             now=1;
         SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, COL_BG));
-        print_text("Is the picture found the one you want ?",ecran,texte,0,0,police, pSurf, COL_BLACK);
+        print_text("Is the picture found the one you want ?",
+                   ecran,texte,0,0,police, pSurf, COL_BLACK);
         print_text("Confirm",ecran,texte,70,100,police, pSurf, COL_BLACK);
         print_text("Retry",ecran,texte,70,200,police, pSurf, COL_BLACK);
         print_text("Exit",ecran,texte,70,300,police, pSurf, COL_BLACK);
@@ -549,15 +559,7 @@ int gui(Network *net, Dataset *dataset)
             }
             else
             {
-                /*
-                SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, COL_BG));
-                print_text("Please close the image to continue",
-                        ecran,texte,0,0,police, pSurf, COL_BLACK);
-
-                SDL_UpdateWindowSurface(ecran);
-                SDL_Delay(1000);
-                page = gui_image_validation(adresse);*/
-                page = gui_image_validation2(ecran,texte,police,pSurf,surImage);
+                page = gui_image_validation(ecran,texte,police,pSurf,surImage);
             }
             break;
         case 5:
@@ -582,14 +584,3 @@ int gui(Network *net, Dataset *dataset)
     SDL_Quit();
     return 0;
 }
-
-
-/*
- * TODO :
-A MODIFIER :
--> Police
--> Mise en forme (couleurs, taille et disposition des caractères...)
--> Dans le main : appeler gui()
--> Taille de nom de fichier maximale : actuellement à 100
--> Lancement de l'analyse à partir de gui_analysis (voir commentaires)
-*/
