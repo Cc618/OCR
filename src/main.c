@@ -81,13 +81,22 @@ int imgMain() {
 
     //Image to Matrix
     imageToGrey(sur);
+
+    //Angle Detection and Rotation
+    double angle = 0.0;
     Matrix *matrix = greyToMatrix(sur);
-    //matrixToGrey(sur, matrix);
+
+    char cpu_angle = 0;
+    //Angle detection
+    if (cpu_angle != 0) {
+    angle = angleDetection(matrix);
+    }
 
     //Rotation
-    /*double angle = 0.0;
-    Matrix *test = rotation(matrix, angle);*/
-
+    if (angle != 0.0) {
+    	    Matrix *test = rotation(matrix, angle);
+	    matrix = matrixCopy(test);
+    }
 
     //Convolution
     Matrix *inter = convolution(matrix, convo);
@@ -108,15 +117,10 @@ int imgMain() {
 
     aiLoad(net, dataset, NET_PATH);
 
-    //Print Rectangle Array
     for (size_t i = 0; i < arr.length; i++) {
         rectangle get_rect = arr.array[i];
         //Line analysis
         dyn_arr dar = getLines(result, get_rect);
-        // drawRectangle(result, get_rect);
-        point b = get_rect.b;
-        point c = get_rect.c;
-
         for (int line = 1; line < dar.length; line += 2) {
             // printf("Line %d -> %d\n", dar.array[line - 1], dar.array[line]);
 
