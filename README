@@ -16,6 +16,13 @@ generation.
 ### Run
 After having built the project, the app is located at bin/ocr.
 
+### Examples
+The res folder contains some example images.
+You should try with res/cctext.bmp (some random text),
+res/ij.bmp (text with Is and Js) or even res/hello.bmp.
+
+Note that the current network uses only lower case letters and period.
+
 ### Training
 To build the dataset use make dataset (before make).
 
