@@ -20,8 +20,6 @@
 #include "analysis.h"
 #include "gui.h"
 
-#define PRINT_SIZE(X) printf("Size(%zu, %zu)\n", (X)->rows, (X)->cols);
-
 Network *buildNetwork(size_t nClasses);
 
 #define SESSION "1"
@@ -29,185 +27,6 @@ Network *buildNetwork(size_t nClasses);
 // For training mode : #define NET_PATH (NET_DIR SESSION "/")
 #define NET_PATH (NET_DIR)
 #define DATA_PATH "data/dataset_bmp"
-
-int imgMain() {
-    //Initialisation
-    SDL_Window *win = 0;
-    SDL_Renderer *ren = 0;
-    if (SDL_Init(SDL_INIT_EVERYTHING)<0)
-    {
-        fprintf(stderr,"Initialisation error.\n");
-        return -1;
-    }
-    //Image Loading
-    // SDL_Surface *sur = SDL_LoadBMP("res/image.bmp");
-    // SDL_Surface *sur = SDL_LoadBMP("res/arev.bmp"); // Too light
-    // SDL_Surface *sur = SDL_LoadBMP("res/arev_bold.bmp");
-    SDL_Surface *sur = SDL_LoadBMP("res/cctext.bmp");
-    // SDL_Surface *sur = SDL_LoadBMP("res/cctext2.bmp");
-    // SDL_Surface *sur = SDL_LoadBMP("res/soutenance.bmp");
-    // SDL_Surface *sur = SDL_LoadBMP("res/neurones.bmp");
-    // SDL_Surface *sur = SDL_LoadBMP("res/hello.bmp");
-    // SDL_Surface *sur = SDL_LoadBMP("res/v_u.bmp");
-    if (!sur)
-    {
-        fprintf(stderr,"Doesn't find the image.\n");
-        return -1;
-    }
-
-    //Matrixes Initialisation
-    //Erasing
-    Matrix *convo = matrixZero(3, 3);
-    matrixSet(convo, 0, 0, 0.1111111);
-    matrixSet(convo, 0, 1, 0.1111111);
-    matrixSet(convo, 0, 2, 0.1111111);
-    matrixSet(convo, 1, 0, 0.1111111);
-    matrixSet(convo, 1, 1, 0.1111111);
-    matrixSet(convo, 1, 2, 0.1111111);
-    matrixSet(convo, 2, 0, 0.1111111);
-    matrixSet(convo, 2, 1, 0.1111111);
-    matrixSet(convo, 2, 2, 0.1111111);
-
-    //Contrast
-    Matrix *convo2 = matrixZero(3, 3);
-    matrixSet(convo2, 0, 0, 0);
-    matrixSet(convo2, 0, 1, -1);
-    matrixSet(convo2, 0, 2, 0);
-    matrixSet(convo2, 1, 0, -1);
-    matrixSet(convo2, 1, 1, 5);
-    matrixSet(convo2, 1, 2, -1);
-    matrixSet(convo2, 2, 0, 0);
-    matrixSet(convo2, 2, 1, -1);
-    matrixSet(convo2, 2, 2, 0);
-
-    //Image to Matrix
-    imageToGrey(sur);
-
-    //Angle Detection and Rotation
-    double angle = 0.0;
-    Matrix *matrix = greyToMatrix(sur);
-
-    char cpu_angle = 0;
-    //Angle detection
-    if (cpu_angle != 0) {
-    angle = angleDetection(matrix);
-    }
-
-    //Rotation
-    if (angle != 0.0) {
-    	    Matrix *test = rotation(matrix, angle);
-	    matrix = matrixCopy(test);
-    }
-
-    //Convolution
-    Matrix *inter = convolution(matrix, convo);
-    Matrix *inter2 = convolution(inter, convo);
-    Matrix *result = convolution(inter2, convo2);
-    matrixToBinary(result);
-
-    //Block analysis
-    rectangle bloc = {{result->cols - 1, 0}, {0, result->rows - 1}};
-    rectangle *array = malloc(500);
-    rect_arr arr = {array, 0};
-    horizontalCut(result, bloc, 40, &arr, 1);
-
-    // --- Init net ---
-    // Load network part
-    Network *net = buildNetwork(1);
-    Dataset *dataset = malloc(sizeof(Dataset));
-
-    aiLoad(net, dataset, NET_PATH);
-
-    for (size_t i = 0; i < arr.length; i++) {
-        rectangle get_rect = arr.array[i];
-        //Line analysis
-        dyn_arr dar = getLines(result, get_rect);
-        for (int line = 1; line < dar.length; line += 2) {
-            // printf("Line %d -> %d\n", dar.array[line - 1], dar.array[line]);
-
-            // We suppose that there are less than 512 chars
-            char *lineStr = malloc(512);
-            rectangle **boxes = malloc(sizeof(rectangle*) * 512);
-            Matrix **charMatrices = malloc(sizeof(Matrix*) * 512);
-            size_t nchars;
-
-            lineAnalysis(result,
-                    dar.array[line - 1], dar.array[line],
-                    boxes, charMatrices, &nchars);
-
-            for (size_t c = 0; c < nchars; ++c) {
-                // // Disp resized
-                // for (size_t i = 0; i < 32; ++i) {
-                //     for (size_t j = 0; j < 32; ++j)
-                //        printf("%c", matrixGet(charMatrices[c], i, j) > .5f ?
-                //                 '.' : '#');
-                //     puts("");
-                // }
-                // puts("---");
-
-                Prediction pred = predict(net, dataset, charMatrices[c]);
-                lineStr[c] = pred.best;
-                // printf("P = %.1f %%\n", pred.prob * 100);
-
-                free(boxes[c]);
-                matrixFree(charMatrices[c]);
-            }
-
-            lineStr[nchars] = 0;
-
-            printf("> %s\n", lineStr);
-
-            free(boxes);
-            free(charMatrices);
-
-            free(lineStr);
-            puts("");
-
-            // return 0;
-        }
-
-
-
-    }
-
-
-
-
-    // Free net
-    networkFree(net);
-    free(dataset);
-
-    //Saving the image
-    matrixToGrey(sur, result);
-    //SDL_SaveBMP(sur, "res/bloc3.bmp");
-
-    //Matrix Freedom
-    matrixFree(matrix);
-    matrixFree(convo);
-    matrixFree(convo2);
-    matrixFree(inter);
-    matrixFree(inter2);
-    matrixFree(result);
-
-    //Image Printing
-    SDL_CreateWindowAndRenderer(1000, 1200,0,&win,&ren);
-    if (!win || !ren)
-    {
-        fprintf(stderr,"Error when building windows.\n");
-        SDL_Quit();
-        return -1;
-    }
-    SDL_SetRenderDrawColor(ren,0,0,255,255);
-    SDL_RenderClear(ren);
-    printImage(ren,sur,0,0);
-    SDL_RenderPresent(ren);
-    SDL_Delay(3000);
-    //Closure
-    SDL_DestroyRenderer(ren);
-    SDL_DestroyWindow(win);
-    SDL_Quit();
-    return 0;
-}
 
 // Hyper parameters
 static const size_t dispFreq = 5;
@@ -368,8 +187,6 @@ int main(int argc,
         return appMain();
     else if (argc != 2)
         err = 1;
-    else if (strcmp(argv[1], "img") == 0)
-        return imgMain();
     else if (strcmp(argv[1], "train") == 0)
         trainMain();
     else
