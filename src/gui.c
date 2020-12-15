@@ -442,9 +442,23 @@ int gui_angle(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,
 }
 int gui_image_validation2(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf, SDL_Surface *surImage)
 {
+    SDL_Rect r;
+    r.x=0; r.y=0; r.w=surImage->w; r.h=surImage->h;
+    int winh=900; int winw = 900;
+    float d=0.0f;
+    if (r.w>winw)
+        d = winw/r.w;
+    if (r.h>winh)
+        d=winh/r.h;
+    if (d)
+    {
+        r.w*=d;
+        r.h*=d;
+    }
+    int now=0;
     SDL_Delay(1000);
     SDL_Renderer* ren;
-    SDL_Window *picture = SDL_CreateWindow("OCR - Picture",0,0,surImage->w,surImage->h,SDL_WINDOW_SHOWN);
+    SDL_Window *picture = SDL_CreateWindow("OCR - Picture",0,0,r.w,r.h,SDL_WINDOW_SHOWN);
     ren = SDL_CreateRenderer(picture,-1,SDL_RENDERER_ACCELERATED);
     SDL_Texture *texImage = SDL_CreateTextureFromSurface(ren,surImage);
     SDL_RenderCopy(ren, texImage, NULL, NULL);
@@ -471,10 +485,12 @@ int gui_image_validation2(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police
                     choix = (choix+1)%3;
                     break;
                 case SDLK_RETURN:
-                    continuer=2;
+                    continuer=1+now;
                     break;
             }
         }
+        if (event.type == SDL_KEYUP && event.key.keysym.sym==SDLK_RETURN)
+            now=1;
         SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, COL_BG));
         print_text("Is the picture found the one you want ?",ecran,texte,0,0,police, pSurf, COL_BLACK);
         print_text("Confirm",ecran,texte,70,100,police, pSurf, COL_BLACK);
