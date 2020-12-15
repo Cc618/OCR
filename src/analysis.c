@@ -76,7 +76,6 @@ int analysis(Matrix* mat, int top,int down, int left,int right,int** result)
         {
             column[fusionscount*2]=0;
             column[fusionscount*2+1]=0;
-            r.y=y*1;
             //For each pixel, we look the others pixel at its left and
             //over him. Then we can determine the value of the pixel.
             //If there are multiple values a pixel can have, it means that
@@ -470,8 +469,6 @@ int analysis(Matrix* mat, int top,int down, int left,int right,int** result)
                     {
                         if ((int)(matrixGet(mat,y1,x1)*100000+0.5f)==fusion->value)
                         {
-                            r.x=x1*1;
-                            r.y=y1*1;
                             matrixSet(mat,y1,x1,otherList->value*0.00001);
                         }
                         y1++;
@@ -534,7 +531,6 @@ void CaractersAnalysis(Matrix* mat, int top, int down, int left, int right)
         Matrix *M = matrixZero(32, 32);
         while (x<=result[0][length*5+3])
         {
-            r.x=10*((int)((x-result[0][length*5+1])*deltaw));
             int y = result[0][length*5+2];
             while (y<=result[0][length*5+4])
             {
