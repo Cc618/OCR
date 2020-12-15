@@ -182,8 +182,8 @@ int analysis(Matrix* mat, int top,int down, int left,int right,int** result)
                                         found=0;
                                         while (w<=down && !found)
                                         {
-                                            found=(int)(matrixGet(mat,w,x-1)*1
-							    00000+0.5f)==value;
+                                            found=(int)(matrixGet(mat,w,x-1)
+							    *100000+0.5f)==value;
                                             w++;
                                         }
                                         if (!found)
