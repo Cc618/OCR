@@ -32,7 +32,6 @@ void aiSave(Network *net, Dataset *dataset, const char *path) {
     free(datasetPath);
 }
 
-// TODO : Stat directory and handle errors in this function
 void aiLoad(Network *net, Dataset *dataset, const char *path) {
     size_t pathLen = strlen(path);
     char *datasetPath = malloc(pathLen + sizeof("dataset.data") + 1);

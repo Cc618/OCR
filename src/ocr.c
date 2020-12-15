@@ -23,9 +23,6 @@ char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset, int argangle) {
     char cpu_angle = argangle == -1;
     double angle = argangle;
 
-    printf("angle = %f, cpu_angle = %d\n", angle, cpu_angle);
-
-    // TODO : Steve : Implementer angle
     //Matrixes Initialisation
     //Gommage
     Matrix *convo = matrixZero(3, 3);
@@ -65,7 +62,6 @@ char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset, int argangle) {
     //Angle detection
     if (cpu_angle != 0) {
         angle = angleDetection(matrix);
-        printf("DETECTED %f\n", angle);
     }
 
     //Rotation
@@ -73,7 +69,6 @@ char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset, int argangle) {
         Matrix *test = rotation(matrix, angle);
         matrix = matrixCopy(test);
 
-        // TODO
         // matrixToGrey(sur, matrix);
         // SDL_SaveBMP(sur, "weights/result.bmp");
     }

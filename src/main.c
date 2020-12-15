@@ -160,7 +160,6 @@ int imgMain() {
             free(boxes);
             free(charMatrices);
 
-            // TODO : Save lineStr
             free(lineStr);
             puts("");
 
@@ -364,9 +363,6 @@ int main(int argc,
         char **argv) {
     // Initialization
     srand(time(NULL));
-
-    // TODO : Remove all *Main() except train
-
     int err = 0;
     if (argc == 1)
         return appMain();

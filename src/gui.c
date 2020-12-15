@@ -39,14 +39,10 @@ void print_text(char* str, SDL_Surface *texte,int x, int y,
 int gui_analysis(int angle, SDL_Window *ecran,SDL_Surface *texte,
         TTF_Font *police,SDL_Surface *pSurf, SDL_Surface *surImage)
 {
-    puts("gui_analysis()");
-
     SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, COL_BG));
     print_text("Analysis running, please wait...",
                  texte,0,0,police, pSurf, COL_BLACK);
     SDL_UpdateWindowSurface(ecran);
-
-    puts("Starting to fetch text");
     char* result = ocr(surImage, guiNet, guiDataset, angle);
     int len = strlen(result);
 
@@ -222,7 +218,6 @@ int gui_home(SDL_Window *ecran,SDL_Surface *texte,
     SDL_Rect logo_rec;
     logo_rec.x = 300;
     logo_rec.y = 300;
-    printf("%i\n", logo_sur == NULL);
     logo_rec.w = logo_sur->w;
     logo_rec.h = logo_sur->h;
     while (continuer==1)
@@ -342,7 +337,6 @@ int gui_select_image(SDL_Window *ecran,SDL_Surface *texte,
     print_text("ENTER : Validate",texte,0,300,police, pSurf, COL_BLACK);
     print_text("ECHAP : Cancel",texte,0,400,police, pSurf, COL_BLACK);
     int a = text_selection(ecran,texte,police,pSurf,adresse);
-    printf("%d,%s\n",a,adresse);
     if (a==2)
     {
         return 4;
@@ -469,21 +463,16 @@ int gui_image_validation(SDL_Window *ecran,SDL_Surface *texte,TTF_Font *police,
     }
     int now=0;
     SDL_Delay(700);
-    puts("img valid 1");
-
     SDL_Renderer* ren;
     // SDL_Window *picture = SDL_CreateWindow("OCR - Picture",
     //                                        0,0,r.w,r.h,SDL_WINDOW_SHOWN);
     SDL_Window *picture = SDL_CreateWindow("OCR - Picture",
                                            0,0,500,500,SDL_WINDOW_SHOWN);
     ren = SDL_CreateRenderer(picture,-1,SDL_RENDERER_ACCELERATED);
-    puts("img valid B");
     SDL_Texture *texImage = SDL_CreateTextureFromSurface(ren,surImage);
-    puts("img valid 2");
     SDL_RenderCopy(ren, texImage, NULL, NULL);
     SDL_RenderPresent(ren);
     SDL_Event event;
-    puts("img valid 3");
     char continuer = 1;
     int choix = 0;
     while (continuer==1)
@@ -546,7 +535,6 @@ int gui(Network *net, Dataset *dataset)
     SDL_Surface *pSurf = SDL_GetWindowSurface(ecran);
     SDL_Surface *surImage = NULL;
     police = TTF_OpenFont("res/Roboto-Regular.ttf", 44);
-    printf("police : %d",police==NULL);
     int page = 1;
     int angle = 0;
     while (page)
@@ -564,7 +552,6 @@ int gui(Network *net, Dataset *dataset)
             break;
         case 4:
             surImage = SDL_LoadBMP(adresse);
-            puts("Page 4");
             if (!surImage)
             {
                 page= gui_error_loading(ecran,texte,police,pSurf);
@@ -578,7 +565,6 @@ int gui(Network *net, Dataset *dataset)
             page = gui_analysis(angle, ecran,texte,police,pSurf,surImage);
             break;
         case 6:
-            puts("Page 6");
             angle = gui_angle(ecran,texte,police,pSurf);
             page = 5;
             if (angle == -2) {
