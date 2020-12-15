@@ -421,7 +421,7 @@ int gui_angle(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface
                 ecran,texte,70,100,police, pSurf, COL_BLACK);
         print_text(angle,ecran,texte,409,200,
                 police, pSurf, COL_GREEN);
-        print_text("Type your angle :       (use arrows)",
+        print_text("Type your angle :       (use arrows and press enter)",
                 ecran,texte,70,200,police, pSurf, COL_BLACK);
         print_text("Confirm",ecran,texte,70,300,police, pSurf, COL_BLACK);
         if (choix<3)
@@ -440,6 +440,7 @@ int gui_angle(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface
 }
 int gui_image_validation2(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf, SDL_Surface *surImage)
 {
+    SDL_Delay(1000);
     SDL_Renderer* ren;
     SDL_Window *picture = SDL_CreateWindow("OCR - Picture",0,0,surImage->w,surImage->h,SDL_WINDOW_SHOWN);
     ren = SDL_CreateRenderer(picture,-1,SDL_RENDERER_ACCELERATED);
@@ -472,7 +473,7 @@ int gui_image_validation2(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police
                     break;
             }
         }
-        SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, 200, 200, 255));
+        SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, COL_BG));
         print_text("Is the picture found the one you want ?",ecran,texte,0,0,police, pSurf, COL_BLACK);
         print_text("Confirm",ecran,texte,70,100,police, pSurf, COL_BLACK);
         print_text("Retry",ecran,texte,70,200,police, pSurf, COL_BLACK);
