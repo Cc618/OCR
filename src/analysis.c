@@ -160,7 +160,8 @@ int analysis(Matrix* mat, int top,int down, int left,int right,int** result)
                                             {
                                                 a1=ramValue[w];
                                             }
-                                            if (ramValue[w]->value==neighbours[z])
+                                            if (ramValue[w]->value==
+							    neighbours[z])
                                             {
                                                 a2=ramValue[w];
                                             }
@@ -181,13 +182,15 @@ int analysis(Matrix* mat, int top,int down, int left,int right,int** result)
                                         found=0;
                                         while (w<=down && !found)
                                         {
-                                            found=(int)(matrixGet(mat,w,x-1)*100000+0.5f)==value;
+                                            found=(int)(matrixGet(mat,w,x-1)
+							    *100000+0.5f)==value;
                                             w++;
                                         }
                                         if (!found)
                                         {
                                             column[fusionscount*2]=value;
-                                            column[fusionscount*2+1]=neighbours[z];
+                                            column[fusionscount*2+1]=
+						    neighbours[z];
                                             fusionscount++;
                                         }
                                     }
@@ -467,7 +470,8 @@ int analysis(Matrix* mat, int top,int down, int left,int right,int** result)
                     int y1 = othercoord[1];
                     while (y1<=othercoord[3])
                     {
-                        if ((int)(matrixGet(mat,y1,x1)*100000+0.5f)==fusion->value)
+                        if ((int)(matrixGet(mat,y1,x1)*100000+0.5f)==fusion->
+					value)
                         {
                             matrixSet(mat,y1,x1,otherList->value*0.00001);
                         }

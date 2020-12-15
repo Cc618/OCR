@@ -24,7 +24,8 @@ CoordList* newCoordList();
 
 ValueList* newValueList();
 
-int analysis(Matrix *mat, int top, int down, int right, int left, int **result);
+int analysis(Matrix *mat, int top, int down, int right, 
+		int left, int **result);
 
 void CaractersAnalysis(Matrix *mat, int top, int down, int left, int right);
 

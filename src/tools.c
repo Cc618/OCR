@@ -178,7 +178,8 @@ void matrixToGrey(SDL_Surface *surface, Matrix *matrix) {
 		for (int i = 0; i < height; i++) {
 			float matrixValue = matrixGet(matrix, i, j);
 			Uint8 average = matrixValue * 255.0f;
-			Uint32 pixel = SDL_MapRGB(surface->format,average,average, average);
+			Uint32 pixel = SDL_MapRGB(surface->format,average,
+					average, average);
 			setpixel(surface, j, i, pixel);
 		}
 	}
@@ -213,7 +214,8 @@ dyn_arr getLines(Matrix *matrix, rectangle bloc) {
 		}
 	}
 
-	//2)On this array, we take only the pixels that are far away from one another.
+	//2)On this array, we take only the pixels that are far away from one 
+	//another.
 	dyn_arr array_lines2;
     	array_lines2.array = (int*) malloc(sizeof(int) * 500);
 	array_lines2.length = 1;
@@ -222,14 +224,16 @@ dyn_arr getLines(Matrix *matrix, rectangle bloc) {
 	//We add a number if two pixels are far from one another.
 	for (int j = 1; j < array_lines.length - 1; j++) {
 		if (array_lines.array[j - 1] != array_lines.array[j] - 1) {
-			array_lines2.array[accu] = array_lines.array[j - 1] + 1;
+			array_lines2.array[accu] = array_lines.array[j - 1]
+			       	+ 1;
 			accu++;
 			array_lines2.array[accu] = array_lines.array[j] - 1;
 			accu++;
 		}
 	}
 	array_lines2.length = accu + 1;
-	array_lines2.array[array_lines2.length - 1] = array_lines.array[array_lines.length - 1];
+	array_lines2.array[array_lines2.length - 1] = 
+		array_lines.array[array_lines.length - 1];
 	free(array_lines.array);
 	return array_lines2;
 
@@ -325,7 +329,8 @@ Matrix *convolution(Matrix *matrix, Matrix *convo) {
 }
 
 //Cut the square horizontally
-void horizontalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr, short krisbool) {
+void horizontalCut(Matrix *matrix, rectangle bloc, size_t threshold, 
+		rect_arr *arr, short krisbool) {
 	point b = bloc.b;
 	point c = bloc.c;
 	size_t bx = b.x;
@@ -336,7 +341,8 @@ void horizontalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *a
 	size_t i = by;
 	//accu represents the number of correct colomns.
 	size_t accu = 0;
-	//begin is a boolean which indicates if we habe already find a black pixel.
+	//begin is a boolean which indicates if we habe already find a black 
+	//pixel.
 	//1) Search a black pixel.
 	short begin = 0;
 	while (begin != 1 && i < cy) {
@@ -370,7 +376,8 @@ void horizontalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *a
 		i++;
 	}
 	//3) Split the blocs and do the recursion.
-	//If we arrive at threshold, we split in half the bloc and restart the slicing on both.
+	//If we arrive at threshold, we split in half the bloc and restart 
+	//the slicing on both.
 	if (accu == threshold && i != 1) {
 		rectangle up = {b, {cx, i - 1}};
 		rectangle down = {{bx, i}, c};
@@ -389,7 +396,8 @@ void horizontalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *a
 	}
 }
 
-void verticalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr, short krisbool) {
+void verticalCut(Matrix *matrix, rectangle bloc, size_t threshold, 
+		rect_arr *arr, short krisbool) {
 	point b = bloc.b;
 	point c = bloc.c;
 	size_t bx = b.x;
@@ -415,7 +423,8 @@ void verticalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr
 		i++;
 	}
 	while (begin != 0 && i < bx && accu < threshold) {
-		//clear is used as a boolean for knowing if the line is empty or not
+		//clear is used as a boolean for knowing if the line is 
+		//empty or not
 		short clean = 1;
 		size_t j = by;
 		//If it's empty, we continue until threshold
@@ -432,7 +441,8 @@ void verticalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr
 		}
 		i++;
 	}
-	//If we arrive at threshold, we split the bloc in half and restart the slicing on both
+	//If we arrive at threshold, we split the bloc in half and restart 
+	//the slicing on both
 	if (accu == threshold && i != 1) {
 		rectangle left = {{i - 1, by}, c};
 		rectangle right = {b, {i, cy}};
@@ -515,7 +525,8 @@ double angleDetection(Matrix *matrix) {
 		for (size_t y = 0; y < rows; y++) {
 			if (matrixGet(matrix, y, x) == 0) {
 				for (size_t theta = 0; theta < 90; theta++) {
-					size_t d = y * sin(theta) + x * cos(theta);
+					size_t d = y * sin(theta) + x * 
+						cos(theta);
 					tableau[d][theta]++;
 				}
 			}
