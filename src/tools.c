@@ -497,39 +497,43 @@ Matrix *rotation(Matrix *matrix, double angle) {
 	return result;
 }
 
-/*double angleDetection(Matrix *matrix) {
+double angleDetection(Matrix *matrix) {
 	size_t rows = matrix->rows;
 	size_t cols = matrix->cols;
 	size_t dmax = sqrt(rows * rows + cols * cols);
-	int t[dmax][90];
+	int tableau[dmax][90];
 
-	for (double d = 0; d < dmax; d += 0.1) {
-		for (double theta = 0; theta < 90; theta += 0.2) {
-			t[d][theta] = 0;
+	//1) Fill the matrix with zeros.
+	for (size_t d = 0; d < dmax; d++) {
+		for (size_t theta = 0; theta < 90; theta++) {
+			tableau[d][theta] = 0;
 		}
 	}
 
+	//2) Fill the matrix with the correct values.
 	for (size_t x = 0; x < cols; x++) {
 		for (size_t y = 0; y < rows; y++) {
 			if (matrixGet(matrix, y, x) == 0) {
-				for (double theta = 0.0; theta < 90.0; theta += 0.2) {
-					int d = y * sin(theta) + x * cos(theta);
-					t[d, theta]++;
+				for (size_t theta = 0; theta < 90; theta++) {
+					size_t d = y * sin(theta) + x * cos(theta);
+					tableau[d][theta]++;
 				}
 			}
 		}
 	}
 
-	int votemax = 0;
-	double theta1 = 0.0;
-	for (double d = 0; d < dmax; d++) {
-		for (theta = 0; theta < 90; theta++) {
-			if (t[d][theta] >= votemax) {
-				votemax = t[d][theta];
-				theta1 = theta;	
-			} 
+	//3) Finds max of the matrix
+	size_t max = 0;
+	double result = 0.0;
+	for (size_t d = 0; d < dmax; d++) {
+		for (size_t theta = 0; theta < 90; theta++) {
+			int value = tableau[d][theta]; 
+			if ((size_t) value > max) {
+				max = value;
+				result = (double) theta;
+			}
 		}
 	}
-	return theta1;
-	return 90.0;
-}*/
+	
+	return result;
+}

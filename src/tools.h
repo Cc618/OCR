@@ -83,6 +83,6 @@ void drawRectangle(Matrix *matrix, rectangle rec);
 Matrix *rotation(Matrix *matrix, double angle);
 
 //Find the angle in a rotated matrix.
-//double angleDetection(Matrix *matrix);
+double angleDetection(Matrix *matrix);
 
 #endif
