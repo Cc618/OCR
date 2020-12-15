@@ -34,7 +34,8 @@ void setpixel(SDL_Surface* sur, int x, int y, Uint32 pixel);
 //Returns the Uint32 value of the pixel (x,y) in the surface sur.
 Uint32 getpixel(SDL_Surface* sur, int x, int y);
 
-//From a basic image, transform all pixels in black pixels or black pixels depending on the pixel's luminosity.
+//From a basic image, transform all pixels in black pixels or black pixels 
+//depending on the pixel's luminosity.
 void modifImage(SDL_Surface *sur);
 
 //Greyscale the image.
@@ -48,7 +49,8 @@ Matrix *greyToMatrix(SDL_Surface *surface);
 // SDL must be loaded
 Matrix *loadImage(const char *path);
 
-//Transforms a surface based on a matrix, the matrix and the surface need to have the same size.
+//Transforms a surface based on a matrix, the matrix and the surface need to 
+//have the same size.
 void matrixToGrey(SDL_Surface *surface, Matrix *matrix);
 
 //Returns an array of lines with the length of this array.
@@ -71,10 +73,12 @@ Matrix *convolution(Matrix *matrix, Matrix *convo);
 
 //krisbool signifie si on ne peut pas couper le bloc.
 //Cut the image horizontally if it can.
-void horizontalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr, short krisbool);
+void horizontalCut(Matrix *matrix, rectangle bloc, size_t threshold, 
+		rect_arr *arr, short krisbool);
 
 //Cut the image vertically if it can.
-void verticalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr, short krisbool);
+void verticalCut(Matrix *matrix, rectangle bloc, size_t threshold, 
+		rect_arr *arr, short krisbool);
 
 //Draw a rectangle on the matrix.
 void drawRectangle(Matrix *matrix, rectangle rec);
