@@ -185,18 +185,22 @@ void matrixToGrey(SDL_Surface *surface, Matrix *matrix) {
 }
 
 //Put the lines in a dynamic array.
-dyn_arr getLines(Matrix *matrix) {
-	int cols = matrix->cols;
-    	int rows = matrix->rows;
+dyn_arr getLines(Matrix *matrix, rectangle bloc) {
+	point c = bloc.c;
+	point b = bloc.b;
+	size_t cx = c.x;
+	size_t cy = c.y;
+	size_t bx = b.x;
+	size_t by = b.y;
 	int accu = 0;
 	//1) Stocks all the black pixels in a array.
    	dyn_arr array_lines;
     	array_lines.array = (int*) malloc(sizeof(int) * 2000);
     	array_lines.length = 0;
-	for (int i = 0; i < rows; i++) {
+	for (size_t i = by; i < cy; i++) {
 		int is_empty = 0;
-		int j = 0;
-		while (is_empty == 0 && j < cols) {
+		size_t j = cx;
+		while (is_empty == 0 && j < bx) {
 			float pixel_color = matrixGet(matrix, i, j);
 			if (pixel_color != 1)
 				is_empty--;
@@ -208,6 +212,7 @@ dyn_arr getLines(Matrix *matrix) {
 			accu++;
 		}
 	}
+
 	//2)On this array, we take only the pixels that are far away from one another.
 	dyn_arr array_lines2;
     	array_lines2.array = (int*) malloc(sizeof(int) * 500);
@@ -241,46 +246,6 @@ void drawLines(Matrix *matrix, dyn_arr arraylines) {
         }
     }
     free(arraylines.array);
-}
-
-//Stores the characters in a dynamic array.
-dyn_arr getCaracters(Matrix *matrix, int top, int down) {
-	int cols = matrix->cols;
-	int accu = 0;
-   	dyn_arr array_lines;
-    	array_lines.array = (int*) malloc(sizeof(int) * 2000);
-    	array_lines.length = 0;
-	for (int j = 0; j < cols; j++) {
-		int is_empty = 0;
-		int i = top;
-		while (is_empty == 0 && i < down) {
-			float pixel_color = matrixGet(matrix, i, j);
-			if (pixel_color != 1)
-				is_empty = -1;
-			i++;
-		}
-		if (is_empty == -1) {
-			array_lines.array[accu] = j;
-			array_lines.length++;
-			accu++;
-		}
-	}
-	dyn_arr array_lines2;
-    	array_lines2.array = (int*)malloc(sizeof(int) * 500);
-	array_lines2.length = 0;
-	accu = 0;
-	//We add a number if two pixels are far from one another.
-	for (int j = 1; j < array_lines.length - 1; j++) {
-		if (array_lines.array[j - 1] != array_lines.array[j] - 1) {
-			array_lines2.array[accu] = array_lines.array[j - 1] + 1;
-			accu++;
-			array_lines2.array[accu] = array_lines.array[j] - 1;
-			accu++;
-		}
-	}
-	array_lines2.length = accu;
-	free(array_lines.array);
-	return array_lines2;
 }
 
 //Separates the characters on the image.
@@ -367,16 +332,17 @@ void horizontalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *a
 	size_t by = b.y;
 	size_t cy = c.y;
 	size_t cx = c.x;
-	//On parcourt toute la colonne à la recherche d'une ligne blanche
+	//We search all the colomn looking for a blank line.
 	size_t i = by;
-	//accu représente le nombre de colonnes bonnes.
+	//accu represents the number of correct colomns.
 	size_t accu = 0;
-	//begin est un boolean qui indique si on a deja passé un pixel noir.
+	//begin is a boolean which indicates if we habe already find a black pixel.
+	//1) Search a black pixel.
 	short begin = 0;
 	while (begin != 1 && i < cy) {
 		size_t j = cx;
 		while (begin != 1 && j < bx) {
-			//Si on a trouvé un pixel noir.
+			//If we find a black pixel.
 			if (matrixGet(matrix, i, j) != 1) {
 				begin++;
 			}
@@ -384,33 +350,34 @@ void horizontalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *a
 		}
 		i++;
 	}
+	//2) Go in depth to see if we can split.
 	while (begin != 0 && i < cy && accu < threshold) {
-		//Avant de commencer on cherche un pixel noir.
-		//clean est un boolean correspondant si la ligne est vide ou non
+		//clean is a boolean to know if a line is blank or not.
 		short clean = 1;
 		size_t j = cx;
-		//Si elle est vide on continue jusqu'à threshold
+		//If it is we continue until threshold.
 		while (clean != 0 && j < bx) {
-			//Si elle ne l'est pas on recommence sur les lignes d'après
+			//If it isn't we restart on the following lines.
 			if (matrixGet(matrix, i, j) != 1) {
 				clean--;
 				accu = 0;
 			}
 			j++;
 		}
-		if (j == bx) {//bx
+		if (j == bx) {
 			accu++;
 		} 
 		i++;
 	}
-	//Si on est arrivé jusqu'à threshold, on découpe en deux le bloc et on relance le découpage sur les deux
+	//3) Split the blocs and do the recursion.
+	//If we arrive at threshold, we split in half the bloc and restart the slicing on both.
 	if (accu == threshold && i != 1) {
 		rectangle up = {b, {cx, i - 1}};
 		rectangle down = {{bx, i}, c};
 		horizontalCut(matrix, up, threshold, arr, 0);
 		horizontalCut(matrix, down, threshold, arr, 0);
 	}
-	//Si on peut pas le découper, on lance juste le verticalCut dessus
+	//If we cannot split, we execute verticalCut on it.
 	else if (accu != 0) {
 		if (krisbool != 0) {
 			arr->array[arr->length] = bloc;
@@ -430,6 +397,7 @@ void verticalCut(Matrix *matrix, rectangle bloc, size_t threshold, rect_arr *arr
 	size_t cx = c.x;
 	size_t cy = c.y;
 	//We search all the vertical line looking for a blank horizontal line.
+	//On parcourt toute la ligne à la recherche d'une ligne blanche
 	size_t i = cx;
 	//accu represents the number of correct colomns.
 	size_t accu = 0;
@@ -528,3 +496,40 @@ Matrix *rotation(Matrix *matrix, double angle) {
 	}
 	return result;
 }
+
+/*double angleDetection(Matrix *matrix) {
+	size_t rows = matrix->rows;
+	size_t cols = matrix->cols;
+	size_t dmax = sqrt(rows * rows + cols * cols);
+	int t[dmax][90];
+
+	for (double d = 0; d < dmax; d += 0.1) {
+		for (double theta = 0; theta < 90; theta += 0.2) {
+			t[d][theta] = 0;
+		}
+	}
+
+	for (size_t x = 0; x < cols; x++) {
+		for (size_t y = 0; y < rows; y++) {
+			if (matrixGet(matrix, y, x) == 0) {
+				for (double theta = 0.0; theta < 90.0; theta += 0.2) {
+					int d = y * sin(theta) + x * cos(theta);
+					t[d, theta]++;
+				}
+			}
+		}
+	}
+
+	int votemax = 0;
+	double theta1 = 0.0;
+	for (double d = 0; d < dmax; d++) {
+		for (theta = 0; theta < 90; theta++) {
+			if (t[d][theta] >= votemax) {
+				votemax = t[d][theta];
+				theta1 = theta;	
+			} 
+		}
+	}
+	return theta1;
+	return 90.0;
+}*/
