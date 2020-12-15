@@ -466,7 +466,7 @@ int gui_image_validation(SDL_Window *ecran,SDL_Surface *texte,TTF_Font *police,
     SDL_Delay(700);
     SDL_Renderer* ren;
     SDL_Window *picture = SDL_CreateWindow("OCR - Picture",
-                                           0,0,r.w,r.h,SDL_WINDOW_SHOWN);
+                                           0,0,500,500,SDL_WINDOW_SHOWN);
     ren = SDL_CreateRenderer(picture,-1,SDL_RENDERER_ACCELERATED);
     SDL_Texture *texImage = SDL_CreateTextureFromSurface(ren,surImage);
     SDL_RenderCopy(ren, texImage, NULL, NULL);

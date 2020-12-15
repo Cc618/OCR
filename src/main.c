@@ -213,7 +213,7 @@ int imgMain() {
 static const size_t dispFreq = 5;
 static const float learningRate = 1e-3;
 static const unsigned int batchSize = 200;
-static const size_t epochs = 75;
+static const size_t epochs = 15;
 static const float momentum = .1f;
 
 static void trainCallback(size_t epoch, size_t batch, float loss) {
