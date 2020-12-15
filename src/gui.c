@@ -449,14 +449,18 @@ int gui_angle(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,
 int gui_image_validation(SDL_Window *ecran,SDL_Surface *texte,TTF_Font *police,
                          SDL_Surface *pSurf, SDL_Surface *surImage)
 {
+    // TODO
+    return 6;
+
+
     SDL_Rect r;
     r.x=0; r.y=0; r.w=surImage->w; r.h=surImage->h;
     int winh=900; int winw = 900;
     float d=0.0f;
     if (r.w>winw)
-        d = winw/r.w;
+        d = (float)winw/ (float)r.w;
     if (r.h>winh)
-        d=winh/r.h;
+        d=(float)winh/(float)r.h;
     if (d)
     {
         r.w*=d;
@@ -464,14 +468,23 @@ int gui_image_validation(SDL_Window *ecran,SDL_Surface *texte,TTF_Font *police,
     }
     int now=0;
     SDL_Delay(700);
+    puts("img valid 1");
+
     SDL_Renderer* ren;
+    // SDL_Window *picture = SDL_CreateWindow("OCR - Picture",
+    //                                        0,0,r.w,r.h,SDL_WINDOW_SHOWN);
     SDL_Window *picture = SDL_CreateWindow("OCR - Picture",
                                            0,0,r.w,r.h,SDL_WINDOW_SHOWN);
+    puts("img valid A");
+    printf("%p\n", picture);
     ren = SDL_CreateRenderer(picture,-1,SDL_RENDERER_ACCELERATED);
+    puts("img valid B");
     SDL_Texture *texImage = SDL_CreateTextureFromSurface(ren,surImage);
+    puts("img valid 2");
     SDL_RenderCopy(ren, texImage, NULL, NULL);
     SDL_RenderPresent(ren);
     SDL_Event event;
+    puts("img valid 3");
     char continuer = 1;
     int choix = 0;
     while (continuer==1)
@@ -552,6 +565,7 @@ int gui(Network *net, Dataset *dataset)
             break;
         case 4:
             surImage = SDL_LoadBMP(adresse);
+            puts("Page 4");
             if (!surImage)
             {
                 page= gui_error_loading(ecran,texte,police,pSurf);
@@ -565,6 +579,7 @@ int gui(Network *net, Dataset *dataset)
             page = gui_analysis(angle, ecran,texte,police,pSurf,surImage);
             break;
         case 6:
+            puts("Page 6");
             angle = gui_angle(ecran,texte,police,pSurf);
             page = 5;
             if (angle == -2) {

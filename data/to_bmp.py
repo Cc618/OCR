@@ -87,9 +87,10 @@ def bounds2(im, y, w, h):
                     box[2] = max(box[2], j)
                     box[3] = max(box[3], i)
 
-    pad = 2
+    # pad = randint(2, 3)
+    pad = 3
     dx = 0 # randint(0, pad // 2)
-    dy = randint(-pad // 2, pad // 2)
+    dy = 0 # randint(-pad, pad)
 
     box[0] = max(0, box[0] - pad) + dx
     box[1] += y - pad + dy
@@ -140,7 +141,7 @@ for impath in impaths:
 
         char = im.crop(box)
 
-        dstretch = randint(-2, 4)
+        dstretch = 0 # randint(-2, 4)
 
         w = box[2] - box[0]
         h = box[3] - box[1]

@@ -82,3 +82,9 @@ Some requirements are necessary, use this command to install :
 ```sh
 python -m pip install -r requirements.txt
 ```
+
+You also have to enable execution of the main script
+
+```sh
+chmod +x data/generate.sh
+```

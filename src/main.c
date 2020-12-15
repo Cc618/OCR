@@ -25,8 +25,9 @@
 Network *buildNetwork(size_t nClasses);
 
 #define SESSION "1"
-#define NET_DIR "weights/"
-#define NET_PATH (NET_DIR SESSION "/")
+#define NET_DIR "model/"
+// For training mode : #define NET_PATH (NET_DIR SESSION "/")
+#define NET_PATH (NET_DIR)
 #define DATA_PATH "data/dataset_bmp"
 
 int imgMain() {
@@ -212,8 +213,8 @@ int imgMain() {
 // Hyper parameters
 static const size_t dispFreq = 5;
 static const float learningRate = 1e-3;
-static const unsigned int batchSize = 200;
-static const size_t epochs = 75;
+static const unsigned int batchSize = 100;
+static const size_t epochs = 30;
 static const float momentum = .1f;
 
 static void trainCallback(size_t epoch, size_t batch, float loss) {
@@ -224,9 +225,9 @@ static void trainCallback(size_t epoch, size_t batch, float loss) {
 // Builds the network used in the OCR
 Network *buildNetwork(size_t nClasses) {
     Layer *layers[] = {
-            denseNew(32 * 32, 256),
+            denseNew(32 * 32, 128),
             sigmoidNew(),
-            denseNew(256, 128),
+            denseNew(128, 128),
             sigmoidNew(),
             denseNew(128, nClasses),
             softmaxNew(),
