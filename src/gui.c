@@ -16,6 +16,7 @@ static Dataset *guiDataset;
 
 #define COL_BLACK ((SDL_Color){0,0,0, 255})
 #define COL_RED ((SDL_Color){230,50,30, 255})
+#define COL_GREEN ((SDL_Color){120, 230, 150})
 #define COL_BG 230, 240, 255
 #define COL_TEXTBG 220, 250, 180
 
@@ -186,7 +187,7 @@ int gui_image_validation(char *path)
 
     free(cmd);
 
-    return 5;
+    return 6;
 }
 
 int gui_credits(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf)
@@ -344,6 +345,100 @@ int gui_select_image(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_
     return 0;
 }
 
+int gui_angle(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,SDL_Surface *pSurf)
+{
+    SDL_Event event;
+    int a=0;
+    int finalchoix=0;
+    char* angle = (char*)malloc(sizeof(char)*4);
+    angle[1]=' ';
+    angle[3]=0;
+    char continuer = 1;
+    int choix = 0;
+    while (continuer==1)
+    {
+        SDL_WaitEvent(&event);
+        if(event.type==SDL_QUIT)
+        {
+            continuer = 0;
+        }
+        if (event.type == SDL_KEYDOWN)
+        {
+            switch(event.key.keysym.sym)
+            {
+                case SDLK_UP:
+                    if (choix<3)
+                    {
+                        choix = (choix+2)%3;
+                    }
+                    if (choix==3 && a<81)
+                        a+=10;
+                    if (choix==4 && a<90)
+                        a+=1;
+                    break;
+                case SDLK_DOWN:
+                    if (choix<3)
+                    {
+                        choix = (choix+1)%3;
+                    }
+                    if (choix==3 && a>9)
+                        a-=10;
+                    if (choix==4 && a>0)
+                        a-=1;
+                    break;
+                case SDLK_RIGHT:
+                    if (choix==3)
+                        choix+=1;
+                    break;
+                case SDLK_LEFT:
+                    if (choix==4)
+                        choix-=1;
+                    break;
+                case SDLK_RETURN:
+                    if (choix==2)
+                        continuer=2;
+                    if (choix==1)
+                    {
+                        finalchoix=1;
+                        choix=3;
+                    }
+                    else
+                    {
+                        if (choix>2)
+                            choix=1;
+                        if (choix==0)
+                            finalchoix=0;
+                    }
+                    break;
+            }
+        }
+        SDL_FillRect(pSurf, NULL, SDL_MapRGB(pSurf->format, COL_BG));
+        angle[0]=48+a/10;
+        angle[2]=48+a%10;
+        print_text("Choose the angle to rotate the image",
+                ecran,texte,0,0,police, pSurf, COL_BLACK);
+        print_text("Let the software choose",
+                ecran,texte,70,100,police, pSurf, COL_BLACK);
+        print_text(angle,ecran,texte,409,200,
+                police, pSurf, COL_GREEN);
+        print_text("Type your angle :       (use arrows)",
+                ecran,texte,70,200,police, pSurf, COL_BLACK);
+        print_text("Confirm",ecran,texte,70,300,police, pSurf, COL_BLACK);
+        if (choix<3)
+            print_text(">",ecran,texte,0,100+choix*100,police, pSurf, COL_BLACK);
+
+        print_text("*",ecran,texte,40,100+finalchoix*100,police, pSurf, COL_BLACK);
+
+        SDL_UpdateWindowSurface(ecran);
+        SDL_Delay(10);
+    }
+    if (!continuer)
+        return -2;
+    if (finalchoix==0)
+        return -1;
+    return a;
+}
+
 int gui(Network *net, Dataset *dataset)
 {
     guiNet = net;
@@ -362,6 +457,7 @@ int gui(Network *net, Dataset *dataset)
     police = TTF_OpenFont("res/Roboto-Regular.ttf", 44);
     printf("police : %d",police==NULL);
     int page = 1;
+    int angle = 0;
     while (page)
     {
         switch(page)
@@ -389,11 +485,18 @@ int gui(Network *net, Dataset *dataset)
 
                 SDL_UpdateWindowSurface(ecran);
                 SDL_Delay(1000);
-                page= gui_image_validation(adresse);
+                page = gui_image_validation(adresse);
             }
             break;
         case 5:
             page = gui_analysis(ecran,texte,police,pSurf,surImage);
+            break;
+        case 6:
+            angle = gui_angle(ecran,texte,police,pSurf);
+            page = 5;
+            if (angle == -2) {
+                page = 0;
+            }
             break;
         }
     }
