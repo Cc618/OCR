@@ -441,6 +441,7 @@ int gui_angle(SDL_Window *ecran,SDL_Surface *texte, TTF_Font *police,
         SDL_UpdateWindowSurface(ecran);
         SDL_Delay(10);
     }
+    free(angle);
     if (!continuer)
         return -2;
     if (finalchoix==0)
@@ -540,6 +541,7 @@ int gui(Network *net, Dataset *dataset)
     int angle = 0;
     while (page)
     {
+        printf("page = %d\n", page);
         switch(page)
         {
         case 1:
@@ -563,7 +565,7 @@ int gui(Network *net, Dataset *dataset)
             }
             break;
         case 5:
-            page = gui_analysis(ecran,texte,police,pSurf,surImage, angle);
+            page = gui_analysis(angle, ecran,texte,police,pSurf,surImage);
             break;
         case 6:
             angle = gui_angle(ecran,texte,police,pSurf);

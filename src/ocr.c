@@ -19,7 +19,12 @@
 #define SPACE_TEMPERATURE 1
 #define GAP(i) ((int)boxes[i + 1]->b.x - (int)boxes[i]->c.x)
 
-char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset, int angle) {
+char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset, int argangle) {
+    char cpu_angle = argangle == -1;
+    double angle = argangle;
+
+    printf("angle = %f, cpu_angle = %d\n", angle, cpu_angle);
+
     // TODO : Steve : Implementer angle
     //Matrixes Initialisation
     //Gommage
@@ -53,6 +58,23 @@ char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset, int angle) {
     Matrix *inter = convolution(matrix, convo);
     Matrix *result = convolution(matrix, convo2);
     matrixToBinary(result);
+
+
+
+
+    //Angle detection
+    if (cpu_angle != 0) {
+        angle = angleDetection(matrix);
+    }
+
+    //Rotation
+    if (angle != 0.0) {
+        Matrix *test = rotation(matrix, angle);
+        matrix = matrixCopy(test);
+    }
+
+
+
 
     //Block analysis
     /*rectangle bloc = {{result->cols - 1, 0}, {0, result->rows - 1}};
@@ -134,10 +156,8 @@ char *ocr(SDL_Surface *sur, Network *net, Dataset *dataset, int angle) {
     }
 
     text[textLen] = 0;
-    printf("Text (%zu) : %s\n", strlen(text), text);
 
     //Matrix Freedom
-    // TODO : matrixToGrey(sur, result);
     matrixFree(matrix);
     matrixFree(convo);
     matrixFree(convo2);
