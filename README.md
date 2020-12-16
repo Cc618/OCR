@@ -1,8 +1,13 @@
-# OCR by Iron Minds
+# OCR - By Iron Minds
+
 An Optical Character Recognition app made in C with SDL2.
 
 Contains a GUI and a CLI to train the neural network or to
-generate thea dataset.
+generate the dataset.
+
+![](readme/menu.png)
+![](readme/pic.png)
+![](readme/result.png)
 
 ## Usage
 ### Build
